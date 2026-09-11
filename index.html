@@ -23,6 +23,7 @@
         }
     </script>
 
+    <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -55,6 +56,7 @@
         #toast.show { visibility: visible; bottom: max(90px, calc(50px + env(safe-area-inset-bottom))); opacity: 1; }
         #toast.success { background-color: #38a169; color: #fff; }
         #toast.error { background-color: #e53e3e; color: #fff; }
+        #toast.info { background-color: #3182ce; color: #fff; }
 
         .nav-item.active { background-color: #f5f3f7; color: #3a1a5b; border-right: 3px solid #3a1a5b; font-weight: 700; }
         @media (max-width: 1280px) { 
@@ -84,14 +86,14 @@
                 <svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                 <div class="text-[11px] text-amber-700 font-medium">
                     <strong class="block text-xs font-bold text-amber-800">System Sync Pending</strong>
-                    The daily master data has not been uploaded yet. Please contact your administrator.
+                    The daily master data has not been uploaded to the global server yet. Please contact your administrator.
                 </div>
             </div>
 
             <div class="space-y-4">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1 ml-1">IMD Code</label>
-                    <input type="text" id="loginIMD" placeholder="e.g. IMD12345" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sbi-purple focus:ring-1 focus:ring-sbi-purple font-semibold text-slate-800 uppercase transition-all">
+                    <input type="text" id="loginIMD" placeholder="e.g. IMD12345" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sbi-purple focus:ring-1 focus:ring-sbi-purple font-semibold text-slate-800 uppercase transition-all" autocomplete="off">
                 </div>
                 <div id="loginError" class="text-sbi-red text-xs font-bold text-center hidden">Invalid IMD Code. Please try again.</div>
                 <button id="loginBtn" onclick="loginAgent()" class="w-full bg-sbi-purple text-white font-bold py-3.5 rounded-xl transition-all shadow-lg hover:opacity-90 flex justify-center items-center gap-2 btn">
@@ -138,22 +140,22 @@
         </header>
         
         <div class="flex-none bg-white border-b border-slate-200 px-4 md:px-8 flex gap-4 overflow-x-auto">
-            <button class="admin-tab-btn text-slate-500 border-transparent font-bold text-sm py-4 border-b-2 hover:text-sbi-purple transition-colors whitespace-nowrap" onclick="switchAdminTab('data', this)">Data Management</button>
-            <button class="admin-tab-btn active text-sbi-purple border-sbi-purple font-bold text-sm py-4 border-b-2 hover:text-sbi-purple transition-colors whitespace-nowrap" onclick="switchAdminTab('controls', this); fetchAdminMeetings();">Session Controls</button>
+            <button class="admin-tab-btn active text-sbi-purple border-sbi-purple font-bold text-sm py-4 border-b-2 hover:text-sbi-purple transition-colors whitespace-nowrap" onclick="switchAdminTab('data', this)">Data Management</button>
+            <button class="admin-tab-btn text-slate-500 border-transparent font-bold text-sm py-4 border-b-2 hover:text-sbi-purple transition-colors whitespace-nowrap" onclick="switchAdminTab('controls', this); fetchAdminMeetings();">Session Controls</button>
             <button class="admin-tab-btn text-slate-500 border-transparent font-bold text-sm py-4 border-b-2 hover:text-sbi-purple transition-colors whitespace-nowrap" onclick="switchAdminTab('live', this); fetchLiveReport();">Live Report</button>
             <button class="admin-tab-btn text-slate-500 border-transparent font-bold text-sm py-4 border-b-2 hover:text-sbi-purple transition-colors whitespace-nowrap" onclick="switchAdminTab('history', this)">Report History</button>
         </div>
 
         <main class="flex-1 overflow-y-auto p-4 md:p-8 max-w-5xl mx-auto w-full pb-12">
             
-            <!-- NEW Admin Tab: Data Management -->
-            <div id="admin-tab-data" class="admin-tab-content hidden fade-in">
+            <!-- Admin Tab: Data Management -->
+            <div id="admin-tab-data" class="admin-tab-content block fade-in">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-6 text-center max-w-3xl mx-auto">
                     <div class="bg-purple-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 text-sbi-purple">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                     </div>
                     <h2 class="text-xl font-black text-slate-800 mb-2 tracking-tight">Upload Daily Master Data</h2>
-                    <p class="text-slate-500 text-xs mb-8 max-w-lg mx-auto leading-relaxed">Upload the latest `.xlsx` data file directly into the system. This bypasses the need for GitHub commits and securely stores the data inside the local environment for fast processing.</p>
+                    <p class="text-slate-500 text-xs mb-8 max-w-lg mx-auto leading-relaxed">Upload the latest `.xlsx` data file directly to the central global server. All agents will automatically sync this data on their next login.</p>
                     
                     <input type="file" id="admin-file-upload" accept=".xlsx, .xls" class="hidden" onchange="handleAdminFileUpload(event)">
                     
@@ -167,15 +169,15 @@
 
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex justify-between items-center max-w-3xl mx-auto">
                     <div>
-                        <h4 class="text-sm font-bold text-slate-800">Current System Data</h4>
+                        <h4 class="text-sm font-bold text-slate-800">Current Local Cache Status</h4>
                         <p class="text-xs text-slate-500 mt-1 font-medium" id="data-status-text">Checking environment...</p>
                     </div>
-                    <button onclick="clearSystemData()" class="bg-rose-50 text-sbi-red hover:bg-rose-100 px-4 py-2 rounded-lg text-xs font-bold border border-rose-100 transition-colors">Clear Local Data</button>
+                    <button onclick="clearSystemData()" class="bg-rose-50 text-sbi-red hover:bg-rose-100 px-4 py-2 rounded-lg text-xs font-bold border border-rose-100 transition-colors">Clear Local Cache</button>
                 </div>
             </div>
 
             <!-- Admin Tab: Controls -->
-            <div id="admin-tab-controls" class="admin-tab-content block fade-in">
+            <div id="admin-tab-controls" class="admin-tab-content hidden fade-in">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 mb-6">
                     <h3 class="text-sm font-bold text-slate-800 mb-3 uppercase tracking-wider">Open New Meeting</h3>
                     <div class="flex flex-col sm:flex-row gap-3">
@@ -226,7 +228,7 @@
         </main>
     </div>
 
-    <!-- MAIN PORTAL LAYOUT (Agent View) - Remains identical structurally -->
+    <!-- MAIN PORTAL LAYOUT (Agent View) -->
     <div id="portal-layout" class="hidden w-full h-full flex-col xl:flex-row">
         <!-- Header (Mobile) -->
         <header class="xl:hidden flex-none h-16 bg-white border-b border-slate-200 flex justify-between items-center z-40 px-4 shrink-0 shadow-sm w-full">
@@ -521,9 +523,10 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxKwF13TVYU5BcA4sHdOJMWe8Mf9L_Jpn-ltc6FPQjKS2_ntkiCA1o_wQktk4Al_gb2/exec';
+        // NEW WEB APP URL INTEGRATED
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx5KoUmyZTilovsZ6HlAr2lN_8mjfiFXKzK7Lf7JgLWVG5aG_MDyZS3XdT-ttx1K2gQ4Q/exec';
         
-        // Setup IndexedDB Config
+        // Setup IndexedDB Config (Acts purely as a high-speed cache)
         const DB_NAME = "SBIMasterDB";
         const DB_STORE = "DataStore";
 
@@ -544,6 +547,7 @@
         let rawData = [];
         let renewalChartInstance = null;
         let agentCountdownIntervals = [];
+        let currentDataVersion = 0;
         
         let state = { 
             mainModule: 'attendance', 
@@ -553,7 +557,7 @@
             agentData: [] 
         };
 
-        // --- LOCAL INDEXEDDB STORAGE SYSTEM ---
+        // --- LOCAL INDEXEDDB STORAGE SYSTEM (CACHE) ---
         function openLocalDB() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open(DB_NAME, 1);
@@ -586,7 +590,7 @@
 
         // --- INACTIVITY LOGOUT LOGIC ---
         let inactivityTimer;
-        const INACTIVITY_LIMIT = 5 * 60 * 1000;
+        const INACTIVITY_LIMIT = 5 * 60 * 1000; // 5 mins
 
         function resetInactivityTimer() {
             clearTimeout(inactivityTimer);
@@ -611,22 +615,7 @@
             document.getElementById('mtdMonthPicker').value = `${y}-${m}`;
             document.getElementById('historyDate').value = `${y}-${m}-${now.getDate().toString().padStart(2,'0')}`;
             
-            // Try to load data natively from local IndexedDB first (Admin Uploads)
-            try {
-                const localData = await loadFromDB("masterExcelData");
-                if (localData && localData.length > 0) {
-                    rawData = localData;
-                    populateYears();
-                    updateDataStatusText();
-                } else {
-                    // Fallback to local github file just in case it's a first load.
-                    await attemptFetchDefaultFile(); 
-                }
-            } catch (err) {
-                console.warn("No persistent data found.");
-            }
-            
-            checkAuth();
+            await syncGlobalData();
         };
 
         function showToast(msg, type = 'success') {
@@ -635,27 +624,61 @@
             setTimeout(() => { toast.className = toast.className.replace(`show ${type}`, ""); }, 4000);
         }
 
-        // Legacy Fallback for Github Hosting
-        async function attemptFetchDefaultFile() {
-            let basePath = window.location.pathname;
-            basePath = basePath.substring(0, basePath.lastIndexOf('/'));
-            if (basePath === '') basePath = '.';
-            const filePathsToTry = ['data.xlsx', 'Data.xlsx', './data.xlsx', basePath + '/data.xlsx'];
-            for(let path of filePathsToTry) {
-                try {
-                    let response = await fetch(path, { cache: 'no-store' });
-                    if (response.ok) {
-                        const arrayBuffer = await response.arrayBuffer();
-                        parseExcelData(arrayBuffer);
+        // --- SMART SYNC LOGIC ---
+        async function syncGlobalData() {
+            const warnEl = document.getElementById('no-data-warning');
+            const loginBtn = document.getElementById('loginBtn');
+            
+            try {
+                loginBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                loginBtn.innerHTML = `<span>Checking Sync...</span><div class="spinner !block"></div>`;
+
+                // 1. Load Local Cache Fast
+                const localData = await loadFromDB("masterExcelData");
+                const localVersion = await loadFromDB("dataVersion") || 0;
+                
+                if (localData && localData.length > 0) {
+                    rawData = localData;
+                    currentDataVersion = localVersion;
+                    populateYears();
+                }
+
+                // 2. Check Server for updates silently
+                const verRes = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'getDataVersion', payload: {} }) });
+                const verData = await verRes.json();
+                const serverVersion = verData.version || 0;
+
+                // 3. Download if server is newer
+                if (serverVersion > currentDataVersion || rawData.length === 0) {
+                    loginBtn.innerHTML = `<span>Downloading System Data...</span><div class="spinner !block"></div>`;
+                    
+                    const dataRes = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'getMasterData', payload: {} }) });
+                    const fullData = await dataRes.json();
+                    
+                    if (fullData && fullData.data && fullData.data.length > 0) {
+                        rawData = fullData.data;
+                        currentDataVersion = serverVersion;
+                        await saveToDB("masterExcelData", rawData);
+                        await saveToDB("dataVersion", currentDataVersion);
                         populateYears();
-                        updateDataStatusText();
-                        return; 
+                        showToast("System Synced Successfully", "success");
                     }
-                } catch(e) {}
+                }
+                
+                updateDataStatusText();
+            } catch (err) {
+                console.error("Sync Failed:", err);
+                if (rawData.length > 0) {
+                    showToast("Offline Mode: Using cached data", "info");
+                }
+            } finally {
+                loginBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                loginBtn.innerHTML = `<span>Secure Login</span><div class="spinner"></div>`;
+                checkAuth();
             }
         }
 
-        // --- ADMIN DATA UPLOAD LOGIC ---
+        // --- ADMIN DATA UPLOAD LOGIC (SEND TO BACKEND) ---
         function handleAdminFileUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -667,28 +690,41 @@
             btn.classList.add('opacity-75', 'cursor-not-allowed');
             spinner.classList.remove('!hidden');
             status.className = "mt-4 text-xs font-bold text-slate-500 block bg-slate-50 p-3 rounded-lg border border-slate-200 max-w-sm mx-auto";
-            status.innerText = "Processing Excel Data... Please hold.";
+            status.innerText = "Parsing and uploading to server... Please hold.";
 
             const reader = new FileReader();
             reader.onload = (e) => {
                 setTimeout(async () => {
                     try {
-                        parseExcelData(e.target.result);
-                        populateYears();
+                        // 1. Parse locally
+                        const newRawData = parseExcelData(e.target.result);
                         
-                        // Save Data locally without Github Commits
+                        // 2. Send to Backend
+                        const response = await fetch(WEB_APP_URL, { 
+                            method: 'POST', 
+                            body: JSON.stringify({ action: 'uploadMasterData', payload: { data: newRawData } }) 
+                        });
+                        const resData = await response.json();
+
+                        if (resData.error) throw new Error(resData.message);
+
+                        // 3. Save to local cache now that server has it
+                        rawData = newRawData;
+                        currentDataVersion = resData.version;
                         await saveToDB("masterExcelData", rawData);
+                        await saveToDB("dataVersion", currentDataVersion);
+                        
+                        populateYears();
                         updateDataStatusText();
                         
                         status.className = "mt-4 text-xs font-bold text-green-700 block bg-green-50 p-3 rounded-lg border border-green-200 max-w-sm mx-auto";
-                        status.innerText = `Success! Stored ${rawData.length.toLocaleString()} policy records in the system.`;
+                        status.innerText = `Global Sync Complete! Stored ${rawData.length.toLocaleString()} policy records globally.`;
                         
-                        // If an agent is already loaded in state, re-process
                         if(state.agentProfile.imd) processAgentData();
                         
                     } catch(err) {
                         status.className = "mt-4 text-xs font-bold text-sbi-red block bg-rose-50 p-3 rounded-lg border border-rose-200 max-w-sm mx-auto";
-                        status.innerText = "Data Parsing Error: " + err.message;
+                        status.innerText = "Upload Error: " + err.message;
                     } finally {
                         btn.classList.remove('opacity-75', 'cursor-not-allowed');
                         spinner.classList.add('!hidden');
@@ -699,12 +735,14 @@
         }
 
         async function clearSystemData() {
-            if(!confirm("Are you sure you want to clear all policy data from this terminal?")) return;
+            if(!confirm("Are you sure you want to clear all policy data from this terminal? Note: This only clears your local cache, not the global server.")) return;
             await saveToDB("masterExcelData", []);
+            await saveToDB("dataVersion", 0);
             rawData = [];
             state.agentData = [];
+            currentDataVersion = 0;
             updateDataStatusText();
-            showToast("System data cleared.", "success");
+            showToast("Local data cache cleared.", "success");
         }
 
         function updateDataStatusText() {
@@ -712,7 +750,7 @@
             const warnEl = document.getElementById('no-data-warning');
             
             if (rawData.length > 0) {
-                if(el) el.innerHTML = `<span class="text-green-600 font-bold">System Online.</span> Tracking ${rawData.length.toLocaleString()} master records.`;
+                if(el) el.innerHTML = `<span class="text-green-600 font-bold">System Online.</span> Tracking ${rawData.length.toLocaleString()} master records globally.`;
                 if(warnEl) warnEl.classList.add('hidden');
             } else {
                 if(el) el.innerHTML = `<span class="text-sbi-red font-bold">Data Offline.</span> Please upload a master file.`;
@@ -722,7 +760,7 @@
 
         function parseExcelData(buffer) {
             const workbook = XLSX.read(buffer, { type: 'array' });
-            rawData = [];
+            let tempRaw = [];
             workbook.SheetNames.forEach(sheetName => {
                 const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: "" });
                 if (sheet.length > 0) {
@@ -731,9 +769,10 @@
                         for (let key in row) if (key) cleanRow[key.toString().trim()] = row[key];
                         return cleanRow;
                     });
-                    rawData = rawData.concat(cleanedSheet);
+                    tempRaw = tempRaw.concat(cleanedSheet);
                 }
             });
+            return tempRaw;
         }
 
         function processAgentData() {
@@ -778,7 +817,6 @@
         }
 
         async function loginAgent() {
-            // Block login if there is no data system-wide
             if (rawData.length === 0) {
                 showToast("System Pending Data. Contact Admin.", "error");
                 return;
@@ -793,24 +831,23 @@
             btn.classList.add('loading');
             
             try {
-                const response = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify({ action: 'validateAgent', payload: {imd} }) });
-                const agent = await response.json();
+                // Ensure local data has the agent.
+                const exactExcelName = findExactNameInExcel(imd);
                 
-                if(agent && !agent.error) {
-                    localStorage.setItem('agentIMD', agent.imd);
-                    localStorage.setItem('agentName', agent.name);
-                    const exactExcelName = findExactNameInExcel(agent.imd);
-                    if(exactExcelName) localStorage.setItem('agentName', exactExcelName);
-
+                // Also validate with backend if needed, but since we have data locally, we can authenticate directly via local cache for speed.
+                if(exactExcelName) {
+                    localStorage.setItem('agentIMD', imd);
+                    localStorage.setItem('agentName', exactExcelName);
                     btn.classList.remove('loading');
                     checkAuth();
                 } else {
                     btn.classList.remove('loading');
+                    err.innerText = "IMD Code not found in Master Data.";
                     err.classList.remove('hidden');
                 }
             } catch (e) {
                 btn.classList.remove('loading');
-                showToast("Network Error during Login", "error");
+                showToast("Error during Login", "error");
             }
         }
 
