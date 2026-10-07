@@ -30,15 +30,9 @@
         .logo-container:active { transform: scale(0.95); }
         .logo-container img { height: 35px; object-fit: contain; }
 
-        /* --- APP LIKE ANIMATIONS --- */
-        .view-section { 
-            display: none; flex: 1; width: 100%; max-width: 1200px; margin: 0 auto; 
-            padding: 1.5rem; box-sizing: border-box; overflow-y: auto;
-        }
-        .view-section.active-view { 
-            display: block; 
-            animation: slideInRight 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) forwards; 
-        }
+        /* APP LIKE ANIMATIONS */
+        .view-section { display: none; flex: 1; width: 100%; max-width: 1200px; margin: 0 auto; padding: 1.5rem; box-sizing: border-box; overflow-y: auto; }
+        .view-section.active-view { display: block; animation: slideInRight 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) forwards; }
         @keyframes slideInRight { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -65,7 +59,6 @@
         .module-card:active { transform: scale(0.96); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .module-card:hover { border-color: var(--accent-orange); }
         .module-card:hover::before { transform: scaleX(1); }
-        
         .module-icon-svg { width: 42px; height: 42px; stroke: var(--accent-orange); fill: none; stroke-width: 1.5; margin-bottom: 0.8rem; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
         .module-card h3 { font-size: 1.05rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0; color: var(--text-main); font-weight: 700; pointer-events: none;}
         .module-card * { pointer-events: none; }
@@ -84,7 +77,6 @@
         input, select, textarea { background-color: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.9rem 1rem; border-radius: 8px; outline: none; transition: all 0.3s; font-size: 1rem; width: 100%; font-weight: 500; }
         input:focus, select:focus, textarea:focus { border-color: var(--accent-orange); background-color: var(--bg-panel); box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.1); }
         input[readonly] { background-color: #e9ecef; color: var(--text-muted); cursor: not-allowed; border-style: dashed; }
-        
         .pin-input { font-size: 2rem; letter-spacing: 0.5rem; text-align: center; padding: 1rem; background-color: var(--bg-main); color: var(--accent-orange); font-weight: 900; }
 
         .btn { padding: 1rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; transition: transform 0.1s; font-size: 0.95rem; display: inline-flex; justify-content: center; align-items: center; gap: 0.5rem; touch-action: manipulation; }
@@ -93,6 +85,7 @@
         .btn.secondary { background-color: transparent; border: 2px solid var(--text-muted); color: var(--text-muted); width: 100%; }
         .btn.danger { background-color: transparent; border: 2px solid var(--error-red); color: var(--error-red); width: 100%; }
         .btn.whatsapp { background-color: var(--success-green); color: #fff; width: 100%; justify-content: center;}
+        .btn.success { background-color: var(--success-green); color: #fff; width: 100%; justify-content: center; }
         
         .action-row { display: flex; gap: 1rem; margin-top: 2rem; }
         .action-row .btn { flex: 1; }
@@ -112,12 +105,6 @@
         #reAdmissionSection { background: var(--bg-main); padding: 1.2rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px dashed var(--accent-orange); display: none; }
         .val-group { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: stretch; margin-bottom: 0.5rem; width: 100%; }
 
-        .tariff-row { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; }
-        .tariff-month-name { font-weight: 800; color: var(--accent-orange); margin-bottom: 1rem; font-size: 1.1rem; text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
-        .tariff-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
-        
-        .promo-card { display:flex; justify-content:space-between; align-items:center; background:#fff5eb; border:1px solid #ffcc99; border-left:4px solid var(--accent-orange); padding:1rem; border-radius:6px; margin-bottom:10px; }
-        
         .fee-summary-box { background-color: var(--bg-main); border: 2px dashed var(--accent-orange); border-radius: 12px; padding: 2rem; margin-bottom: 2rem; font-size: 1.1rem; }
         .fee-row { display: flex; justify-content: space-between; margin-bottom: 1rem; align-items: center;}
         .fee-total { font-size: 1.4rem; color: var(--accent-orange); font-weight: 900; border-top: 1px solid var(--border-color); padding-top: 1rem; margin-top: 0.5rem;}
@@ -128,7 +115,6 @@
         .cal-month:hover { transform: scale(1.05); }
         .cal-month h4 { font-size: 0.9rem; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; color: #fff;}
         .cal-month p { font-size: 0.75rem; font-weight: bold; line-height: 1.4; margin: 0; }
-        
         .status-paid { background: var(--success-green); border-color: #1b9f4a; }
         .status-partial { background: var(--warning-yellow); border-color: #c87f0a; color: #000; }
         .status-unpaid { background: var(--error-red); border-color: #a72424; }
@@ -141,12 +127,6 @@
         .contact-action-btn { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: var(--bg-panel); border: 1px solid var(--border-color); margin-left: 6px; cursor: pointer; text-decoration: none; transition: transform 0.2s; }
         .contact-action-btn:hover { transform: scale(1.1); }
 
-        .report-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .kpi-card { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 8px; padding: 1.5rem 1rem; text-align: center; border-bottom: 3px solid var(--accent-orange); }
-        .kpi-card h4 { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 0.5rem; white-space: nowrap;}
-        .kpi-card .val { font-size: 1.8rem; font-weight: 900; color: var(--text-main); }
-        .kpi-card .sub-val { font-size: 0.8rem; color: var(--success-green); font-weight: 600; margin-top: 5px; display: block; }
-        
         .table-responsive { overflow-x: auto; background: var(--bg-panel); border-radius: 8px; border: 1px solid var(--border-color); }
         .data-table { width: 100%; border-collapse: collapse; min-width: 600px; font-size: 0.9rem; }
         .data-table th, .data-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
@@ -231,6 +211,11 @@
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                     <h3>Daily Attendance</h3>
                 </div>
+                <!-- MOVED: SUPPLEMENT STORE MODULE NOW AFTER ATTENDANCE -->
+                <div class="module-card" onclick="window.storeContext.openStoreLogin()">
+                    <svg class="module-icon-svg" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                    <h3>Supplement Store</h3>
+                </div>
                 <div class="module-card" onclick="window.appContext.openLogin('staff')">
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                     <h3>Staff Login</h3>
@@ -238,11 +223,6 @@
                 <div class="module-card" onclick="window.appContext.openLogin('admin')">
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                     <h3>Admin Login</h3>
-                </div>
-                <!-- NEW SUPPLEMENT STORE MODULE -->
-                <div class="module-card" onclick="window.storeContext.openStoreLogin()">
-                    <svg class="module-icon-svg" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                    <h3>Supplement Store</h3>
                 </div>
             </div>
         </main>
@@ -497,7 +477,6 @@
                         <div class="kpi-card"><h4>Total Expenses</h4><div class="val" style="color:var(--error-red);">₹<span id="kpi-exp-total">0</span></div></div>
                         <div class="kpi-card"><h4>Net Profit (P&L)</h4><div class="val" id="kpi-pnl-total">₹0</div></div>
                     </div>
-                    <!-- Simplified table output for reports (matches original logic) -->
                     <div class="table-responsive"><table class="data-table" id="table-fees"><thead><tr><th>Paid On</th><th>ID & Name</th><th>Month</th><th>Amount</th><th>Method</th></tr></thead><tbody></tbody></table></div>
                 </div>
             </div>
@@ -508,16 +487,19 @@
         <main id="view-pin-editor" class="view-section"><div class="form-layout"><div class="module-toolbar"><button class="back-btn" onclick="appContext.goHome()">Back</button><h2 class="module-title">PIN Settings</h2></div><div class="form-row"><div class="form-group"><label>Admin PIN</label><input type="password" id="admin-admin-pin" required></div></div><div class="action-row"><button type="button" onclick="moduleContext.savePins()" class="btn primary">Save</button></div></div></main>
         
         <main id="view-staff-editor" class="view-section">
-            <div class="form-layout">
+            <div class="form-layout" style="max-width: 600px;">
                 <div class="module-toolbar"><button class="back-btn" onclick="appContext.goHome()">Back</button><h2 class="module-title">Staff Access Management</h2></div>
-                <form onsubmit="moduleContext.saveStaff(event); return false;">
+                <form id="staffForm" onsubmit="moduleContext.saveStaff(event); return false;">
                     <div class="form-row">
-                        <div class="form-group"><label>Staff Name</label><input type="text" id="staff-name" required></div>
-                        <div class="form-group"><label>Login PIN</label><input type="password" id="staff-pin" required></div>
+                        <div class="form-group"><label>Staff Name <span class="required">*</span></label><input type="text" id="staff-name" required></div>
+                        <div class="form-group"><label>Login PIN <span class="required">*</span></label><input type="password" id="staff-pin" required></div>
                     </div>
-                    <div class="action-row"><button type="submit" class="btn primary">+ Add Staff</button></div>
+                    <div class="action-row"><button type="submit" class="btn primary">+ Add Staff Member</button></div>
                 </form>
-                <div class="table-responsive" style="margin-top:1rem;"><table class="data-table" id="table-staff-list"><thead><tr><th>Staff Name</th><th>Login PIN</th><th>Action</th></tr></thead><tbody></tbody></table></div>
+                <div style="margin-top: 2rem; padding-top:1.5rem; border-top:1px solid var(--border-color);">
+                    <h3 style="color:var(--accent-orange); margin-bottom:1rem; font-size:1.1rem; text-transform:uppercase;">Active Staff Accounts</h3>
+                    <div class="table-responsive"><table class="data-table" id="table-staff-list"><thead><tr><th>Staff Name</th><th>Login PIN</th><th>Action</th></tr></thead><tbody></tbody></table></div>
+                </div>
             </div>
         </main>
 
@@ -530,7 +512,7 @@
             </div>
         </main>
 
-        <!-- FULL ADMISSION VIEW (3 Steps, Webcam, Signature) -->
+        <!-- FULL ADMISSION VIEW -->
         <main id="view-admission" class="view-section">
             <div class="form-layout">
                 <div class="module-toolbar"><button class="back-btn" onclick="appContext.goHome()" type="button" id="form-back-btn">Back</button><h2 class="module-title" id="form-main-title">Admission Registration</h2></div>
@@ -541,10 +523,11 @@
                             <div class="form-group"><label>Date of Admission <span class="required">*</span></label><input type="text" id="dateOfAdmission" placeholder="DD-MM-YYYY" required></div>
                             <div class="form-group"><label>Admission Type <span class="required">*</span></label><select id="admissionTypeSelect" required><option value="New Admission">New Admission</option><option value="Re-Admission">Re-Admission</option></select></div>
                         </div>
+                        <!-- READMISSION FIX -->
                         <div id="reAdmissionSection">
-                            <label style="color: var(--accent-orange);">Validate Previous Registration</label>
-                            <div class="val-group"><input type="tel" id="prevPhoneInput" placeholder="10-digit number"><button type="button" onclick="window.moduleContext.validateReadmission()" class="btn secondary">Validate</button></div>
-                            <div id="validationResultBox"></div>
+                            <label style="color: var(--accent-orange); margin-bottom: 0.8rem; display: block; font-weight: 800;">Validate Previous Registration</label>
+                            <div class="val-group"><input type="tel" id="prevPhoneInput" placeholder="10-digit number" pattern="\d{10}" maxlength="10"><button type="button" onclick="window.moduleContext.validateReadmission()" class="btn secondary">Validate</button></div>
+                            <div id="validationResultBox" style="display:none; font-size: 0.9rem; line-height: 1.5; padding: 1rem; background: var(--bg-panel); border-radius: 6px; border: 1px solid var(--border-color);"></div>
                         </div>
                         <div class="form-row">
                             <div class="form-group"><label>Admission Category</label><select id="admissionCategory" required><option value="Individual">Individual</option><option value="Family">Family</option></select></div>
@@ -688,7 +671,6 @@
         let userLocationStr = "Location details unavailable"; let currentMemberDetails = {}; let calculatedTotalFee = 0; let preAdmissionId = "";
         let currentActiveUser = null; let activePaymentConfig = null; let IS_EDIT_MODE = false; let currentHubMode = 'details';
 
-        // Helper logic preserved from your file
         function formatDateStr(isoStr) { if(!isoStr) return ''; const d = new Date(isoStr); return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`; }
         function calculateAgeFromDate(dateStr) { if(!dateStr || dateStr.length !== 10) return ''; const p = dateStr.split('-'); const dob = new Date(p[2], p[1]-1, p[0]); if (isNaN(dob.getTime())) return ''; const today = new Date(); let age = today.getFullYear() - dob.getFullYear(); const m = today.getMonth() - dob.getMonth(); if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) { age--; } return age >= 0 ? age : ''; }
 
@@ -699,7 +681,6 @@
                 document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
                 const target = document.getElementById(`view-${viewName}`);
                 if(target) { target.classList.add('active-view'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-                // Call initializers dynamically
                 if(viewName === 'tariff-editor') window.moduleContext.initTariffEditor();
                 if(viewName === 'staff-editor') window.moduleContext.initStaffEditor();
                 if(viewName === 'reports') window.moduleContext.initReports();
@@ -742,15 +723,110 @@
                 const sigC = document.getElementById('signature-pad'); if(sigC) sigC.getContext('2d').clearRect(0, 0, 450, 150);
                 document.getElementById('step-3').classList.remove('active-step'); document.getElementById('step-2').classList.remove('active-step'); document.getElementById('step-1').classList.add('active-step');
                 const today = new Date(); document.getElementById('dateOfAdmission').value = `${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth() + 1).padStart(2, '0')}-${today.getFullYear()}`;
+                
+                // Reset Readmission specific fields
+                document.getElementById('reAdmissionSection').style.display = 'none';
+                document.getElementById('validationResultBox').style.display = 'none';
+                document.getElementById('prevPhoneInput').value = '';
+                
                 window.appContext.switchView('admission');
             },
             closeModal: function() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); window.appContext.goHome(); }
         };
 
-        // --- ORIGINAL MODULE LOGIC (Adapted to LocalStoreMock) ---
+        // --- ORIGINAL MODULE LOGIC ---
         var moduleContext = {
-            // (Preserved exact functions: markAttendance, saveExpense, saveStaff, fetchUserHub, loadProfileByPhoneOrId, generateReport, renderFeeCalendar, confirmPayment, editUser, regeneratePdf, preparePdfDom, sendWelcomeMessage, validateReadmission)
-            
+            // FIXED 1: READMISSION VALIDATION (Now fully functional using LocalStoreMock)
+            validateReadmission: function() {
+                const phone = document.getElementById('prevPhoneInput').value; 
+                const resBox = document.getElementById('validationResultBox'); 
+                const admissionTypeSelect = document.getElementById('admissionTypeSelect');
+                if(phone.length !== 10) { resBox.style.display = 'block'; resBox.innerHTML = '<span style="color:var(--error-red);">Please enter a valid 10-digit number.</span>'; return; }
+                
+                let users = JSON.parse(LocalStoreMock.getItem('revive_users_db')) || []; 
+                let user = [...users].reverse().find(u => String(u.primaryContact) === String(phone));
+                resBox.style.display = 'block';
+                
+                if(user) {
+                    const parts = user.date.split('-'); const prevDate = new Date(parts[2], parts[1]-1, parts[0]);
+                    const currParts = document.getElementById('dateOfAdmission').value.split('-'); const currDate = new Date(currParts[2], currParts[1]-1, currParts[0]);
+                    
+                    let expiryDate = new Date(prevDate); expiryDate.setMonth(expiryDate.getMonth() + 6);
+                    
+                    let statusHtml = '';
+                    if (currDate > expiryDate) {
+                        statusHtml = '<span style="color:var(--error-red); font-weight:bold; font-size:1.1rem;">Status: NOT ELIGIBLE (> 6 Months)</span><br><span style="color:var(--text-muted); font-size:0.85rem;">Type changed to New Admission.</span>';
+                        admissionTypeSelect.value = 'New Admission';
+                    } else { statusHtml = '<span style="color:var(--success-green); font-weight:bold; font-size:1.1rem;">Status: ELIGIBLE</span>'; admissionTypeSelect.value = 'Re-Admission'; }
+                    
+                    document.getElementById('firstName').value = user.firstName || ''; document.getElementById('lastName').value = user.lastName || '';
+                    document.getElementById('primaryContact').value = user.primaryContact || phone; document.getElementById('alternateContact').value = user.alternateContact || '';
+                    document.getElementById('dob').value = user.dob || ''; document.getElementById('address').value = user.address || '';
+                    if(user.dob) { document.getElementById('age').value = calculateAgeFromDate(user.dob); }
+                    
+                    resBox.innerHTML = `${statusHtml}<br><br><strong>Name:</strong> ${user.fullName}<br><strong>Contact:</strong> ${user.primaryContact}<br><strong>Prev. Registration Date:</strong> ${user.date}`;
+                } else {
+                    resBox.innerHTML = '<span style="color:var(--error-red);">No previous registration found.</span><br><span style="color:var(--text-muted); font-size:0.85rem;">Type changed to New Admission.</span>';
+                    admissionTypeSelect.value = 'New Admission'; document.getElementById('primaryContact').value = phone;
+                    document.getElementById('firstName').value = ''; document.getElementById('lastName').value = '';
+                    document.getElementById('alternateContact').value = ''; document.getElementById('dob').value = '';
+                    document.getElementById('address').value = ''; document.getElementById('age').value = '';
+                }
+            },
+
+            // FIXED 2: STAFF EDITOR & LIST GENERATION (Now fully functional)
+            initStaffEditor: function() {
+                document.getElementById('staffForm').reset();
+                window.moduleContext.renderStaffList();
+            },
+            saveStaff: function(e) {
+                if(e) e.preventDefault();
+                const name = document.getElementById('staff-name').value.trim();
+                const pin = document.getElementById('staff-pin').value.trim();
+                
+                let db = JSON.parse(LocalStoreMock.getItem('revive_staff_db')) || [];
+                
+                if (db.some(s => String(s.pin) === pin)) {
+                    alert("This PIN is already in use by another staff member. Choose a unique PIN.");
+                    return;
+                }
+
+                const staffMember = { id: 'STF-' + Date.now(), name: name, pin: pin };
+                db.push(staffMember);
+                LocalStoreMock.setItem('revive_staff_db', JSON.stringify(db));
+                
+                cloudSync.push('pushStaff', staffMember);
+                alert("Staff member added securely.");
+                window.moduleContext.initStaffEditor();
+            },
+            deleteStaff: function(id) {
+                if(confirm("Revoke access for this staff member? They will be immediately locked out.")) {
+                    let db = JSON.parse(LocalStoreMock.getItem('revive_staff_db')) || [];
+                    db = db.filter(s => s.id !== id);
+                    LocalStoreMock.setItem('revive_staff_db', JSON.stringify(db));
+                    cloudSync.push('deleteStaff', { id: id });
+                    window.moduleContext.renderStaffList();
+                }
+            },
+            renderStaffList: function() {
+                let db = JSON.parse(LocalStoreMock.getItem('revive_staff_db')) || [];
+                const tbody = document.querySelector('#table-staff-list tbody');
+                tbody.innerHTML = '';
+                if(db.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">No staff accounts configured.</td></tr>';
+                    return;
+                }
+                db.forEach(staff => {
+                    tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${staff.name}</strong></td>
+                        <td style="letter-spacing: 2px;">••••${String(staff.pin).slice(-2)}</td>
+                        <td><button type="button" class="btn danger" style="padding:0.4rem 1rem; width:auto; border:none;" onclick="window.moduleContext.deleteStaff('${staff.id}')">Remove</button></td>
+                    </tr>`;
+                });
+            },
+
+            // --- EXPENSE LOGIC ---
             initExpenseView: function() { document.getElementById('expenseForm').reset(); document.getElementById('exp-date').value = new Date().toISOString().split('T')[0]; this.renderRecentExpenses(); },
             saveExpense: function(e) {
                 if(e) e.preventDefault();
@@ -764,6 +840,7 @@
                 db.slice(0, 10).forEach(ex => { tbody.innerHTML += `<tr><td>${ex.date}</td><td>${ex.category}</td><td>${ex.desc || '-'}</td><td>${ex.mode}</td><td style="color:var(--error-red); font-weight:bold;">₹${ex.amount}</td></tr>`; });
             },
 
+            // --- ATTENDANCE LOGIC ---
             initAttendanceView: function() { document.getElementById('att-input').value = ''; this.renderAttendanceLogs(); },
             previewMemberName: function(val) {
                 const previewEl = document.getElementById('att-live-preview'); const cleanVal = String(val).trim().toLowerCase();
@@ -793,8 +870,9 @@
                 dayLogs.forEach(log => { tbody.innerHTML += `<tr><td>${log.timestamp}</td><td>${log.userId}</td><td>${log.fullName}</td></tr>`; });
             },
 
-            // (For brevity in display, remaining functions use LocalStoreMock properly - preparePdfDom, generateReport etc act normally against it)
+            // --- PDF RENDERING ---
             regeneratePdf: function() {
+                if (!currentMemberDetails || !currentMemberDetails.id) currentMemberDetails = currentActiveUser || {id: "N/A", fullName: "N/A"};
                 document.getElementById('pdf-id').innerText = currentMemberDetails.id || "N/A"; document.getElementById('pdf-name').innerText = currentMemberDetails.fullName || "N/A";
                 const element = document.getElementById('pdf-template'); document.getElementById('pdf-template-wrapper').style.display = 'flex'; document.getElementById('app-wrapper').style.display = 'none';
                 setTimeout(() => { html2pdf().from(element).save(`${currentMemberDetails.id}_Copy.pdf`).then(() => { document.getElementById('pdf-template-wrapper').style.display = 'none'; document.getElementById('app-wrapper').style.display = 'flex'; }); }, 300);
@@ -807,7 +885,14 @@
             openStoreLogin: function() { document.getElementById('store-pin').value = ''; appContext.switchView('store-login'); },
             verifyPin: function() {
                 const pin = document.getElementById('store-pin').value.trim();
-                if(pin.length >= 4) { this.initStore(); } else { alert("Invalid PIN"); }
+                const settings = JSON.parse(LocalStoreMock.getItem('revive_settings_db')) || {};
+                const adminPin = settings.adminPin || '1234';
+                
+                const staffDb = JSON.parse(LocalStoreMock.getItem('revive_staff_db')) || [];
+                const isStaff = staffDb.some(s => String(s.pin) === pin);
+                
+                if (pin === adminPin || isStaff) { this.initStore(); } 
+                else { alert("Unauthorized Access. Invalid PIN."); }
             },
             initStore: function() { this.cart = {}; this.renderCatalog(); appContext.switchView('store-catalog'); },
             renderCatalog: function() {
@@ -861,7 +946,21 @@
 
         window.appContext = appContext; window.moduleContext = moduleContext; window.storeContext = storeContext;
 
-        document.addEventListener('DOMContentLoaded', () => { cloudSync.pullInitial(); });
+        document.addEventListener('DOMContentLoaded', () => { 
+            cloudSync.pullInitial(); 
+            
+            // Reattach admission type listener for Readmission UI toggle
+            const admSelect = document.getElementById('admissionTypeSelect');
+            if(admSelect) admSelect.addEventListener('change', function(e) {
+                if (e.target.value === 'Re-Admission') { document.getElementById('reAdmissionSection').style.display = 'block'; } 
+                else { 
+                    document.getElementById('reAdmissionSection').style.display = 'none'; document.getElementById('validationResultBox').style.display = 'none'; 
+                    document.getElementById('prevPhoneInput').value = ''; document.getElementById('firstName').value = ''; document.getElementById('lastName').value = ''; 
+                    document.getElementById('primaryContact').value = ''; document.getElementById('alternateContact').value = ''; 
+                    document.getElementById('dob').value = ''; document.getElementById('address').value = ''; document.getElementById('age').value = '';
+                }
+            });
+        });
     </script>
 </body>
 </html>
