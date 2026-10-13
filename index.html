@@ -1,39 +1,52 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#ff6500"><meta name="description" content="Revive Fitness Studio staff portal for admissions, attendance, members, and payments."><title>Revive Fitness Studio | Portal</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="description" content="Revive Fitness Studio member and staff portal" />
+  <title>Revive Fitness Studio | Portal</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<div class="app-shell">
-  <aside class="sidebar" id="sidebar">
-    <a class="brand" href="#home" aria-label="Revive Fitness home"><span class="brand-word">REV<span class="brand-v">/</span>VE</span><span class="brand-sub">FITNESS STUDIO</span></a>
-    <div class="branch-pill"><i></i> KOCHI · STUDIO 01 <span class="chevron">⌄</span></div>
-    <div class="nav-label">WORKSPACE</div>
-    <nav class="main-nav" aria-label="Main navigation">
-      <button class="nav-item active" data-page="overview"><span class="nav-icon">▦</span>Overview</button>
-      <button class="nav-item" data-page="members"><span class="nav-icon">♙</span>Members <span class="nav-count" id="memberNavCount">0</span></button>
-      <button class="nav-item" data-page="admissions"><span class="nav-icon">＋</span>Admissions</button>
-      <button class="nav-item" data-page="attendance"><span class="nav-icon">✓</span>Attendance</button>
-      <button class="nav-item" data-page="payments"><span class="nav-icon">₹</span>Payments</button>
-    </nav>
-    <div class="nav-label management-label">MANAGEMENT</div>
-    <nav class="main-nav">
-      <button class="nav-item" data-page="reports"><span class="nav-icon">▤</span>Reports</button>
-      <button class="nav-item" data-page="settings"><span class="nav-icon">⚙</span>Settings</button>
-    </nav>
-    <div class="sidebar-bottom">
-      <div class="sync-card"><div class="sync-top"><span class="sync-dot" id="syncDot"></span><span id="syncLabel">Demo workspace</span></div><p id="syncDescription">Connect your Google Sheet to sync live data.</p><button class="text-action" data-page="settings">Set up data connection <span>↗</span></button></div>
-      <button class="user-profile" id="profileButton"><span class="avatar">RF</span><span class="profile-copy"><strong id="profileName">Studio team</strong><small id="profileRole">Staff access</small></span><span class="profile-menu">···</span></button>
-    </div>
-  </aside>
-  <main class="main-area">
-    <header class="topbar"><button class="mobile-menu" id="menuToggle" aria-label="Toggle navigation">☰</button><div class="crumb"><span>Revive Fitness</span><b>/</b><strong id="pageCrumb">Overview</strong></div><div class="top-actions"><span class="today-label" id="todayLabel"></span><button class="icon-button" id="refreshButton" aria-label="Refresh data" title="Refresh data">⟳</button><button class="top-avatar" id="topAvatar">RF</button></div></header>
-    <div class="content" id="pageContent"></div>
-    <footer class="footer"><span>REVIVE FITNESS STUDIO</span><span>Move better. Feel stronger.</span></footer>
+  <header class="topbar">
+    <a class="brand" href="#home" aria-label="Revive Fitness Studio home">
+      <img src="assets/revive-logo.svg" alt="Revive Fitness Studio" />
+    </a>
+  </header>
+  <main id="app">
+    <section class="welcome" aria-labelledby="welcome-title">
+      <p class="eyebrow">YOUR FITNESS, IN ONE PLACE</p>
+      <h1 id="welcome-title">WELCOME TO <span>REVIVE</span></h1>
+      <p class="subtitle">Studio Portal</p>
+    </section>
+    <section class="module-grid" aria-label="Portal modules">
+      <button class="module-card" data-action="admission">
+        <span class="icon"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M29 8H12a4 4 0 0 0-4 4v24a4 4 0 0 0 4 4h24a4 4 0 0 0 4-4V23M25 27l-2 8 8-2L43 21a4 4 0 0 0-6-6L25 27Z"/></svg></span><span>ADMISSION REGISTRATION</span>
+      </button>
+      <button class="module-card" data-action="attendance">
+        <span class="icon"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6a18 18 0 1 0 18 18M42 11 23 30l-8-8"/></svg></span><span>DAILY ATTENDANCE</span>
+      </button>
+      <button class="module-card" data-action="store">
+        <span class="icon"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 17h32l-3 24H11L8 17Zm8 0a8 8 0 0 1 16 0M18 25v2m12-2v2"/></svg></span><span>SUPPLEMENT STORE</span>
+      </button>
+      <button class="module-card" data-action="staff">
+        <span class="icon"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="15" r="8"/><path d="M7 41v-4a10 10 0 0 1 10-10h14a10 10 0 0 1 10 10v4"/></svg></span><span>STAFF LOGIN</span>
+      </button>
+      <button class="module-card" data-action="admin">
+        <span class="icon"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="m24 4 17 7v12c0 10-7 17-17 21C14 40 7 33 7 23V11l17-7Z"/></svg></span><span>ADMIN LOGIN</span>
+      </button>
+    </section>
+    <p class="connection" id="connection-status"><span class="status-dot"></span><span>Portal ready</span></p>
   </main>
-</div>
-<div class="toast-region" id="toastRegion" aria-live="polite"></div>
-<div class="modal-backdrop" id="modalBackdrop" hidden><section class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></section></div>
-<script src="app.js" defer></script>
-</body></html>
+  <footer class="footer">© <span id="year"></span> Revive Fitness Studio. All rights reserved.</footer>
+  <dialog id="panel" aria-labelledby="panel-title">
+    <div class="dialog-head"><div><p class="eyebrow" id="panel-kicker">REVIVE FITNESS STUDIO</p><h2 id="panel-title">Portal</h2></div><button class="close" type="button" aria-label="Close">×</button></div>
+    <div id="panel-content"></div>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
