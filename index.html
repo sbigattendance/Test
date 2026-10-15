@@ -38,6 +38,33 @@
         .header-sync-btn { background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-muted); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; transition: all 0.2s; }
         .header-sync-btn:hover { border-color: var(--accent-orange); color: var(--accent-orange); }
 
+        .app-footer {
+            background-color: var(--bg-panel); height: 42px; padding: 0 1.5rem; display: flex; justify-content: center; align-items: center;
+            border-top: 2px solid var(--accent-orange); position: fixed; bottom: 0; left: 0; width: 100%; z-index: 100;
+            font-size: 0.8rem; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; box-shadow: 0 -2px 10px rgba(0,0,0,0.04);
+        }
+        .app-footer span { color: var(--accent-orange); font-weight: 800; margin: 0 4px; }
+
+        .supp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1.2rem; margin-top: 1rem; }
+        .supp-card { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.2rem; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: all 0.2s; position: relative; overflow: hidden; }
+        .supp-card:hover { border-color: var(--accent-orange); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(255,102,0,0.08); }
+        .supp-card-header { margin-bottom: 0.8rem; }
+        .supp-card-title { font-size: 1.05rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.25rem; }
+        .supp-card-cat { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+        .supp-price-box { display: flex; align-items: baseline; gap: 0.6rem; margin: 0.6rem 0; }
+        .supp-offer-price { font-size: 1.35rem; font-weight: 900; color: var(--accent-orange); }
+        .supp-mrp-price { font-size: 0.9rem; color: var(--text-muted); text-decoration: line-through; font-weight: 600; }
+        .supp-save-badge { background: rgba(37, 211, 102, 0.15); color: #1b9f4a; font-size: 0.7rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; }
+        .supp-stock-badge { display: inline-block; font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 20px; margin-bottom: 0.9rem; }
+        .stock-in { background: #eefbf3; color: #1b9f4a; border: 1px solid #b7ebc9; }
+        .stock-low { background: #fff8eb; color: #c87f0a; border: 1px solid #fad7a0; }
+        .stock-out { background: #fdecea; color: var(--error-red); border: 1px solid #f5b7b1; }
+        .qty-stepper { display: flex; align-items: center; justify-content: space-between; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 4px; gap: 6px; }
+        .qty-btn { width: 34px; height: 34px; border: none; background: var(--bg-panel); color: var(--text-main); font-weight: 900; font-size: 1.1rem; border-radius: 6px; cursor: pointer; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; }
+        .qty-btn:hover { border-color: var(--accent-orange); color: var(--accent-orange); }
+        .qty-val { font-weight: 800; font-size: 1rem; min-width: 30px; text-align: center; }
+        .cart-summary-bar { background: var(--bg-panel); border: 2px solid var(--accent-orange); border-radius: 12px; padding: 1.2rem 1.5rem; margin-top: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; box-shadow: 0 8px 25px rgba(255,102,0,0.12); }
+
         .view-section { 
             display: none; 
             flex: 1; 
@@ -261,8 +288,7 @@
         <header class="app-header">
             <div style="width: 110px;"></div>
             <div class="logo-container" onclick="window.appContext.goHome()">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ff6600" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5 17.5 17.5"/><path d="M3 10l7-7"/><path d="M14 21l7-7"/><path d="m2 6 4-4"/><path d="m18 22 4-4"/></svg>
-                <span>REVIVE <span style="color:var(--accent-orange);">FITNESS</span></span>
+                <img data-logo-src="logo.png" src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22220%22%20height%3D%2250%22%20viewBox%3D%220%200%20220%2050%22%3E%3Crect%20width%3D%22220%22%20height%3D%2250%22%20rx%3D%226%22%20fill%3D%22%23ffffff%22%2F%3E%3Ctext%20x%3D%2212%22%20y%3D%2232%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%20fill%3D%22%23222222%22%3EREVIVE%20%3C%2Ftext%3E%3Ctext%20x%3D%22102%22%20y%3D%2232%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%20fill%3D%22%23ff6600%22%3EFITNESS%3C%2Ftext%3E%3C%2Fsvg%3E" class="brand-logo-img" alt="REVIVE FITNESS STUDIO" onerror="this.onerror=null; this.src=window.FALLBACK_LOGO_SVG;">
             </div>
             <button type="button" class="header-sync-btn" onclick="window.cloudSync.forceRefreshCache()" title="Clear stale cache & pull fresh cloud data">
                 ↻ Sync & Clear Cache
@@ -282,6 +308,10 @@
                 <div class="module-card" onclick="window.appContext.switchView('attendance')">
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                     <h3>Daily Attendance</h3>
+                </div>
+                <div class="module-card" onclick="window.appContext.switchView('supplement-store')">
+                    <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                    <h3>Supplement Store</h3>
                 </div>
                 <div class="module-card" onclick="window.appContext.openLogin('staff')">
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
@@ -325,6 +355,14 @@
                 <div class="module-card" onclick="window.moduleContext.openUserSearch('details')">
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     <h3>User Details</h3>
+                </div>
+                <div class="module-card" onclick="window.appContext.switchView('supplement-store')">
+                    <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                    <h3>Supplement Store</h3>
+                </div>
+                <div class="module-card admin-only" onclick="window.appContext.switchView('supplement-admin')">
+                    <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                    <h3>Supplement Inventory</h3>
                 </div>
                 <div class="module-card admin-only" onclick="window.appContext.switchView('expense')">
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
@@ -568,6 +606,16 @@
                             <div class="val" id="kpi-fee-count">0</div>
                             <span class="sub-val">₹<span id="kpi-fee-amt">0</span></span>
                         </div>
+                        <div class="kpi-card">
+                            <h4>Supplement Sales</h4>
+                            <div class="val" id="kpi-supp-sales-count">0</div>
+                            <span class="sub-val" style="color:var(--success-green);">₹<span id="kpi-supp-sales-amt">0</span></span>
+                        </div>
+                        <div class="kpi-card">
+                            <h4>Supplement Purchases</h4>
+                            <div class="val" id="kpi-supp-purch-count">0</div>
+                            <span class="sub-val" style="color:var(--error-red);">₹<span id="kpi-supp-purch-amt">0</span></span>
+                        </div>
                         <div class="kpi-card" style="cursor:pointer;" onclick="window.moduleContext.filterReportByShortfall()" title="Click to scroll to pending shortfalls">
                             <h4>Due (Shortfall) 🔍</h4>
                             <div class="val" id="kpi-shortfall-count" style="color:var(--warning-yellow);">0</div>
@@ -611,7 +659,31 @@
 
                     <div class="report-section">
                         <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:10px;">
-                            <h3 style="margin:0; border:none; color:var(--error-red);">Expense Register (Debit)</h3>
+                            <h3 style="margin:0; border:none; color:var(--success-green);">Supplement Sales Register (Credit / Revenue)</h3>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table" id="table-supp-sales-report">
+                                <thead><tr><th>Date</th><th>Invoice No</th><th>Member (ID & Name)</th><th>Items Sold</th><th>Mode</th><th>Sold By</th><th>Total Sale</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="report-section">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:10px;">
+                            <h3 style="margin:0; border:none; color:var(--error-red);">Supplement Purchase Register (Debit / Stock Cost)</h3>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table" id="table-supp-purchases-report">
+                                <thead><tr><th>Date</th><th>Purchase ID</th><th>Product Name</th><th>Qty</th><th>Unit Cost</th><th>Mode</th><th>Total Cost</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="report-section">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:10px;">
+                            <h3 style="margin:0; border:none; color:var(--error-red);">General Expense Register (Debit)</h3>
                         </div>
                         <div class="table-responsive">
                             <table class="data-table" id="table-expenses-report">
@@ -934,6 +1006,211 @@
             </div>
         </main>
 
+        <!-- New Module: Supplement Store (Catalog -> Member Validation -> Payment & PIN Verification) -->
+        <main id="view-supplement-store" class="view-section">
+            <div class="form-layout" style="max-width: 950px;">
+                <div class="module-toolbar">
+                    <button class="back-btn" onclick="window.appContext.goHome()" type="button">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                        Back
+                    </button>
+                    <h2 class="module-title">Supplement Store</h2>
+                </div>
+
+                <!-- Step 1: Browse Products & Add Multiple Quantities to Cart -->
+                <div id="supp-step-1" class="step-container active-step">
+                    <div class="step-indicator">Step 1 of 3: Select Supplements & Quantities</div>
+                    <div id="supp-catalog-grid" class="supp-grid"></div>
+
+                    <div class="cart-summary-bar" id="supp-cart-bar">
+                        <div>
+                            <div style="font-size:0.8rem; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Cart Summary (<span id="supp-cart-count">0</span> Items)</div>
+                            <div style="font-size:1.3rem; font-weight:900; color:var(--text-main);">Total: <span style="color:var(--accent-orange);">₹<span id="supp-cart-total">0</span></span> <span id="supp-cart-savings" style="font-size:0.82rem; color:var(--success-green); font-weight:700; margin-left:6px;"></span></div>
+                        </div>
+                        <div style="display:flex; gap:0.8rem;">
+                            <button type="button" class="btn secondary" style="width:auto; padding:0.75rem 1.2rem; font-size:0.82rem;" onclick="window.moduleContext.clearSupplementCart()">Clear Cart</button>
+                            <button type="button" class="btn primary" style="width:auto; padding:0.75rem 1.5rem; font-size:0.88rem;" onclick="window.moduleContext.proceedToSuppCheckout()">Proceed to Checkout →</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Validate Member (Phone, Admission ID, or Name) & Confirm Invoice Details -->
+                <div id="supp-step-2" class="step-container">
+                    <div class="step-indicator">Step 2 of 3: Member Validation & Invoice Details</div>
+
+                    <div style="background:var(--bg-main); padding:1.2rem; border-radius:10px; border:1px dashed var(--accent-orange); margin-bottom:1.5rem;">
+                        <label style="color:var(--accent-orange); display:block; margin-bottom:0.5rem;">Search Member by Phone Number, Admission ID, or Name <span class="required">*</span></label>
+                        <div class="form-row" style="margin-bottom:0;">
+                            <div class="form-group">
+                                <input type="text" id="supp-member-search" placeholder="e.g. 9999999999, REV-0001, or Rahul" oninput="window.moduleContext.previewSuppMember(this.value)" autocomplete="off">
+                                <div id="supp-member-live-preview" style="margin-top:6px;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Member Admission ID <span class="required">*</span></label>
+                            <input type="text" id="supp-cust-id" readonly placeholder="Select member above">
+                        </div>
+                        <div class="form-group">
+                            <label>Member Full Name <span class="required">*</span></label>
+                            <input type="text" id="supp-cust-name" readonly placeholder="Auto-fetched on selection">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Phone Number <span class="required">*</span></label>
+                            <input type="text" id="supp-cust-phone" readonly placeholder="Auto-fetched on selection">
+                        </div>
+                        <div class="form-group">
+                            <label>Billing Address (For Invoice) <span class="required">*</span></label>
+                            <input type="text" id="supp-cust-address" placeholder="Auto-fetched residential address">
+                        </div>
+                    </div>
+
+                    <h3 style="color:var(--accent-orange); font-size:1rem; text-transform:uppercase; margin: 1.5rem 0 0.8rem 0;">Order Items Breakdown</h3>
+                    <div class="table-responsive" style="margin-bottom:1.5rem;">
+                        <table class="data-table" id="table-supp-checkout-items">
+                            <thead><tr><th>Product Name</th><th>MRP</th><th>Offer Price</th><th>Qty</th><th>Subtotal</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+
+                    <div class="action-row" style="flex-direction:column;">
+                        <button type="button" class="btn primary" onclick="window.moduleContext.proceedToSuppPayment()">Proceed to Payment →</button>
+                        <button type="button" class="btn secondary" onclick="window.moduleContext.backToSuppStep(1)">← Back to Store</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Payment & Staff/Admin PIN Verification -->
+                <div id="supp-step-3" class="step-container">
+                    <div class="step-indicator">Step 3 of 3: Supplement Payment & Seller PIN Verification</div>
+
+                    <div class="fee-summary-box">
+                        <h3 style="color:var(--accent-orange); text-align:center; margin-bottom:1.2rem; letter-spacing:1px;">SUPPLEMENT INVOICE SUMMARY</h3>
+                        <div class="fee-row"><span>Invoice Number:</span> <strong id="supp-pay-inv-id" style="color:var(--accent-orange);">INV-0001</strong></div>
+                        <div class="fee-row"><span>Billed To Member:</span> <strong id="supp-pay-member-label">-</strong></div>
+                        <div class="fee-row"><span>Total MRP Value:</span> <strong>₹<span id="supp-pay-mrp">0</span></strong></div>
+                        <div class="fee-row"><span>Total Offer Discount:</span> <strong style="color:var(--success-green);">- ₹<span id="supp-pay-disc">0</span></strong></div>
+                        <div class="fee-row fee-total"><span>Net Payable Amount:</span> <strong>₹<span id="supp-pay-net">0</span></strong></div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 1.2rem;">
+                        <label>Select Payment Method <span class="required">*</span></label>
+                        <select id="suppPaymentMethod" onchange="window.moduleContext.updateSuppPaymentUI()">
+                            <option value="UPI">UPI Payment (QR Code)</option>
+                            <option value="CASH">Cash Payment</option>
+                        </select>
+                    </div>
+
+                    <div id="supp-upi-section" style="text-align:center; margin: 1.5rem 0; padding: 1.2rem; background: var(--bg-main); border: 1px dashed var(--border-color); border-radius: 12px;">
+                        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1rem; text-transform:uppercase; letter-spacing:1px; font-weight:700;">Scan to pay <strong style="color:var(--accent-orange); font-size:1.4rem;">₹<span id="supp-qr-amount-display">0</span></strong></p>
+                        <div class="qr-wrapper">
+                            <img id="supp-upi-qr-code" src="" alt="Supplement UPI QR Code" style="width:190px; height:190px; display:block;">
+                        </div>
+                    </div>
+
+                    <div class="staff-verify-box">
+                        <div class="form-group">
+                            <label for="supp-staff-pin">Staff / Admin Verification PIN (Sold By) <span class="required">*</span></label>
+                            <input type="password" id="supp-staff-pin" class="pin-input" placeholder="Enter Staff or Admin PIN" inputmode="numeric" maxlength="6" autocomplete="off" oninput="window.moduleContext.previewPinIdentity(this.value, 'supp-pin-identity')">
+                            <div id="supp-pin-identity" style="margin-top:6px; font-size:0.85rem; font-weight:700; text-align:center; color:var(--text-muted);">Enter Staff or Admin PIN to authorize and record who completed this sale</div>
+                        </div>
+                    </div>
+
+                    <div class="action-row" style="flex-direction:column; margin-top:1.5rem;">
+                        <button type="button" class="btn primary" onclick="window.moduleContext.completeSupplementSale()">Verify PIN & Complete Sale</button>
+                        <button type="button" class="btn secondary" onclick="window.moduleContext.backToSuppStep(2)">← Back to Member Details</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- New Admin Module: Supplement Inventory & Purchase Manager -->
+        <main id="view-supplement-admin" class="view-section">
+            <div class="form-layout" style="max-width: 980px;">
+                <div class="module-toolbar">
+                    <button class="back-btn" onclick="window.appContext.goHome()" type="button">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                        Back
+                    </button>
+                    <h2 class="module-title">Supplement Inventory & Purchases</h2>
+                </div>
+
+                <div style="background:var(--bg-main); padding:1.5rem; border-radius:10px; border:1px dashed var(--accent-orange); margin-bottom:2rem;">
+                    <h3 id="supp-inv-form-title" style="color:var(--accent-orange); margin-bottom:0.5rem; font-size:1.1rem; text-transform:uppercase;">Add New Product / Record Stock Purchase</h3>
+                    <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:1.2rem;">Add new supplement products, restock existing items (automatically recorded in the P&L Purchase Report), or update pricing details.</p>
+
+                    <form id="suppInventoryForm" onsubmit="window.moduleContext.saveSupplementInventory(event); return false;">
+                        <input type="hidden" id="supp-inv-id" value="">
+                        <div class="form-row">
+                            <div class="form-group" style="flex:2;">
+                                <label>Product Name <span class="required">*</span></label>
+                                <input type="text" id="supp-inv-name" placeholder="e.g. Optimum Nutrition Gold Standard Whey 2lbs" required>
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label>Category / Brand</label>
+                                <input type="text" id="supp-inv-cat" placeholder="e.g. Whey Protein / Creatine">
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label>Entry Mode <span class="required">*</span></label>
+                                <select id="supp-inv-entry-mode">
+                                    <option value="purchase">Stock Purchase (Logs P&L Debit)</option>
+                                    <option value="update">Update Details / Price Only</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Unit Purchase Cost (₹) <span class="required">*</span></label>
+                                <input type="number" id="supp-inv-cost" min="0" placeholder="e.g. 2400" required>
+                            </div>
+                            <div class="form-group">
+                                <label>MRP (₹) <span class="required">*</span></label>
+                                <input type="number" id="supp-inv-mrp" min="1" placeholder="e.g. 3899" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Offer Selling Price (₹) <span class="required">*</span></label>
+                                <input type="number" id="supp-inv-offer" min="1" placeholder="e.g. 3200" required>
+                            </div>
+                            <div class="form-group">
+                                <label id="supp-inv-qty-label">Stock Qty (Units) <span class="required">*</span></label>
+                                <input type="number" id="supp-inv-qty" min="0" placeholder="e.g. 10" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Purchase Mode</label>
+                                <select id="supp-inv-paymode">
+                                    <option value="UPI">UPI / Bank</option>
+                                    <option value="CASH">Cash</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:0.8rem; margin-top:0.5rem;">
+                            <button type="submit" class="btn primary" id="btn-save-supp-inv" style="width:auto; padding:0.85rem 1.8rem;">Save Product & Record Stock</button>
+                            <button type="button" class="btn secondary" id="btn-cancel-supp-edit" style="display:none; width:auto; padding:0.85rem 1.4rem;" onclick="window.moduleContext.resetSuppInventoryForm()">Cancel Edit</button>
+                        </div>
+                    </form>
+                </div>
+
+                <h3 style="color:var(--accent-orange); margin-bottom:0.8rem; font-size:1.05rem; text-transform:uppercase;">Live Supplement Stock Inventory</h3>
+                <div class="table-responsive" style="margin-bottom:2.2rem;">
+                    <table class="data-table" id="table-supp-inventory">
+                        <thead><tr><th>ID</th><th>Product Name</th><th>Unit Cost</th><th>MRP</th><th>Offer Price</th><th>Live Stock</th><th>Actions</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <h3 style="color:var(--error-red); margin-bottom:0.8rem; font-size:1.05rem; text-transform:uppercase;">Recent Supplement Stock Purchases (P&L Debit Log)</h3>
+                <div class="table-responsive">
+                    <table class="data-table" id="table-supp-purchases-admin">
+                        <thead><tr><th>Date</th><th>Purchase ID</th><th>Product</th><th>Qty Added</th><th>Unit Cost</th><th>Mode</th><th>Total Purchase Cost</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
         <!-- Payment Process Modal with Staff/Admin PIN verification & live QR listeners -->
         <div id="paymentProcessModal" class="modal">
             <div class="modal-content" style="text-align: left;">
@@ -985,6 +1262,7 @@
 
         <div id="successModal" class="modal">
             <div class="modal-content">
+                <img data-logo-src="logo.png" src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22220%22%20height%3D%2250%22%20viewBox%3D%220%200%20220%2050%22%3E%3Crect%20width%3D%22220%22%20height%3D%2250%22%20rx%3D%226%22%20fill%3D%22%23ffffff%22%2F%3E%3Ctext%20x%3D%2212%22%20y%3D%2232%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%20fill%3D%22%23222222%22%3EREVIVE%20%3C%2Ftext%3E%3Ctext%20x%3D%22102%22%20y%3D%2232%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%20fill%3D%22%23ff6600%22%3EFITNESS%3C%2Ftext%3E%3C%2Fsvg%3E" class="brand-logo-img" alt="REVIVE FITNESS STUDIO" style="height: 45px; margin-bottom: 1rem; object-fit: contain;" onerror="this.onerror=null; this.src=window.FALLBACK_LOGO_SVG;">
                 <h2 class="orange-text" id="sm-title">Registration Complete!</h2>
                 <div class="admission-badge" id="generated-id">REV-0000</div>
                 <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.8rem;">Registered & Collected By: <strong id="sm-collected-by" style="color:var(--text-main);"></strong></p>
@@ -1023,6 +1301,21 @@
             </div>
         </div>
 
+        <!-- Supplement Sale Complete & Invoice Modal -->
+        <div id="suppSaleSuccessModal" class="modal">
+            <div class="modal-content">
+                <img data-logo-src="logo.png" src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22220%22%20height%3D%2250%22%20viewBox%3D%220%200%20220%2050%22%3E%3Crect%20width%3D%22220%22%20height%3D%2250%22%20rx%3D%226%22%20fill%3D%22%23ffffff%22%2F%3E%3Ctext%20x%3D%2212%22%20y%3D%2232%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%20fill%3D%22%23222222%22%3EREVIVE%20%3C%2Ftext%3E%3Ctext%20x%3D%22102%22%20y%3D%2232%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%20fill%3D%22%23ff6600%22%3EFITNESS%3C%2Ftext%3E%3C%2Fsvg%3E" class="brand-logo-img" alt="REVIVE FITNESS STUDIO" style="height: 42px; margin-bottom: 0.8rem; object-fit: contain;" onerror="this.onerror=null; this.src=window.FALLBACK_LOGO_SVG;">
+                <div class="checkmark-circle"><div class="checkmark-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div></div>
+                <h2 class="orange-text">Supplement Sale Complete!</h2>
+                <div class="admission-badge" id="supp-generated-inv-id" style="font-size:1.6rem; padding:0.8rem; margin:0.8rem 0;">INV-0001</div>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">Sold By: <strong id="supp-sm-sold-by" style="color:var(--text-main);"></strong></p>
+                <div class="modal-actions">
+                    <button type="button" id="btn-share-supp-invoice" class="btn whatsapp" onclick="window.moduleContext.shareSupplementInvoice()">Share / Download Invoice Receipt</button>
+                    <button type="button" class="btn secondary" onclick="window.appContext.closeModal()">Close & Return</button>
+                </div>
+            </div>
+        </div>
+
         <!-- In-page Confirmation Modal (avoids browser blocking confirm()) -->
         <div id="confirmDialogModal" class="modal">
             <div class="modal-content" style="max-width:400px;">
@@ -1034,12 +1327,16 @@
                 </div>
             </div>
         </div>
+
+        <footer class="app-footer">
+            &copy; <span id="footer-year">2026</span> <span>Revive Fitness Studio</span>. All Rights Reserved.
+        </footer>
     </div> 
 
     <div id="pdf-template-wrapper">
         <div id="pdf-template">
             <div class="pdf-flex-between pdf-border-bottom">
-                <div style="font-weight:900; font-size:20px; color:#222; letter-spacing:1px;">REVIVE <span style="color:#ff6600;">FITNESS STUDIO</span></div>
+                <div><img data-logo-src="logo.png" src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22220%22%20height%3D%2250%22%20viewBox%3D%220%200%20220%2050%22%3E%3Crect%20width%3D%22220%22%20height%3D%2250%22%20rx%3D%226%22%20fill%3D%22%23ffffff%22%2F%3E%3Ctext%20x%3D%2212%22%20y%3D%2232%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%20fill%3D%22%23222222%22%3EREVIVE%20%3C%2Ftext%3E%3Ctext%20x%3D%22102%22%20y%3D%2232%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%20fill%3D%22%23ff6600%22%3EFITNESS%3C%2Ftext%3E%3C%2Fsvg%3E" alt="REVIVE FITNESS STUDIO" class="pdf-logo brand-logo-img" onerror="this.onerror=null; this.src=window.FALLBACK_LOGO_SVG;"></div>
                 <div style="text-align:right; font-weight:bold; font-size:12px; line-height:1.3;">OFFICIAL MEMBER<br>ADMISSION</div>
             </div>
             <div class="pdf-meta-box"><span>ADMISSION ID: <span id="pdf-id" style="color:var(--accent-orange);"></span></span><span>REGISTRATION DATE: <span id="pdf-date"></span></span></div>
@@ -1099,7 +1396,7 @@
     <div id="receipt-render-zone">
         <div id="receipt-template">
             <div class="rcpt-header">
-                <div style="font-weight:900; font-size:18px; color:#222; margin-bottom:4px;">REVIVE <span style="color:#ff6600;">FITNESS STUDIO</span></div>
+                <img data-logo-src="logo.png" src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22220%22%20height%3D%2250%22%20viewBox%3D%220%200%20220%2050%22%3E%3Crect%20width%3D%22220%22%20height%3D%2250%22%20rx%3D%226%22%20fill%3D%22%23ffffff%22%2F%3E%3Ctext%20x%3D%2212%22%20y%3D%2232%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%20fill%3D%22%23222222%22%3EREVIVE%20%3C%2Ftext%3E%3Ctext%20x%3D%22102%22%20y%3D%2232%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%20fill%3D%22%23ff6600%22%3EFITNESS%3C%2Ftext%3E%3C%2Fsvg%3E" class="brand-logo-img" alt="REVIVE FITNESS STUDIO" onerror="this.onerror=null; this.src=window.FALLBACK_LOGO_SVG;">
                 <div class="rcpt-address">Kadayil Arcade, Thanal Nagar, Keralapuram, Keralam 691504<br>Ph: 8921698044</div>
                 <h3 class="rcpt-title">PAYMENT RECEIPT</h3>
             </div>
@@ -1119,6 +1416,44 @@
             </div>
             <div class="rcpt-footer">Generated on <span id="rcpt-date"></span><br>Thank you for choosing Revive!</div>
         </div>
+
+        <div id="supp-invoice-template" style="width: 420px; padding: 25px; background: #ffffff; border: 3px solid var(--accent-orange); font-family: 'Segoe UI', Arial, sans-serif; color: #111; box-sizing: border-box;">
+            <div class="rcpt-header">
+                <img data-logo-src="logo.png" src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22220%22%20height%3D%2250%22%20viewBox%3D%220%200%20220%2050%22%3E%3Crect%20width%3D%22220%22%20height%3D%2250%22%20rx%3D%226%22%20fill%3D%22%23ffffff%22%2F%3E%3Ctext%20x%3D%2212%22%20y%3D%2232%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%20fill%3D%22%23222222%22%3EREVIVE%20%3C%2Ftext%3E%3Ctext%20x%3D%22102%22%20y%3D%2232%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%20fill%3D%22%23ff6600%22%3EFITNESS%3C%2Ftext%3E%3C%2Fsvg%3E" class="brand-logo-img" alt="REVIVE FITNESS STUDIO" onerror="this.onerror=null; this.src=window.FALLBACK_LOGO_SVG;">
+                <div class="rcpt-address">Kadayil Arcade, Thanal Nagar, Keralapuram, Keralam 691504<br>Ph: 8921698044</div>
+                <h3 class="rcpt-title">SUPPLEMENT TAX INVOICE</h3>
+            </div>
+            <table class="rcpt-table" style="font-size:12px; line-height:1.7;">
+                <tr><td><strong>Invoice No:</strong></td><td id="sinv-id" style="text-align:right; font-weight:bold; color:var(--accent-orange);"></td></tr>
+                <tr><td><strong>Date:</strong></td><td id="sinv-date" style="text-align:right;"></td></tr>
+                <tr><td><strong>Member:</strong></td><td id="sinv-member" style="text-align:right; font-weight:bold;"></td></tr>
+                <tr><td><strong>Phone:</strong></td><td id="sinv-phone" style="text-align:right;"></td></tr>
+                <tr><td><strong>Address:</strong></td><td id="sinv-address" style="text-align:right; font-size:11px;"></td></tr>
+            </table>
+            <div style="margin-top:12px; border-top:1px solid #ddd; border-bottom:1px solid #ddd; padding:8px 0;">
+                <table style="width:100%; font-size:11.5px; border-collapse:collapse;" id="sinv-items-table">
+                    <thead>
+                        <tr style="border-bottom:1px dashed #ccc; color:#555; text-align:left;">
+                            <th style="padding:4px 0;">Item</th>
+                            <th style="padding:4px 0; text-align:center;">Qty</th>
+                            <th style="padding:4px 0; text-align:right;">Rate</th>
+                            <th style="padding:4px 0; text-align:right;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="rcpt-amount-box" style="margin-top:12px; padding:12px;">
+                <table style="width: 100%; font-size: 12.5px; line-height:1.8;">
+                    <tr><td>Total MRP:</td><td style="text-align: right; text-decoration:line-through; color:#777;">₹<span id="sinv-mrp"></span></td></tr>
+                    <tr><td>Total Savings:</td><td style="text-align: right; color: green; font-weight:bold;">- ₹<span id="sinv-disc"></span></td></tr>
+                    <tr><td><strong>Net Paid:</strong></td><td style="text-align: right; color: var(--accent-orange); font-weight: 900; font-size:15px;">₹<span id="sinv-net"></span></td></tr>
+                    <tr><td><strong>Payment Mode:</strong></td><td style="text-align: right; font-weight:bold;" id="sinv-mode"></td></tr>
+                    <tr><td><strong>Sold By:</strong></td><td style="text-align: right; font-weight:bold;" id="sinv-seller"></td></tr>
+                </table>
+            </div>
+            <div class="rcpt-footer">Thank you for shopping at Revive Supplement Store!</div>
+        </div>
     </div>
     <script>
         const CLOUD_SYNC_URL = "https://script.google.com/macros/s/AKfycbxv-ri1TP3f7SzugYNLcz9DuFASuhssX6dZnqA_Me7WyOaM2rcH5WL7q6XdbW2WCstM/exec"; 
@@ -1133,7 +1468,45 @@
         const tariffMonthIndices = [3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2]; 
 
         const DEFAULT_AVATAR_SVG = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#ff6600" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>');
+        const FALLBACK_LOGO_SVG = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="220" height="50" viewBox="0 0 220 50"><rect width="220" height="50" rx="6" fill="#ffffff"/><text x="12" y="32" font-family="Arial, sans-serif" font-weight="900" font-size="22" fill="#222222">REVIVE </text><text x="102" y="32" font-family="Arial, sans-serif" font-weight="900" font-size="22" fill="#ff6600">FITNESS</text></svg>');
+        window.FALLBACK_LOGO_SVG = FALLBACK_LOGO_SVG;
         const BLANK_PIXEL = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
+        let cachedLogoDataUri = null;
+
+        // Preload logo.png from repository into a Base64 Data URI so html2pdf and html2canvas always capture it reliably
+        function preloadLogoForCapture() {
+            document.querySelectorAll('.brand-logo-img').forEach(el => {
+                const repoLogo = el.getAttribute('data-logo-src') || 'logo.png';
+                el.onerror = function() { this.onerror = null; this.src = FALLBACK_LOGO_SVG; };
+                el.src = repoLogo;
+            });
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.onload = function() {
+                try {
+                    const c = document.createElement('canvas');
+                    c.width = img.naturalWidth || 220;
+                    c.height = img.naturalHeight || 50;
+                    c.getContext('2d').drawImage(img, 0, 0);
+                    cachedLogoDataUri = c.toDataURL('image/png');
+                    document.querySelectorAll('.brand-logo-img').forEach(el => { el.src = cachedLogoDataUri; });
+                } catch (e) {
+                    cachedLogoDataUri = 'logo.png';
+                }
+            };
+            img.onerror = function() {
+                cachedLogoDataUri = FALLBACK_LOGO_SVG;
+                document.querySelectorAll('.brand-logo-img').forEach(el => { el.src = FALLBACK_LOGO_SVG; });
+            };
+            img.src = 'logo.png';
+        }
+
+        function applyLogoToExportTemplates() {
+            const srcToUse = cachedLogoDataUri || 'logo.png';
+            document.querySelectorAll('#pdf-template .brand-logo-img, #receipt-template .brand-logo-img, #supp-invoice-template .brand-logo-img').forEach(el => {
+                el.src = srcToUse;
+            });
+        }
 
         // Safe localStorage wrapper
         const storage = {
@@ -1185,6 +1558,36 @@
         let pendingConfirmCallback = null;
         let activePortraitStream = null;
         let activeSigStream = null;
+        let supplementCart = {};
+        let selectedSuppMember = null;
+        let currentSuppSaleRecord = null;
+
+        function ensureDefaultSupplements() {
+            let supps = storage.get('revive_supplements_db', null);
+            if (!supps || !Array.isArray(supps) || supps.length === 0) {
+                supps = [
+                    { id: 'SUPP-101', name: 'Gold Standard 100% Whey (2 lbs)', category: 'Whey Protein', costPrice: 2400, mrp: 3899, offerPrice: 3299, stock: 12 },
+                    { id: 'SUPP-102', name: 'Micronized Creatine Monohydrate (250g)', category: 'Creatine', costPrice: 650, mrp: 1299, offerPrice: 899, stock: 20 },
+                    { id: 'SUPP-103', name: 'BCAA Energy Intra-Workout (30 Servings)', category: 'Amino Acids', costPrice: 900, mrp: 1799, offerPrice: 1299, stock: 15 },
+                    { id: 'SUPP-104', name: 'Pre-Workout Explosive Surge (200g)', category: 'Pre-Workout', costPrice: 850, mrp: 1699, offerPrice: 1199, stock: 10 },
+                    { id: 'SUPP-105', name: 'High Protein Peanut Butter (1 kg)', category: 'Nutrition', costPrice: 320, mrp: 599, offerPrice: 449, stock: 25 }
+                ];
+                storage.set('revive_supplements_db', supps);
+            }
+            return supps;
+        }
+
+        function getNextSupplementInvoiceId() {
+            const sales = storage.get('revive_supplement_sales_db', []);
+            let maxNum = 0;
+            sales.forEach(s => {
+                if (s && s.id && String(s.id).startsWith('INV-')) {
+                    const n = parseInt(String(s.id).replace(/\D/g, ''), 10);
+                    if (!isNaN(n) && n > maxNum) maxNum = n;
+                }
+            });
+            return `INV-${String(maxNum + 1).padStart(4, '0')}`;
+        }
 
         // Fix #6: Auto cache & transient state clearance to prevent data capture mismatch
         function clearRuntimeCache(preserveActiveUser = false) {
@@ -1288,6 +1691,9 @@
                     if(data.tariffs) storage.set('revive_tariffs', data.tariffs);
                     if(data.specialTariffs) storage.set('revive_special_tariffs', data.specialTariffs);
                     if(data.expenses) storage.set('revive_expenses_db', data.expenses);
+                    if(data.supplements) storage.set('revive_supplements_db', data.supplements);
+                    if(data.supplementSales) storage.set('revive_supplement_sales_db', data.supplementSales);
+                    if(data.supplementPurchases) storage.set('revive_supplement_purchases_db', data.supplementPurchases);
                     
                     if(data.users) {
                         const localUsers = storage.get('revive_users_db', []);
@@ -1423,10 +1829,12 @@
                 if(viewName === 'reports') window.moduleContext.initReports();
                 if(viewName === 'attendance') window.moduleContext.initAttendanceView();
                 if(viewName === 'expense') window.moduleContext.initExpenseView();
+                if(viewName === 'supplement-store') window.moduleContext.initSupplementStore();
+                if(viewName === 'supplement-admin') window.moduleContext.initSupplementAdmin();
                 if(viewName !== 'admission') { IS_EDIT_MODE = false; }
             },
             goHome: function() {
-                if (document.getElementById('successModal').style.display === 'flex' || document.getElementById('receiptSuccessModal').style.display === 'flex' || document.getElementById('viewReceiptModal').style.display === 'flex') return;
+                if (document.getElementById('successModal').style.display === 'flex' || document.getElementById('receiptSuccessModal').style.display === 'flex' || document.getElementById('viewReceiptModal').style.display === 'flex' || document.getElementById('suppSaleSuccessModal').style.display === 'flex') return;
                 clearRuntimeCache(false);
                 if (appContext.currentRole) window.appContext.switchView('dashboard');
                 else { appContext.pendingRole = null; window.appContext.switchView('home'); }
@@ -2284,6 +2692,7 @@
             },
             
             generateReceiptImage: function(paidAmt, newBal, mode, collector, triggerFlow, overrideDate) {
+                applyLogoToExportTemplates();
                 const dIso = overrideDate || new Date().toISOString();
                 const dStr = new Date(dIso).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
                 
@@ -2338,6 +2747,7 @@
             },
 
             shareAdmissionReceipt: function() {
+                applyLogoToExportTemplates();
                 const btn = document.getElementById('btn-share-adm-receipt');
                 btn.innerText = "Generating...";
                 
@@ -2453,6 +2863,7 @@
                 );
             },
             preparePdfDom: function() {
+                applyLogoToExportTemplates();
                 const target = (currentMemberDetails && currentMemberDetails.id) ? currentMemberDetails : currentActiveUser;
                 if (!target) return;
                 const photoSrc = target.photo || BLANK_PIXEL;
@@ -2583,12 +2994,14 @@
                 const payments = storage.get('revive_payments_db', {});
                 const tariffs = storage.get('revive_tariffs', {});
                 const expenses = storage.get('revive_expenses_db', []);
+                const suppSales = storage.get('revive_supplement_sales_db', []);
+                const suppPurchases = storage.get('revive_supplement_purchases_db', []);
 
                 const userMap = {};
                 users.forEach(u => { if (u && u.id) userMap[u.id] = u; });
 
                 function calcStats(targetFy, targetMonth) {
-                    let s = { rev: 0, exp: 0, pnl: 0, admCount: 0, admAmt: 0, feeCount: 0, feeAmt: 0, shortCount: 0, shortAmt: 0, unpaidCount: 0, unpaidAmt: 0, admRows: [], feeRows: [], shortRows: [], expRows: [] };
+                    let s = { rev: 0, exp: 0, pnl: 0, admCount: 0, admAmt: 0, feeCount: 0, feeAmt: 0, suppSalesCount: 0, suppSalesAmt: 0, suppPurchCount: 0, suppPurchAmt: 0, shortCount: 0, shortAmt: 0, unpaidCount: 0, unpaidAmt: 0, admRows: [], feeRows: [], suppSalesRows: [], suppPurchRows: [], shortRows: [], expRows: [] };
                     const fyStartYear = parseInt(targetFy.split('-')[0], 10);
                     const today = new Date();
                     const currentScore = today.getFullYear() * 100 + today.getMonth();
@@ -2697,7 +3110,31 @@
                         }
                     });
 
-                    s.feeAmt = Math.max(0, s.rev - s.admAmt);
+                    const gymFeeRev = s.rev;
+                    s.feeAmt = Math.max(0, gymFeeRev - s.admAmt);
+
+                    // 4. Supplement Sales Revenue (Credit)
+                    suppSales.forEach(sale => {
+                        if (sale.fy === targetFy && (targetMonth === 'All' || sale.month === targetMonth)) {
+                            const amt = parseInt(sale.totalAmount || 0, 10);
+                            s.suppSalesCount++;
+                            s.suppSalesAmt += amt;
+                            s.rev += amt;
+                            s.suppSalesRows.push(sale);
+                        }
+                    });
+
+                    // 5. Supplement Stock Purchases (Debit)
+                    suppPurchases.forEach(pur => {
+                        if (pur.fy === targetFy && (targetMonth === 'All' || pur.month === targetMonth)) {
+                            const cost = parseInt(pur.totalCost || 0, 10);
+                            s.suppPurchCount++;
+                            s.suppPurchAmt += cost;
+                            s.exp += cost;
+                            s.suppPurchRows.push(pur);
+                        }
+                    });
+
                     s.pnl = s.rev - s.exp;
                     return s;
                 }
@@ -2715,6 +3152,10 @@
                 document.getElementById('kpi-adm-amt').innerText = currStats.admAmt.toLocaleString();
                 document.getElementById('kpi-fee-count').innerText = currStats.feeCount;
                 document.getElementById('kpi-fee-amt').innerText = currStats.feeAmt.toLocaleString();
+                document.getElementById('kpi-supp-sales-count').innerText = currStats.suppSalesCount;
+                document.getElementById('kpi-supp-sales-amt').innerText = currStats.suppSalesAmt.toLocaleString();
+                document.getElementById('kpi-supp-purch-count').innerText = currStats.suppPurchCount;
+                document.getElementById('kpi-supp-purch-amt').innerText = currStats.suppPurchAmt.toLocaleString();
                 document.getElementById('kpi-shortfall-count').innerText = currStats.shortCount;
                 document.getElementById('kpi-shortfall-amt').innerText = currStats.shortAmt.toLocaleString();
                 document.getElementById('kpi-unpaid-count').innerText = currStats.unpaidCount;
@@ -2725,6 +3166,35 @@
 
                 const feeTbody = document.querySelector('#table-fees tbody');
                 feeTbody.innerHTML = currStats.feeRows.length ? currStats.feeRows.map(p => `<tr onclick="window.moduleContext.loadProfileByPhoneOrId('${p.userId}')" title="Click to view member profile"><td>${p.lastDate ? new Date(p.lastDate).toLocaleDateString('en-IN') : '-'}</td><td><strong>${p.userId}</strong> - ${p.fullName}${p.isDeleted ? ' <span class="deleted-badge">Archived</span>' : ''}</td><td>${p.month}</td><td style="color:green; font-weight:bold;">₹${p.amountPaid}</td><td>${p.method || 'CASH'}</td><td>${p.collectedBy || 'Admin'}</td></tr>`).join('') : '<tr><td colspan="6" style="text-align:center;">No fee collections found for this period.</td></tr>';
+
+                const suppSalesTbody = document.querySelector('#table-supp-sales-report tbody');
+                if (suppSalesTbody) {
+                    suppSalesTbody.innerHTML = currStats.suppSalesRows.length ? currStats.suppSalesRows.map(sale => {
+                        const itemsSummary = (sale.items || []).map(i => `${i.name} (x${i.qty})`).join(', ');
+                        return `<tr onclick="window.moduleContext.loadProfileByPhoneOrId('${sale.userId}')" title="Click to view member profile">
+                            <td>${sale.date || formatDateStr(sale.isoDate)}</td>
+                            <td><strong>${sale.id}</strong></td>
+                            <td><strong>${sale.userId}</strong> - ${sale.fullName}</td>
+                            <td>${itemsSummary}</td>
+                            <td>${sale.method || 'CASH'}</td>
+                            <td>${sale.soldBy || 'Admin'}</td>
+                            <td style="color:var(--success-green); font-weight:bold;">₹${sale.totalAmount}</td>
+                        </tr>`;
+                    }).join('') : '<tr><td colspan="7" style="text-align:center;">No supplement sales recorded for this period.</td></tr>';
+                }
+
+                const suppPurchTbody = document.querySelector('#table-supp-purchases-report tbody');
+                if (suppPurchTbody) {
+                    suppPurchTbody.innerHTML = currStats.suppPurchRows.length ? currStats.suppPurchRows.map(pur => `<tr>
+                        <td>${formatDateStr(pur.date)}</td>
+                        <td><strong>${pur.id}</strong></td>
+                        <td>${pur.productName}</td>
+                        <td>${pur.qty}</td>
+                        <td>₹${pur.unitCost}</td>
+                        <td>${pur.mode || 'UPI'}</td>
+                        <td style="color:var(--error-red); font-weight:bold;">₹${pur.totalCost}</td>
+                    </tr>`).join('') : '<tr><td colspan="7" style="text-align:center;">No supplement stock purchases recorded for this period.</td></tr>';
+                }
 
                 const expTbody = document.querySelector('#table-expenses-report tbody');
                 expTbody.innerHTML = currStats.expRows.length ? currStats.expRows.map(ex => `<tr><td>${formatDateStr(ex.date)}</td><td>${ex.category}</td><td>${ex.desc || '-'}</td><td>${ex.mode}</td><td style="color:var(--error-red); font-weight:bold;">₹${ex.amount}</td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;">No expenses recorded for this period.</td></tr>';
@@ -2809,6 +3279,621 @@
                     document.getElementById('primaryContact').value = phone;
                     window.moduleContext.checkDuplicatePhoneLive();
                 }
+            },
+
+            // ==========================================
+            // SUPPLEMENT STORE MODULE (BROWSE, CART, MEMBER VALIDATION, PAYMENT & INVOICE)
+            // ==========================================
+            initSupplementStore: function() {
+                ensureDefaultSupplements();
+                supplementCart = {};
+                selectedSuppMember = null;
+                currentSuppSaleRecord = null;
+                document.getElementById('supp-step-1').classList.add('active-step');
+                document.getElementById('supp-step-2').classList.remove('active-step');
+                document.getElementById('supp-step-3').classList.remove('active-step');
+                window.moduleContext.renderSupplementCatalog();
+            },
+
+            renderSupplementCatalog: function() {
+                const supps = ensureDefaultSupplements();
+                const grid = document.getElementById('supp-catalog-grid');
+                if (!grid) return;
+                grid.innerHTML = '';
+
+                let totalItems = 0;
+                let totalPayable = 0;
+                let totalMrp = 0;
+
+                supps.forEach(item => {
+                    const stock = parseInt(item.stock || 0, 10);
+                    const mrp = parseInt(item.mrp || 0, 10);
+                    const offer = parseInt(item.offerPrice || mrp, 10);
+                    const inCartQty = supplementCart[item.id] || 0;
+
+                    if (inCartQty > 0) {
+                        totalItems += inCartQty;
+                        totalPayable += inCartQty * offer;
+                        totalMrp += inCartQty * mrp;
+                    }
+
+                    const savingsPct = mrp > offer ? Math.round(((mrp - offer) / mrp) * 100) : 0;
+                    let stockBadgeClass = 'stock-in';
+                    let stockText = `Live Stock: ${stock} units`;
+                    if (stock <= 0) {
+                        stockBadgeClass = 'stock-out';
+                        stockText = 'Out of Stock (0)';
+                    } else if (stock <= 5) {
+                        stockBadgeClass = 'stock-low';
+                        stockText = `Low Stock: Only ${stock} left`;
+                    }
+
+                    grid.innerHTML += `
+                        <div class="supp-card">
+                            <div>
+                                <div class="supp-card-header">
+                                    <div class="supp-card-cat">${item.category || 'Supplement'}</div>
+                                    <div class="supp-card-title">${item.name}</div>
+                                </div>
+                                <div class="supp-price-box">
+                                    <span class="supp-offer-price">₹${offer}</span>
+                                    ${mrp > offer ? `<span class="supp-mrp-price">₹${mrp}</span><span class="supp-save-badge">${savingsPct}% OFF</span>` : ''}
+                                </div>
+                                <span class="supp-stock-badge ${stockBadgeClass}">${stockText}</span>
+                            </div>
+                            <div style="margin-top:0.5rem;">
+                                ${stock > 0 ? `
+                                    <div class="qty-stepper">
+                                        <button type="button" class="qty-btn" onclick="window.moduleContext.changeSuppCartQty('${item.id}', -1)">−</button>
+                                        <span class="qty-val">${inCartQty} in cart</span>
+                                        <button type="button" class="qty-btn" onclick="window.moduleContext.changeSuppCartQty('${item.id}', 1)">+</button>
+                                    </div>
+                                ` : `<button type="button" class="btn secondary" disabled style="opacity:0.5; cursor:not-allowed; padding:0.6rem;">Out of Stock</button>`}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                document.getElementById('supp-cart-count').innerText = totalItems;
+                document.getElementById('supp-cart-total').innerText = totalPayable.toLocaleString();
+                const totSavings = Math.max(0, totalMrp - totalPayable);
+                document.getElementById('supp-cart-savings').innerText = totSavings > 0 ? `(You Save ₹${totSavings.toLocaleString()})` : '';
+            },
+
+            changeSuppCartQty: function(productId, delta) {
+                const supps = ensureDefaultSupplements();
+                const item = supps.find(s => String(s.id) === String(productId));
+                if (!item) return;
+                const maxStock = parseInt(item.stock || 0, 10);
+                const curr = supplementCart[productId] || 0;
+                const next = curr + delta;
+                if (next < 0) return;
+                if (next > maxStock) {
+                    showNotice(`Only ${maxStock} units of ${item.name} available in live stock!`, "warning");
+                    return;
+                }
+                if (next === 0) delete supplementCart[productId];
+                else supplementCart[productId] = next;
+                window.moduleContext.renderSupplementCatalog();
+            },
+
+            clearSupplementCart: function() {
+                supplementCart = {};
+                window.moduleContext.renderSupplementCatalog();
+                showNotice("Supplement cart cleared.", "info");
+            },
+
+            proceedToSuppCheckout: function() {
+                const keys = Object.keys(supplementCart);
+                if (keys.length === 0) {
+                    showNotice("Please add at least one supplement product to the cart first.", "error");
+                    return;
+                }
+                const supps = ensureDefaultSupplements();
+                const tbody = document.querySelector('#table-supp-checkout-items tbody');
+                tbody.innerHTML = '';
+                let grandTotal = 0;
+
+                keys.forEach(pid => {
+                    const item = supps.find(s => String(s.id) === String(pid));
+                    const qty = supplementCart[pid] || 0;
+                    if (!item || qty <= 0) return;
+                    const sub = qty * parseInt(item.offerPrice, 10);
+                    grandTotal += sub;
+                    tbody.innerHTML += `<tr>
+                        <td><strong>${item.name}</strong></td>
+                        <td style="text-decoration:line-through; color:var(--text-muted);">₹${item.mrp}</td>
+                        <td style="color:var(--accent-orange); font-weight:700;">₹${item.offerPrice}</td>
+                        <td><strong>${qty}</strong></td>
+                        <td style="font-weight:900;">₹${sub}</td>
+                    </tr>`;
+                });
+                tbody.innerHTML += `<tr style="background:var(--bg-main);"><td colspan="4" style="text-align:right; font-weight:800;">Grand Total:</td><td style="color:var(--accent-orange); font-weight:900; font-size:1.05rem;">₹${grandTotal}</td></tr>`;
+
+                document.getElementById('supp-member-search').value = '';
+                document.getElementById('supp-member-live-preview').innerHTML = '';
+                if (!selectedSuppMember) {
+                    document.getElementById('supp-cust-id').value = '';
+                    document.getElementById('supp-cust-name').value = '';
+                    document.getElementById('supp-cust-phone').value = '';
+                    document.getElementById('supp-cust-address').value = '';
+                }
+
+                document.getElementById('supp-step-1').classList.remove('active-step');
+                document.getElementById('supp-step-2').classList.add('active-step');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+
+            previewSuppMember: function(val) {
+                const previewEl = document.getElementById('supp-member-live-preview');
+                const cleanVal = String(val || '').trim();
+                if (!cleanVal) { previewEl.innerHTML = ''; return; }
+
+                const matches = findUsersForAttendance(cleanVal);
+                if (matches && matches.length > 0) {
+                    let html = '<div style="display:grid; gap:8px; margin-top:8px; max-height:220px; overflow-y:auto; padding:4px;">';
+                    matches.forEach(user => {
+                        const photoUrl = user.photo || DEFAULT_AVATAR_SVG;
+                        const safeId = String(user.id).replace(/'/g, "\'");
+                        html += `
+                        <div style="display:flex; align-items:center; gap:12px; padding:10px; border:1px solid var(--border-color); border-radius:8px; cursor:pointer; background:var(--bg-panel);"
+                             onclick="window.moduleContext.selectSuppMember('${safeId}')">
+                            <img src="${photoUrl}" alt="${user.fullName}" style="width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid var(--accent-orange);">
+                            <div style="flex:1;">
+                                <div style="color:var(--text-main); font-weight:800;">${user.fullName}</div>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">ID: ${user.id} | Ph: ${user.primaryContact} | ${user.address || ''}</div>
+                            </div>
+                        </div>`;
+                    });
+                    html += '</div>';
+                    previewEl.innerHTML = html;
+                } else {
+                    previewEl.innerHTML = `<span style="color:var(--text-muted); font-size:0.85rem;">No active member found matching "${cleanVal}".</span>`;
+                }
+            },
+
+            selectSuppMember: function(userId) {
+                const users = storage.get('revive_users_db', []);
+                const user = users.find(u => !u.isDeleted && String(u.id) === String(userId));
+                if (!user) return;
+                selectedSuppMember = user;
+                document.getElementById('supp-cust-id').value = user.id;
+                document.getElementById('supp-cust-name').value = user.fullName;
+                document.getElementById('supp-cust-phone').value = user.primaryContact;
+                document.getElementById('supp-cust-address').value = user.address || 'Keralapuram';
+                document.getElementById('supp-member-search').value = `${user.fullName} (${user.id})`;
+                document.getElementById('supp-member-live-preview').innerHTML = `<span style="color:var(--success-green); font-weight:700; font-size:0.85rem;">✔ Member verified and details loaded for invoice generation.</span>`;
+            },
+
+            proceedToSuppPayment: function() {
+                if (!selectedSuppMember || !document.getElementById('supp-cust-id').value) {
+                    const typed = document.getElementById('supp-member-search').value.trim();
+                    if (typed) {
+                        const matches = findUsersForAttendance(typed);
+                        if (matches.length === 1) window.moduleContext.selectSuppMember(matches[0].id);
+                    }
+                }
+                if (!selectedSuppMember || !document.getElementById('supp-cust-id').value) {
+                    showNotice("Please search and select a valid Member (by Phone, Admission ID, or Name) first.", "error");
+                    document.getElementById('supp-member-search').focus();
+                    return;
+                }
+
+                const supps = ensureDefaultSupplements();
+                let totalMrp = 0;
+                let totalNet = 0;
+                Object.keys(supplementCart).forEach(pid => {
+                    const item = supps.find(s => String(s.id) === String(pid));
+                    const qty = supplementCart[pid] || 0;
+                    if (item && qty > 0) {
+                        totalMrp += qty * parseInt(item.mrp, 10);
+                        totalNet += qty * parseInt(item.offerPrice, 10);
+                    }
+                });
+
+                const nextInvId = getNextSupplementInvoiceId();
+                document.getElementById('supp-pay-inv-id').innerText = nextInvId;
+                document.getElementById('supp-pay-member-label').innerText = `${selectedSuppMember.fullName} (${selectedSuppMember.id})`;
+                document.getElementById('supp-pay-mrp').innerText = totalMrp;
+                document.getElementById('supp-pay-disc').innerText = Math.max(0, totalMrp - totalNet);
+                document.getElementById('supp-pay-net').innerText = totalNet;
+
+                document.getElementById('supp-staff-pin').value = '';
+                document.getElementById('supp-pin-identity').style.color = 'var(--text-muted)';
+                document.getElementById('supp-pin-identity').innerText = 'Enter Staff or Admin PIN to authorize and record who completed this sale';
+
+                window.moduleContext.updateSuppPaymentUI();
+                document.getElementById('supp-step-2').classList.remove('active-step');
+                document.getElementById('supp-step-3').classList.add('active-step');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+
+            updateSuppPaymentUI: function() {
+                const method = document.getElementById('suppPaymentMethod').value;
+                const netAmt = parseInt(document.getElementById('supp-pay-net').innerText || '0', 10);
+                const upiSec = document.getElementById('supp-upi-section');
+                if (method === 'UPI' && netAmt > 0) {
+                    upiSec.style.display = 'block';
+                    document.getElementById('supp-qr-amount-display').innerText = netAmt;
+                    const s = storage.get('revive_settings_db', {});
+                    const activeUpiId = s.upiId || APP_CONFIG.upiId;
+                    const upiString = `upi://pay?pa=${activeUpiId}&pn=ReviveFitness&am=${netAmt}&cu=INR`;
+                    document.getElementById('supp-upi-qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=${encodeURIComponent(upiString)}`;
+                } else {
+                    upiSec.style.display = 'none';
+                }
+            },
+
+            backToSuppStep: function(stepNum) {
+                document.getElementById('supp-step-1').classList.remove('active-step');
+                document.getElementById('supp-step-2').classList.remove('active-step');
+                document.getElementById('supp-step-3').classList.remove('active-step');
+                document.getElementById(`supp-step-${stepNum}`).classList.add('active-step');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+
+            completeSupplementSale: function() {
+                const pinVal = document.getElementById('supp-staff-pin').value;
+                const sellerIdentity = verifyCollectorPin(pinVal);
+                if (!sellerIdentity) {
+                    showNotice("Invalid Staff or Admin PIN. Please enter a valid PIN to finalize this sale.", "error");
+                    document.getElementById('supp-staff-pin').focus();
+                    return;
+                }
+
+                let supps = ensureDefaultSupplements();
+                const itemsSold = [];
+                let totalMrp = 0;
+                let totalAmount = 0;
+                let totalCost = 0;
+
+                // Validate stock and deduct
+                for (const pid of Object.keys(supplementCart)) {
+                    const qty = supplementCart[pid] || 0;
+                    const idx = supps.findIndex(s => String(s.id) === String(pid));
+                    if (idx === -1 || qty <= 0) continue;
+                    if (parseInt(supps[idx].stock, 10) < qty) {
+                        showNotice(`Insufficient stock for ${supps[idx].name}!`, "error");
+                        return;
+                    }
+                    supps[idx].stock = parseInt(supps[idx].stock, 10) - qty;
+                    const mrp = parseInt(supps[idx].mrp, 10);
+                    const offer = parseInt(supps[idx].offerPrice, 10);
+                    const cost = parseInt(supps[idx].costPrice || 0, 10);
+                    itemsSold.push({
+                        id: supps[idx].id,
+                        name: supps[idx].name,
+                        qty: qty,
+                        mrp: mrp,
+                        offerPrice: offer,
+                        costPrice: cost,
+                        lineTotal: qty * offer
+                    });
+                    totalMrp += qty * mrp;
+                    totalAmount += qty * offer;
+                    totalCost += qty * cost;
+                }
+
+                storage.set('revive_supplements_db', supps);
+                cloudSync.push('pushSupplements', supps);
+
+                const now = new Date();
+                const dateStr = `${String(now.getDate()).padStart(2, '0')}-${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
+                const monthName = now.toLocaleString('default', { month: 'long' });
+                const y = now.getFullYear();
+                const m = now.getMonth();
+                const fyStart = m >= 3 ? y : y - 1;
+                const fyString = `${fyStart}-${fyStart + 1}`;
+                const invId = getNextSupplementInvoiceId();
+                const payMethod = document.getElementById('suppPaymentMethod').value;
+                const custAddress = document.getElementById('supp-cust-address').value.trim() || selectedSuppMember.address || 'Keralapuram';
+
+                const saleRecord = {
+                    id: invId,
+                    date: dateStr,
+                    isoDate: now.toISOString(),
+                    fy: fyString,
+                    month: monthName,
+                    userId: selectedSuppMember.id,
+                    fullName: selectedSuppMember.fullName,
+                    phone: selectedSuppMember.primaryContact,
+                    address: custAddress,
+                    items: itemsSold,
+                    totalMrp: totalMrp,
+                    totalAmount: totalAmount,
+                    totalCost: totalCost,
+                    method: payMethod,
+                    soldBy: sellerIdentity
+                };
+
+                let salesDb = storage.get('revive_supplement_sales_db', []);
+                salesDb.push(saleRecord);
+                storage.set('revive_supplement_sales_db', salesDb);
+                cloudSync.push('pushSupplementSale', saleRecord);
+
+                currentSuppSaleRecord = saleRecord;
+                supplementCart = {};
+
+                document.getElementById('supp-generated-inv-id').innerText = invId;
+                document.getElementById('supp-sm-sold-by').innerText = sellerIdentity;
+                document.getElementById('suppSaleSuccessModal').style.display = 'flex';
+                showNotice(`Supplement Sale ${invId} recorded!`, "success");
+            },
+
+            shareSupplementInvoice: function() {
+                if (!currentSuppSaleRecord) return;
+                applyLogoToExportTemplates();
+                const btn = document.getElementById('btn-share-supp-invoice');
+                btn.innerText = "Generating Invoice...";
+
+                const s = currentSuppSaleRecord;
+                document.getElementById('sinv-id').innerText = s.id;
+                document.getElementById('sinv-date').innerText = new Date(s.isoDate).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+                document.getElementById('sinv-member').innerText = `${s.fullName} (${s.userId})`;
+                document.getElementById('sinv-phone').innerText = s.phone;
+                document.getElementById('sinv-address').innerText = s.address;
+
+                const tbody = document.querySelector('#sinv-items-table tbody');
+                tbody.innerHTML = '';
+                (s.items || []).forEach(it => {
+                    tbody.innerHTML += `<tr style="border-bottom:1px solid #f0f0f0;">
+                        <td style="padding:4px 0;">${it.name}</td>
+                        <td style="padding:4px 0; text-align:center;">${it.qty}</td>
+                        <td style="padding:4px 0; text-align:right;">₹${it.offerPrice}</td>
+                        <td style="padding:4px 0; text-align:right; font-weight:bold;">₹${it.lineTotal}</td>
+                    </tr>`;
+                });
+
+                document.getElementById('sinv-mrp').innerText = s.totalMrp;
+                document.getElementById('sinv-disc').innerText = Math.max(0, s.totalMrp - s.totalAmount);
+                document.getElementById('sinv-net').innerText = s.totalAmount;
+                document.getElementById('sinv-mode').innerText = s.method;
+                document.getElementById('sinv-seller').innerText = s.soldBy;
+
+                const wrapper = document.getElementById('receipt-render-zone');
+                const target = document.getElementById('supp-invoice-template');
+                wrapper.style.left = '0';
+                wrapper.style.opacity = '1';
+
+                setTimeout(() => {
+                    html2canvas(target, { scale: 2 }).then(canvas => {
+                        canvas.toBlob(async blob => {
+                            wrapper.style.left = '-9999px';
+                            wrapper.style.opacity = '0';
+                            btn.innerText = "Share / Download Invoice Receipt";
+
+                            try {
+                                const file = new File([blob], `Supplement_Invoice_${s.id}.jpg`, { type: 'image/jpeg' });
+                                const itemsTxt = (s.items || []).map(i => `• ${i.name} x${i.qty} = ₹${i.lineTotal}`).join('\n');
+                                const msg = `Dear ${s.fullName},\n\nThank you for shopping at *Revive Fitness Supplement Store*!\n\n*Invoice No:* ${s.id}\n*Items:*\n${itemsTxt}\n*Total Paid:* ₹${s.totalAmount} (${s.method})\n*Sold By:* ${s.soldBy}\n\nBest Regards,\n*Revive Fitness Studio*\n📞 8921698044`;
+
+                                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                                    await navigator.share({ title: `Supplement Invoice ${s.id}`, text: msg, files: [file] });
+                                } else {
+                                    const url = window.URL.createObjectURL(blob);
+                                    const a = document.createElement("a");
+                                    a.href = url;
+                                    a.download = file.name;
+                                    document.body.appendChild(a);
+                                    a.click();
+                                    document.body.removeChild(a);
+                                    window.URL.revokeObjectURL(url);
+
+                                    showNotice("Invoice downloaded! Opening WhatsApp to share.", "info");
+                                    window.open(`https://api.whatsapp.com/send?phone=91${s.phone}&text=${encodeURIComponent(msg)}`, '_blank');
+                                }
+                            } catch (e) { console.error(e); }
+                        }, 'image/jpeg', 0.95);
+                    });
+                }, 300);
+            },
+
+            // ==========================================
+            // ADMIN SUPPLEMENT INVENTORY & PURCHASE MANAGER
+            // ==========================================
+            initSupplementAdmin: function() {
+                ensureDefaultSupplements();
+                window.moduleContext.resetSuppInventoryForm();
+                window.moduleContext.renderSupplementInventoryTable();
+                window.moduleContext.renderSupplementPurchasesAdminTable();
+            },
+
+            resetSuppInventoryForm: function() {
+                const form = document.getElementById('suppInventoryForm');
+                if (form) form.reset();
+                document.getElementById('supp-inv-id').value = '';
+                document.getElementById('supp-inv-form-title').innerText = 'Add New Product / Record Stock Purchase';
+                document.getElementById('supp-inv-entry-mode').value = 'purchase';
+                document.getElementById('supp-inv-qty-label').innerHTML = 'Stock Qty to Add <span class="required">*</span>';
+                document.getElementById('btn-save-supp-inv').innerText = 'Save Product & Record Stock';
+                document.getElementById('btn-cancel-supp-edit').style.display = 'none';
+            },
+
+            saveSupplementInventory: function(e) {
+                if (e) e.preventDefault();
+                const editId = document.getElementById('supp-inv-id').value.trim();
+                const name = document.getElementById('supp-inv-name').value.trim();
+                const cat = document.getElementById('supp-inv-cat').value.trim() || 'Supplement';
+                const entryMode = document.getElementById('supp-inv-entry-mode').value;
+                const costPrice = parseInt(document.getElementById('supp-inv-cost').value || '0', 10);
+                const mrp = parseInt(document.getElementById('supp-inv-mrp').value || '0', 10);
+                const offerPrice = parseInt(document.getElementById('supp-inv-offer').value || '0', 10);
+                const qtyVal = parseInt(document.getElementById('supp-inv-qty').value || '0', 10);
+                const payMode = document.getElementById('supp-inv-paymode').value;
+
+                if (offerPrice > mrp) {
+                    showNotice("Offer Price cannot exceed MRP!", "error");
+                    return;
+                }
+
+                let supps = ensureDefaultSupplements();
+                let targetProduct = null;
+                let qtyPurchasedForReport = 0;
+
+                if (editId) {
+                    const idx = supps.findIndex(s => String(s.id) === String(editId));
+                    if (idx !== -1) {
+                        supps[idx].name = name;
+                        supps[idx].category = cat;
+                        supps[idx].costPrice = costPrice;
+                        supps[idx].mrp = mrp;
+                        supps[idx].offerPrice = offerPrice;
+                        if (entryMode === 'purchase') {
+                            supps[idx].stock = parseInt(supps[idx].stock || 0, 10) + qtyVal;
+                            qtyPurchasedForReport = qtyVal;
+                        } else {
+                            supps[idx].stock = qtyVal;
+                        }
+                        targetProduct = supps[idx];
+                    }
+                } else {
+                    const newId = 'SUPP-' + (Date.now().toString().slice(-4));
+                    targetProduct = {
+                        id: newId,
+                        name: name,
+                        category: cat,
+                        costPrice: costPrice,
+                        mrp: mrp,
+                        offerPrice: offerPrice,
+                        stock: qtyVal
+                    };
+                    supps.push(targetProduct);
+                    if (entryMode === 'purchase' && qtyVal > 0) {
+                        qtyPurchasedForReport = qtyVal;
+                    }
+                }
+
+                storage.set('revive_supplements_db', supps);
+                cloudSync.push('pushSupplements', supps);
+
+                // Record purchase transaction in P&L Purchase Report if stock was purchased
+                if (entryMode === 'purchase' && qtyPurchasedForReport > 0 && costPrice > 0 && targetProduct) {
+                    const now = new Date();
+                    const dateIso = now.toISOString().split('T')[0];
+                    const monthName = now.toLocaleString('default', { month: 'long' });
+                    const y = now.getFullYear();
+                    const m = now.getMonth();
+                    const fyStart = m >= 3 ? y : y - 1;
+                    const fyString = `${fyStart}-${fyStart + 1}`;
+
+                    const purRecord = {
+                        id: 'PUR-' + Date.now().toString().slice(-5),
+                        date: dateIso,
+                        fy: fyString,
+                        month: monthName,
+                        productId: targetProduct.id,
+                        productName: targetProduct.name,
+                        qty: qtyPurchasedForReport,
+                        unitCost: costPrice,
+                        totalCost: qtyPurchasedForReport * costPrice,
+                        mode: payMode,
+                        timestamp: now.toISOString()
+                    };
+                    let purDb = storage.get('revive_supplement_purchases_db', []);
+                    purDb.push(purRecord);
+                    storage.set('revive_supplement_purchases_db', purDb);
+                    cloudSync.push('pushSupplementPurchase', purRecord);
+                }
+
+                showNotice(editId ? "Supplement inventory updated!" : "New supplement added to inventory!", "success");
+                window.moduleContext.initSupplementAdmin();
+            },
+
+            editSupplementItem: function(id, mode) {
+                const supps = ensureDefaultSupplements();
+                const item = supps.find(s => String(s.id) === String(id));
+                if (!item) return;
+
+                document.getElementById('supp-inv-id').value = item.id;
+                document.getElementById('supp-inv-name').value = item.name;
+                document.getElementById('supp-inv-cat').value = item.category || '';
+                document.getElementById('supp-inv-cost').value = item.costPrice || 0;
+                document.getElementById('supp-inv-mrp').value = item.mrp;
+                document.getElementById('supp-inv-offer').value = item.offerPrice;
+                document.getElementById('supp-inv-entry-mode').value = mode;
+
+                if (mode === 'purchase') {
+                    document.getElementById('supp-inv-form-title').innerText = `Restock Purchase: ${item.name} (Current Stock: ${item.stock})`;
+                    document.getElementById('supp-inv-qty-label').innerHTML = 'Qty to Add (Purchase) <span class="required">*</span>';
+                    document.getElementById('supp-inv-qty').value = 5;
+                    document.getElementById('btn-save-supp-inv').innerText = '+ Record Stock Purchase';
+                } else {
+                    document.getElementById('supp-inv-form-title').innerText = `Edit Product Details: ${item.name}`;
+                    document.getElementById('supp-inv-qty-label').innerHTML = 'Set Exact Live Stock <span class="required">*</span>';
+                    document.getElementById('supp-inv-qty').value = item.stock;
+                    document.getElementById('btn-save-supp-inv').innerText = 'Update Product Details';
+                }
+                document.getElementById('btn-cancel-supp-edit').style.display = 'inline-flex';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+
+            deleteSupplementItem: function(id) {
+                window.appContext.askConfirm(
+                    "Remove Supplement Product",
+                    "Are you sure you want to remove this product from the active store catalog? Past sales and purchase records in P&L reports will remain preserved.",
+                    function() {
+                        let supps = ensureDefaultSupplements();
+                        supps = supps.filter(s => String(s.id) !== String(id));
+                        storage.set('revive_supplements_db', supps);
+                        cloudSync.push('pushSupplements', supps);
+                        window.moduleContext.renderSupplementInventoryTable();
+                        showNotice("Product removed from catalog.", "info");
+                    }
+                );
+            },
+
+            renderSupplementInventoryTable: function() {
+                const supps = ensureDefaultSupplements();
+                const tbody = document.querySelector('#table-supp-inventory tbody');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                if (supps.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No supplements in inventory.</td></tr>';
+                    return;
+                }
+                supps.forEach(item => {
+                    const st = parseInt(item.stock || 0, 10);
+                    const stColor = st <= 0 ? 'var(--error-red)' : (st <= 5 ? 'var(--warning-yellow)' : 'var(--success-green)');
+                    tbody.innerHTML += `<tr>
+                        <td><strong>${item.id}</strong></td>
+                        <td><strong>${item.name}</strong><br><span style="font-size:0.75rem; color:var(--text-muted);">${item.category || ''}</span></td>
+                        <td>₹${item.costPrice || 0}</td>
+                        <td>₹${item.mrp}</td>
+                        <td style="color:var(--accent-orange); font-weight:800;">₹${item.offerPrice}</td>
+                        <td style="color:${stColor}; font-weight:900;">${st} units</td>
+                        <td>
+                            <div style="display:flex; gap:6px;">
+                                <button type="button" class="btn primary" style="padding:0.35rem 0.7rem; font-size:0.75rem; width:auto;" onclick="window.moduleContext.editSupplementItem('${item.id}', 'purchase')">+ Restock</button>
+                                <button type="button" class="btn secondary" style="padding:0.35rem 0.7rem; font-size:0.75rem; width:auto;" onclick="window.moduleContext.editSupplementItem('${item.id}', 'update')">Edit</button>
+                                <button type="button" class="btn danger" style="padding:0.35rem 0.7rem; font-size:0.75rem; width:auto; border:none;" onclick="window.moduleContext.deleteSupplementItem('${item.id}')">✕</button>
+                            </div>
+                        </td>
+                    </tr>`;
+                });
+            },
+
+            renderSupplementPurchasesAdminTable: function() {
+                let purDb = storage.get('revive_supplement_purchases_db', []);
+                purDb = [...purDb].sort((a, b) => new Date(b.timestamp || b.date) - new Date(a.timestamp || a.date));
+                const tbody = document.querySelector('#table-supp-purchases-admin tbody');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                const recent = purDb.slice(0, 15);
+                if (recent.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No stock purchases recorded yet.</td></tr>';
+                    return;
+                }
+                recent.forEach(p => {
+                    tbody.innerHTML += `<tr>
+                        <td>${formatDateStr(p.date)}</td>
+                        <td><strong>${p.id}</strong></td>
+                        <td>${p.productName}</td>
+                        <td><strong>+${p.qty}</strong></td>
+                        <td>₹${p.unitCost}</td>
+                        <td>${p.mode || 'UPI'}</td>
+                        <td style="color:var(--error-red); font-weight:bold;">₹${p.totalCost}</td>
+                    </tr>`;
+                });
             }
         };
         window.moduleContext = moduleContext;
@@ -2819,6 +3904,10 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            preloadLogoForCapture();
+            ensureDefaultSupplements();
+            const fyEl = document.getElementById('footer-year');
+            if (fyEl) fyEl.innerText = new Date().getFullYear();
             cloudSync.pullInitial();
 
             const dobInp = document.getElementById('dob'); 
