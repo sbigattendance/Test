@@ -157,8 +157,8 @@
         .sig-camera-container { width: 100%; max-width: 400px; height: 150px; background-color: #ffffff; border: 2px solid var(--accent-orange); margin: 1rem 0; display: flex; justify-content: center; align-items: center; overflow: hidden; border-radius: 8px; box-shadow: inset 0 2px 6px rgba(0,0,0,0.05); position: relative; }
         .camera-placeholder svg { width: 48px; height: 48px; stroke: var(--text-muted); fill: none; stroke-width: 1.5; }
         
-        /* Fix #9: Explicitly ensure true un-mirrored orientation on all video & image captures */
-        video, #selfie-preview, #sig-preview { width: 100%; height: 100%; object-fit: cover; position: relative; z-index: 2; transform: scaleX(1) !important; -webkit-transform: scaleX(1) !important; }
+        /* Fix #9: Allow dynamic mirror correction on selfie camera & true orientation on previews */
+        video, #selfie-preview, #sig-preview { width: 100%; height: 100%; object-fit: cover; position: relative; z-index: 2; }
         #sig-preview { object-fit: contain; background: #fff; }
         .control-btns { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; width: 100%; max-width: 420px; }
 
@@ -355,10 +355,6 @@
                 <div class="module-card" onclick="window.moduleContext.openUserSearch('details')">
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     <h3>User Details</h3>
-                </div>
-                <div class="module-card" onclick="window.appContext.switchView('supplement-store')">
-                    <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-                    <h3>Supplement Store</h3>
                 </div>
                 <div class="module-card admin-only" onclick="window.appContext.switchView('supplement-admin')">
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
@@ -925,6 +921,7 @@
                             <div class="control-btns">
                                 <button type="button" id="btn-start-camera" class="btn secondary" style="flex:1;">Open Camera</button>
                                 <button type="button" id="btn-switch-camera" class="btn secondary" style="display:none; flex:1;">Switch Camera</button>
+                                <button type="button" id="btn-flip-camera" class="btn secondary" style="display:none; flex:1;">⇄ Flip Mirror</button>
                                 <button type="button" id="btn-capture" class="btn primary" style="display:none; flex:1;">Capture Photo</button>
                                 <button type="button" id="btn-retake" class="btn secondary" style="display:none; flex:1;">Retake Photo</button>
                             </div>
@@ -948,8 +945,8 @@
                                 <button type="button" id="btn-start-sig-camera" class="btn secondary" style="flex:1; font-size:0.82rem; padding:0.75rem;">📷 Use Live Camera</button>
                                 <button type="button" id="btn-switch-sig-camera" class="btn secondary" style="display:none; flex:1; font-size:0.82rem; padding:0.75rem;">Switch Lens</button>
                                 <button type="button" id="btn-capture-sig" class="btn primary" style="display:none; flex:1; font-size:0.82rem; padding:0.75rem;">Capture Signature</button>
-                                <label for="sig-file-input" class="btn secondary" style="flex:1; font-size:0.82rem; padding:0.75rem; margin:0; cursor:pointer;">📁 Upload Image</label>
-                                <input type="file" id="sig-file-input" accept="image/*" capture="environment" style="display:none;">
+                                <label for="sig-file-input" class="btn secondary" style="flex:1; font-size:0.82rem; padding:0.75rem; margin:0; cursor:pointer;">📁 Select from Gallery</label>
+                                <input type="file" id="sig-file-input" accept="image/*" style="display:none;">
                                 <button type="button" id="btn-retake-sig" class="btn danger" style="display:none; flex:1; font-size:0.82rem; padding:0.75rem;">Clear / Retake</button>
                             </div>
                             <input type="hidden" id="sig-data" required>
@@ -1619,31 +1616,35 @@
             if (sigFile) sigFile.value = '';
         }
 
-        // Fix #2: Synchronize Admission ID series (REV-XXXX) with all Google Sheet / local users & payment records
+        // Fix #2: Synchronize Admission ID series (REV-XXXX) strictly with Google Sheet users data
+        function extractRevNumber(val) {
+            if (!val) return 0;
+            const s = String(val).trim().toUpperCase();
+            const match = s.match(/REV[-\s]*(\d+)/i) || s.match(/^(\d+)$/);
+            if (match && match[1]) {
+                const n = parseInt(match[1], 10);
+                return (!isNaN(n) && n > 0 && n < 1000000) ? n : 0;
+            }
+            return 0;
+        }
+
         function syncAdmissionCounter() {
             const users = storage.get('revive_users_db', []);
-            const payments = storage.get('revive_payments_db', {});
             let maxNum = 0;
 
-            users.forEach(u => {
-                if (u && u.id && String(u.id).startsWith('REV-')) {
-                    const num = parseInt(String(u.id).replace(/\D/g, ''), 10);
-                    if (!isNaN(num) && num > maxNum) maxNum = num;
-                }
-            });
+            if (Array.isArray(users) && users.length > 0) {
+                users.forEach(u => {
+                    if (!u) return;
+                    const rawId = u.id || u.admissionId || u.AdmissionID || u['Admission ID'] || u.userId || '';
+                    const num = extractRevNumber(rawId);
+                    if (num > maxNum) maxNum = num;
+                });
+                // Fallback if sheet rows exist without standard REV-XXXX parseable strings
+                if (maxNum === 0) maxNum = users.length;
+            }
 
-            Object.keys(payments).forEach(uid => {
-                if (String(uid).startsWith('REV-')) {
-                    const num = parseInt(String(uid).replace(/\D/g, ''), 10);
-                    if (!isNaN(num) && num > maxNum) maxNum = num;
-                }
-            });
-
-            let storedCount = 0;
-            try { storedCount = parseInt(localStorage.getItem('revive_admission_count') || '0', 10) || 0; } catch (e) {}
-            const syncedCount = Math.max(maxNum, storedCount);
-            try { localStorage.setItem('revive_admission_count', String(syncedCount)); } catch (e) {}
-            return syncedCount;
+            try { localStorage.setItem('revive_admission_count', String(maxNum)); } catch (e) {}
+            return maxNum;
         }
 
         function getNextAdmissionId() {
@@ -1695,22 +1696,21 @@
                     if(data.supplementSales) storage.set('revive_supplement_sales_db', data.supplementSales);
                     if(data.supplementPurchases) storage.set('revive_supplement_purchases_db', data.supplementPurchases);
                     
-                    if(data.users) {
-                        const localUsers = storage.get('revive_users_db', []);
-                        const localDeleted = localUsers.filter(u => u && u.isDeleted);
-                        const mergedUsers = [...data.users];
-                        localDeleted.forEach(delUser => {
-                            const idx = mergedUsers.findIndex(u => String(u.id) === String(delUser.id));
-                            if (idx === -1) mergedUsers.push(delUser);
-                            else mergedUsers[idx].isDeleted = true;
+                    if(Array.isArray(data.users)) {
+                        // Normalize user IDs from Google Sheet so every row's REV-XXXX is recognized
+                        const normalizedUsers = data.users.map((u, idx) => {
+                            const rawId = u.id || u.admissionId || u.AdmissionID || u['Admission ID'] || u.userId || `REV-${String(idx + 1).padStart(4, '0')}`;
+                            const num = extractRevNumber(rawId);
+                            const cleanId = num > 0 ? `REV-${String(num).padStart(4, '0')}` : String(rawId).trim();
+                            return { ...u, id: cleanId };
                         });
-                        storage.set('revive_users_db', mergedUsers);
+                        storage.set('revive_users_db', normalizedUsers);
                     }
                     
-                    if(data.payments) {
-                        const localPayObj = storage.get('revive_payments_db', {});
-                        const pObj = { ...localPayObj };
+                    if(Array.isArray(data.payments)) {
+                        const pObj = {};
                         data.payments.forEach(p => {
+                            if(!p || !p.userId) return;
                             if(!pObj[p.userId]) pObj[p.userId] = {};
                             if(!pObj[p.userId][p.fy]) pObj[p.userId][p.fy] = {};
                             pObj[p.userId][p.fy][p.month] = p;
@@ -1893,6 +1893,24 @@
                 IS_EDIT_MODE = false;
                 clearRuntimeCache(false);
                 syncAdmissionCounter();
+                // Refresh latest user series from Google Sheet in background so REV-XXXX is always aligned
+                if (CLOUD_SYNC_URL && CLOUD_SYNC_URL !== "YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE") {
+                    fetch(CLOUD_SYNC_URL + '?action=pull&t=' + Date.now(), { cache: 'no-store' })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (Array.isArray(data.users)) {
+                                const normalizedUsers = data.users.map((u, idx) => {
+                                    const rawId = u.id || u.admissionId || u.AdmissionID || u['Admission ID'] || u.userId || `REV-${String(idx + 1).padStart(4, '0')}`;
+                                    const num = extractRevNumber(rawId);
+                                    const cleanId = num > 0 ? `REV-${String(num).padStart(4, '0')}` : String(rawId).trim();
+                                    return { ...u, id: cleanId };
+                                });
+                                storage.set('revive_users_db', normalizedUsers);
+                                syncAdmissionCounter();
+                            }
+                        })
+                        .catch(() => {});
+                }
                 document.getElementById('form-main-title').innerText = "Admission Registration";
                 document.getElementById('step-1-ind').innerText = "Step 1 of 3: Member Details";
                 document.getElementById('step-2-ind').innerText = "Step 2 of 3: Digital Verification (True Un-Mirrored Camera)";
@@ -1909,6 +1927,8 @@
                 document.getElementById('selfie-data').value = '';
                 document.getElementById('btn-start-camera').style.display = 'inline-flex';
                 document.getElementById('btn-switch-camera').style.display = 'none';
+                const flipBtnEl = document.getElementById('btn-flip-camera');
+                if (flipBtnEl) flipBtnEl.style.display = 'none';
                 document.getElementById('btn-capture').style.display = 'none';
                 document.getElementById('btn-retake').style.display = 'none';
 
@@ -2896,6 +2916,10 @@
             regeneratePdf: function() {
                 if (!currentMemberDetails || !currentMemberDetails.id) currentMemberDetails = currentActiveUser;
                 if (!currentMemberDetails) return;
+                const dlBtn = document.getElementById('btn-download-pdf');
+                const origTxt = dlBtn ? dlBtn.innerText : '';
+                if (dlBtn) dlBtn.innerText = 'Downloading PDF...';
+
                 window.moduleContext.preparePdfDom();
 
                 const appWrapper = document.getElementById('app-wrapper'); 
@@ -2904,10 +2928,35 @@
                 window.scrollTo(0, 0); appWrapper.style.display = 'none'; pdfWrapper.style.display = 'flex';
 
                 setTimeout(() => {
+                    const fileName = `${currentMemberDetails.id}_Admission_Record.pdf`;
                     html2pdf().set({
-                        margin: 0, filename: `${currentMemberDetails.id}_Copy.pdf`, image: { type: 'jpeg', quality: 1.0 },
+                        margin: 0, filename: fileName, image: { type: 'jpeg', quality: 1.0 },
                         html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                    }).from(element).save().then(() => { pdfWrapper.style.display = 'none'; appWrapper.style.display = 'flex'; });
+                    }).from(element).output('blob').then((pdfBlob) => {
+                        pdfWrapper.style.display = 'none';
+                        appWrapper.style.display = 'flex';
+                        if (dlBtn && origTxt) dlBtn.innerText = origTxt;
+
+                        // Force direct file download into internal storage using application/octet-stream
+                        const forceDownloadBlob = new Blob([pdfBlob], { type: 'application/octet-stream' });
+                        const blobUrl = window.URL.createObjectURL(forceDownloadBlob);
+                        const link = document.createElement('a');
+                        link.style.display = 'none';
+                        link.href = blobUrl;
+                        link.setAttribute('download', fileName);
+                        document.body.appendChild(link);
+                        link.click();
+                        setTimeout(() => {
+                            document.body.removeChild(link);
+                            window.URL.revokeObjectURL(blobUrl);
+                        }, 1500);
+                        showNotice(`Downloaded ${fileName} to storage!`, 'success');
+                    }).catch((err) => {
+                        console.error(err);
+                        pdfWrapper.style.display = 'none';
+                        appWrapper.style.display = 'flex';
+                        if (dlBtn && origTxt) dlBtn.innerText = origTxt;
+                    });
                 }, 350);
             },
             
@@ -3929,38 +3978,75 @@
                 });
             }
 
-            // Fix #9: Portrait Live Camera (Un-mirrored true orientation + downscaled to prevent localStorage overflow)
+            // Fix #9: Portrait Live Camera with Front-Camera Mirror Compensation + 1-Tap Flip Button
             const video = document.getElementById('camera-stream');
             const canvas = document.getElementById('canvas-snapshot');
             const preview = document.getElementById('selfie-preview');
             const btnStart = document.getElementById('btn-start-camera');
             const btnSwitch = document.getElementById('btn-switch-camera');
+            const btnFlip = document.getElementById('btn-flip-camera');
             const btnCapture = document.getElementById('btn-capture');
             const btnRetake = document.getElementById('btn-retake');
             const selfieData = document.getElementById('selfie-data');
             let currentFacingMode = 'user';
+            // Counteract front-camera mirror image by flipping horizontally when facingMode === 'user'
+            let flipHorizontal = true;
+
+            function applyVideoMirrorTransform() {
+                const scaleVal = flipHorizontal ? 'scaleX(-1)' : 'scaleX(1)';
+                video.style.transform = scaleVal;
+                video.style.webkitTransform = scaleVal;
+            }
 
             async function startCamera() {
                 if(activePortraitStream) activePortraitStream.getTracks().forEach(t => t.stop());
                 try {
                     activePortraitStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } });
                     video.srcObject = activePortraitStream;
-                    video.style.transform = 'scaleX(1)';
+                    applyVideoMirrorTransform();
                     video.style.display = 'block';
                     document.getElementById('selfie-placeholder').style.display = 'none';
                     preview.style.display = 'none';
                     btnStart.style.display = 'none';
                     btnSwitch.style.display = 'inline-flex';
+                    if (btnFlip) btnFlip.style.display = 'inline-flex';
                     btnCapture.style.display = 'inline-flex';
                     btnCapture.disabled = false;
                 } catch (err) {
                     showNotice("Camera access unavailable in this browser environment.", "error");
                 }
             }
-            if(btnStart) btnStart.addEventListener('click', startCamera);
+            if(btnStart) btnStart.addEventListener('click', () => {
+                flipHorizontal = (currentFacingMode === 'user');
+                startCamera();
+            });
             if(btnSwitch) btnSwitch.addEventListener('click', () => {
                 currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+                flipHorizontal = (currentFacingMode === 'user');
                 startCamera();
+            });
+            if(btnFlip) btnFlip.addEventListener('click', () => {
+                if (video.style.display === 'block') {
+                    flipHorizontal = !flipHorizontal;
+                    applyVideoMirrorTransform();
+                } else if (selfieData.value) {
+                    // Flip the already captured selfie image horizontally
+                    const img = new Image();
+                    img.onload = function() {
+                        const targetSize = 360;
+                        canvas.width = targetSize;
+                        canvas.height = targetSize;
+                        const ctx = canvas.getContext('2d');
+                        ctx.save();
+                        ctx.translate(targetSize, 0);
+                        ctx.scale(-1, 1);
+                        ctx.drawImage(img, 0, 0, targetSize, targetSize);
+                        ctx.restore();
+                        selfieData.value = canvas.toDataURL('image/jpeg', 0.65);
+                        preview.src = selfieData.value;
+                    };
+                    img.src = selfieData.value;
+                }
             });
 
             if(btnCapture) btnCapture.addEventListener('click', () => {
@@ -3970,17 +4056,25 @@
                 canvas.width = targetSize;
                 canvas.height = targetSize;
                 const ctx = canvas.getContext('2d');
-                ctx.setTransform(1, 0, 0, 1, 0, 0); // Explicitly un-mirrored
+                ctx.save();
+                if (flipHorizontal) {
+                    ctx.translate(targetSize, 0);
+                    ctx.scale(-1, 1);
+                } else {
+                    ctx.setTransform(1, 0, 0, 1, 0, 0);
+                }
                 const minDim = Math.min(vw, vh);
                 const sx = (vw - minDim) / 2;
                 const sy = (vh - minDim) / 2;
                 ctx.drawImage(video, sx, sy, minDim, minDim, 0, 0, targetSize, targetSize);
+                ctx.restore();
                 selfieData.value = canvas.toDataURL('image/jpeg', 0.65);
                 preview.src = selfieData.value;
                 video.style.display = 'none';
                 preview.style.display = 'block';
                 btnCapture.style.display = 'none';
                 btnSwitch.style.display = 'none';
+                if (btnFlip) btnFlip.style.display = 'inline-flex';
                 btnRetake.style.display = 'inline-flex';
                 if(activePortraitStream) { activePortraitStream.getTracks().forEach(track => track.stop()); activePortraitStream = null; }
             });
