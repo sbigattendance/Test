@@ -7,6 +7,7 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     
     <style>
         :root {
@@ -504,8 +505,9 @@
                 </div>
                 <form id="userSearchForm" onsubmit="window.moduleContext.fetchUserHub(event); return false;">
                     <div class="form-group" style="margin-bottom:1rem;">
-                        <label>Member Phone Number or ID <span class="required">*</span></label>
-                        <input type="text" id="search-phone" placeholder="10-digit Phone or REV-XXXX" required autocomplete="off">
+                        <label>Member Phone Number, Admission ID, or Name <span class="required">*</span></label>
+                        <input type="text" id="search-phone" placeholder="Enter 10-digit Phone, REV-XXXX, or Name" oninput="window.moduleContext.previewUserSearch(this.value)" required autocomplete="off">
+                        <div id="search-user-live-preview" style="margin-top: 8px;"></div>
                     </div>
                     <div class="form-group">
                         <label>Financial Year <span class="required">*</span></label>
@@ -526,6 +528,7 @@
                     <h2 class="module-title" id="hub-title">Member Profile</h2>
                 </div>
                 
+                <div id="hub-family-switcher" style="display:none; margin-bottom:1rem; padding:0.9rem 1rem; background:#fff8f3; border:1px dashed var(--accent-orange); border-radius:8px;"></div>
                 <div class="profile-snippet">
                     <img id="hub-photo" src="" alt="User Photo">
                     <div class="profile-snippet-info" style="flex:1;">
@@ -1364,7 +1367,7 @@
                     <div class="pdf-sig-meta"><strong>Verified by:</strong> <span id="member-verified"></span><br><strong>Timestamp:</strong> <span id="member-timestamp"></span><br><strong>Location:</strong> <span id="member-location"></span></div>
                 </div>
                 <div class="pdf-sig-block">
-                    <div class="pdf-sig-image-box" style="font-weight:800; color:#ff6600; font-size:12px;">REVIVE VERIFIED</div>
+                    <div class="pdf-sig-image-box"><img data-seal-src="signature.png" id="pdf-official-seal" src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22140%22%20height%3D%2245%22%20viewBox%3D%220%200%20140%2045%22%3E%3Crect%20x%3D%222%22%20y%3D%222%22%20width%3D%22136%22%20height%3D%2241%22%20rx%3D%224%22%20fill%3D%22none%22%20stroke%3D%22%23ff6600%22%20stroke-width%3D%222%22%2F%3E%3Ctext%20x%3D%2270%22%20y%3D%2220%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2210%22%20fill%3D%22%23ff6600%22%20text-anchor%3D%22middle%22%3EREVIVE%20FITNESS%20STUDIO%3C%2Ftext%3E%3Ctext%20x%3D%2270%22%20y%3D%2234%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22700%22%20font-size%3D%228.5%22%20fill%3D%22%23222222%22%20text-anchor%3D%22middle%22%3EAUTHORIZED%20SEAL%3C%2Ftext%3E%3C%2Fsvg%3E" class="brand-seal-img" alt="Authorized Signature & Seal" onerror="this.onerror=null; this.src=window.FALLBACK_SEAL_SVG;"></div>
                     <div class="pdf-sig-line">AUTHORIZED SIGNATURE</div>
                     <div class="pdf-sig-meta"><strong>Registered & Verified by:</strong> <span id="official-verified-by">Revive System Admin</span><br><strong>Timestamp:</strong> <span id="official-timestamp"></span><br><strong>Location:</strong> Revive Fitness Studio H.O</div>
                 </div>
@@ -1469,16 +1472,25 @@
         const DEFAULT_AVATAR_SVG = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#ff6600" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>');
         const FALLBACK_LOGO_SVG = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="220" height="50" viewBox="0 0 220 50"><rect width="220" height="50" rx="6" fill="#ffffff"/><text x="12" y="32" font-family="Arial, sans-serif" font-weight="900" font-size="22" fill="#222222">REVIVE </text><text x="102" y="32" font-family="Arial, sans-serif" font-weight="900" font-size="22" fill="#ff6600">FITNESS</text></svg>');
         window.FALLBACK_LOGO_SVG = FALLBACK_LOGO_SVG;
+        const FALLBACK_SEAL_SVG = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="140" height="45" viewBox="0 0 140 45"><rect x="2" y="2" width="136" height="41" rx="4" fill="none" stroke="#ff6600" stroke-width="2"/><text x="70" y="20" font-family="Arial, sans-serif" font-weight="900" font-size="10" fill="#ff6600" text-anchor="middle">REVIVE FITNESS STUDIO</text><text x="70" y="34" font-family="Arial, sans-serif" font-weight="700" font-size="8.5" fill="#222222" text-anchor="middle">AUTHORIZED SEAL</text></svg>');
+        window.FALLBACK_SEAL_SVG = FALLBACK_SEAL_SVG;
         const BLANK_PIXEL = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
         let cachedLogoDataUri = null;
+        let cachedSealDataUri = null;
 
-        // Preload logo.png from repository into a Base64 Data URI so html2pdf and html2canvas always capture it reliably
+        // Preload logo.png and signature.png (company seal) from repository into Base64 Data URIs so html2pdf and html2canvas always capture them reliably
         function preloadLogoForCapture() {
             document.querySelectorAll('.brand-logo-img').forEach(el => {
                 const repoLogo = el.getAttribute('data-logo-src') || 'logo.png';
                 el.onerror = function() { this.onerror = null; this.src = FALLBACK_LOGO_SVG; };
                 el.src = repoLogo;
             });
+            document.querySelectorAll('.brand-seal-img').forEach(el => {
+                const repoSeal = el.getAttribute('data-seal-src') || 'signature.png';
+                el.onerror = function() { this.onerror = null; this.src = FALLBACK_SEAL_SVG; };
+                el.src = repoSeal;
+            });
+
             const img = new Image();
             img.crossOrigin = "anonymous";
             img.onload = function() {
@@ -1498,6 +1510,26 @@
                 document.querySelectorAll('.brand-logo-img').forEach(el => { el.src = FALLBACK_LOGO_SVG; });
             };
             img.src = 'logo.png';
+
+            const sealImg = new Image();
+            sealImg.crossOrigin = "anonymous";
+            sealImg.onload = function() {
+                try {
+                    const c = document.createElement('canvas');
+                    c.width = sealImg.naturalWidth || 160;
+                    c.height = sealImg.naturalHeight || 60;
+                    c.getContext('2d').drawImage(sealImg, 0, 0);
+                    cachedSealDataUri = c.toDataURL('image/png');
+                    document.querySelectorAll('.brand-seal-img').forEach(el => { el.src = cachedSealDataUri; });
+                } catch (e) {
+                    cachedSealDataUri = 'signature.png';
+                }
+            };
+            sealImg.onerror = function() {
+                cachedSealDataUri = FALLBACK_SEAL_SVG;
+                document.querySelectorAll('.brand-seal-img').forEach(el => { el.src = FALLBACK_SEAL_SVG; });
+            };
+            sealImg.src = 'signature.png';
         }
 
         function applyLogoToExportTemplates() {
@@ -1505,6 +1537,46 @@
             document.querySelectorAll('#pdf-template .brand-logo-img, #receipt-template .brand-logo-img, #supp-invoice-template .brand-logo-img').forEach(el => {
                 el.src = srcToUse;
             });
+            const sealToUse = cachedSealDataUri || 'signature.png';
+            document.querySelectorAll('#pdf-template .brand-seal-img').forEach(el => {
+                el.src = sealToUse;
+                el.style.display = 'inline-block';
+            });
+        }
+
+        // Fix #4: Reliable, instant UPI QR Code generator using client-side QRious canvas with fallback
+        function renderUpiQrToElement(imgElId, amount, sizePx = 200) {
+            const imgEl = document.getElementById(imgElId);
+            if (!imgEl) return;
+            const s = storage.get('revive_settings_db', {});
+            const activeUpiId = (s && s.upiId && String(s.upiId).trim()) ? String(s.upiId).trim() : APP_CONFIG.upiId;
+            const cleanAmt = Math.max(0, parseFloat(amount || 0));
+            const upiUri = `upi://pay?pa=${encodeURIComponent(activeUpiId)}&pn=${encodeURIComponent('Revive Fitness Studio')}&am=${cleanAmt}&cu=INR`;
+
+            if (typeof window.QRious === 'function') {
+                try {
+                    const qr = new window.QRious({
+                        value: upiUri,
+                        size: sizePx,
+                        level: 'M',
+                        background: '#ffffff',
+                        foreground: '#111111',
+                        padding: 10
+                    });
+                    imgEl.src = qr.toDataURL('image/png');
+                    imgEl.style.display = 'block';
+                    return;
+                } catch (e) {
+                    console.error("QRious error:", e);
+                }
+            }
+            // Fallback to external QR API if QRious script hasn't loaded
+            imgEl.onerror = function() {
+                this.onerror = null;
+                this.src = `https://quickchart.io/qr?size=${sizePx}&text=${encodeURIComponent(upiUri)}`;
+            };
+            imgEl.src = `https://api.qrserver.com/v1/create-qr-code/?size=${sizePx}x${sizePx}&data=${encodeURIComponent(upiUri)}`;
+            imgEl.style.display = 'block';
         }
 
         // Safe localStorage wrapper
@@ -1634,6 +1706,7 @@
 
         function syncAdmissionCounter() {
             const users = storage.get('revive_users_db', []);
+            const deletedIds = storage.get('revive_deleted_ids_db', []);
             let maxNum = 0;
 
             if (Array.isArray(users) && users.length > 0) {
@@ -1643,8 +1716,13 @@
                     const num = extractRevNumber(rawId);
                     if (num > maxNum) maxNum = num;
                 });
-                // Fallback if sheet rows exist without standard REV-XXXX parseable strings
                 if (maxNum === 0) maxNum = users.length;
+            }
+            if (Array.isArray(deletedIds)) {
+                deletedIds.forEach(did => {
+                    const num = extractRevNumber(did);
+                    if (num > maxNum) maxNum = num;
+                });
             }
 
             try { localStorage.setItem('revive_admission_count', String(maxNum)); } catch (e) {}
@@ -1701,13 +1779,14 @@
                     if(data.supplementPurchases) storage.set('revive_supplement_purchases_db', data.supplementPurchases);
                     
                     if(Array.isArray(data.users)) {
-                        // Normalize user IDs from Google Sheet so every row's REV-XXXX is recognized
+                        const deletedIds = storage.get('revive_deleted_ids_db', []);
                         const normalizedUsers = data.users.map((u, idx) => {
                             const rawId = u.id || u.admissionId || u.AdmissionID || u['Admission ID'] || u.userId || `REV-${String(idx + 1).padStart(4, '0')}`;
                             const num = extractRevNumber(rawId);
                             const cleanId = num > 0 ? `REV-${String(num).padStart(4, '0')}` : String(rawId).trim();
-                            const dInfo = parseAdmissionDateInfo(u.date || u.dateOfAdmission, u._month, u._fy); return { ...u, id: cleanId, date: dInfo.formattedDate, _fy: dInfo.fy, _month: dInfo.monthName };
-                        });
+                            const dInfo = parseAdmissionDateInfo(u.date || u.dateOfAdmission, u._month, u._fy);
+                            return { ...u, id: cleanId, date: dInfo.formattedDate, _fy: dInfo.fy, _month: dInfo.monthName };
+                        }).filter(u => !deletedIds.includes(String(u.id)));
                         storage.set('revive_users_db', normalizedUsers);
                     }
                     
@@ -1973,12 +2052,14 @@
                         .then(r => r.json())
                         .then(data => {
                             if (Array.isArray(data.users)) {
+                                const deletedIds = storage.get('revive_deleted_ids_db', []);
                                 const normalizedUsers = data.users.map((u, idx) => {
                                     const rawId = u.id || u.admissionId || u.AdmissionID || u['Admission ID'] || u.userId || `REV-${String(idx + 1).padStart(4, '0')}`;
                                     const num = extractRevNumber(rawId);
                                     const cleanId = num > 0 ? `REV-${String(num).padStart(4, '0')}` : String(rawId).trim();
-                                    const dInfo = parseAdmissionDateInfo(u.date || u.dateOfAdmission, u._month, u._fy); return { ...u, id: cleanId, date: dInfo.formattedDate, _fy: dInfo.fy, _month: dInfo.monthName };
-                                });
+                                    const dInfo = parseAdmissionDateInfo(u.date || u.dateOfAdmission, u._month, u._fy);
+                                    return { ...u, id: cleanId, date: dInfo.formattedDate, _fy: dInfo.fy, _month: dInfo.monthName };
+                                }).filter(u => !deletedIds.includes(String(u.id)));
                                 storage.set('revive_users_db', normalizedUsers);
                                 syncAdmissionCounter();
                             }
@@ -2479,8 +2560,40 @@
                     if(i === 0) opt.selected = true; fySelect.appendChild(opt);
                 }
                 document.getElementById('search-phone').value = '';
+                const prevEl = document.getElementById('search-user-live-preview');
+                if (prevEl) prevEl.innerHTML = '';
                 document.getElementById('search-title').innerText = mode === 'fee' ? "Search for Fee Collection" : "Search User Details";
                 window.appContext.switchView('user-search');
+            },
+
+            previewUserSearch: function(val) {
+                const previewEl = document.getElementById('search-user-live-preview');
+                if (!previewEl) return;
+                const cleanVal = String(val || '').trim();
+                if (!cleanVal) { previewEl.innerHTML = ''; return; }
+
+                const matches = findUsersForAttendance(cleanVal);
+                if (matches && matches.length > 0) {
+                    let html = `<div style="font-size:0.78rem; font-weight:700; color:var(--accent-orange); margin-bottom:6px;">Found ${matches.length} member(s) — click a member to open profile:</div>`;
+                    html += '<div style="display:grid; gap:8px; max-height: 260px; overflow-y: auto; padding: 4px;">';
+                    matches.forEach(user => {
+                        const photoUrl = user.photo || DEFAULT_AVATAR_SVG;
+                        const safeId = String(user.id).replace(/'/g, "\'");
+                        html += `
+                        <div style="display:flex; align-items:center; gap:12px; padding:10px; border:1px solid var(--border-color); border-radius:8px; cursor:pointer; background:var(--bg-panel); transition: transform 0.2s;" 
+                             onclick="window.moduleContext.loadProfileByPhoneOrId('${safeId}')">
+                            <img src="${photoUrl}" alt="${user.fullName}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-orange);">
+                            <div style="flex:1; text-align:left;">
+                                <div style="color:var(--text-main); font-weight:800; font-size:0.98rem;">${user.fullName} <span style="font-size:0.72rem; background:#fff5eb; color:var(--accent-orange); padding:2px 6px; border-radius:4px; border:1px solid #ffcc99; margin-left:4px;">${user.admissionCategory || 'Individual'}</span></div>
+                                <div style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">ID: <strong>${user.id}</strong> | Ph: ${appContext.currentRole === 'staff' ? maskPhoneLast4(user.primaryContact) : user.primaryContact} | Joined: ${user.date || '-'}</div>
+                            </div>
+                        </div>`;
+                    });
+                    html += '</div>';
+                    previewEl.innerHTML = html;
+                } else {
+                    previewEl.innerHTML = `<span style="color:var(--text-muted); font-size:0.85rem;">No active members found matching "${cleanVal}".</span>`;
+                }
             },
 
             switchHubFy: function(newFy) {
@@ -2493,12 +2606,37 @@
             loadProfileByPhoneOrId: function(identifier) {
                 const cleanId = String(identifier || '').trim();
                 const users = storage.get('revive_users_db', []);
-                // Prefer active users first, fallback to archived if searched by exact ID from reports
-                let user = [...users].reverse().find(u => !u.isDeleted && (String(u.primaryContact) === cleanId || String(u.id).toLowerCase() === cleanId.toLowerCase()));
+                // Match exact Admission ID first so selecting a specific family member always loads that exact person
+                let user = users.find(u => !u.isDeleted && String(u.id).toLowerCase() === cleanId.toLowerCase());
                 if (!user) {
-                    user = [...users].reverse().find(u => String(u.id).toLowerCase() === cleanId.toLowerCase() || String(u.primaryContact) === cleanId);
+                    user = [...users].reverse().find(u => !u.isDeleted && String(u.primaryContact) === cleanId);
+                }
+                if (!user) {
+                    const archived = storage.get('revive_archived_users_db', []);
+                    user = [...users, ...archived].reverse().find(u => String(u.id).toLowerCase() === cleanId.toLowerCase() || String(u.primaryContact) === cleanId);
                 }
                 if(!user) { showNotice("User profile not found.", "error"); return; }
+
+                // Check if multiple active members are registered under the same phone number (Family combination)
+                const samePhoneMembers = users.filter(u => !u.isDeleted && String(u.primaryContact) === String(user.primaryContact));
+                const famSwitcher = document.getElementById('hub-family-switcher');
+                if (famSwitcher) {
+                    if (samePhoneMembers.length > 1) {
+                        famSwitcher.style.display = 'block';
+                        let famHtml = `<div style="font-size:0.8rem; font-weight:800; color:var(--accent-orange); text-transform:uppercase; margin-bottom:8px;">👨‍👩‍👧‍👦 ${samePhoneMembers.length} Members Registered Under Phone ${appContext.currentRole === 'staff' ? maskPhoneLast4(user.primaryContact) : user.primaryContact} (Click to Switch):</div>`;
+                        famHtml += `<div style="display:flex; flex-wrap:wrap; gap:8px;">`;
+                        samePhoneMembers.forEach(fm => {
+                            const isCurr = String(fm.id) === String(user.id);
+                            const safeFid = String(fm.id).replace(/'/g, "\'");
+                            famHtml += `<button type="button" onclick="window.moduleContext.loadProfileByPhoneOrId('${safeFid}')" class="btn ${isCurr ? 'primary' : 'secondary'}" style="width:auto; padding:0.45rem 0.9rem; font-size:0.8rem; border-radius:20px;">${fm.fullName} (${fm.id})</button>`;
+                        });
+                        famHtml += `</div>`;
+                        famSwitcher.innerHTML = famHtml;
+                    } else {
+                        famSwitcher.style.display = 'none';
+                        famSwitcher.innerHTML = '';
+                    }
+                }
 
                 // Fix #1: Determine Financial Year starting from the user's month of admission
                 const userAdmFy = user._fy || window.moduleContext.getFyFromDateStr(user.date);
@@ -2578,9 +2716,24 @@
                 if(e && e.preventDefault) e.preventDefault();
                 const query = document.getElementById('search-phone').value.trim();
                 const users = storage.get('revive_users_db', []);
-                const user = [...users].reverse().find(u => !u.isDeleted && (String(u.primaryContact) === String(query) || String(u.id).toLowerCase() === String(query).toLowerCase()));
-                if(!user) { showNotice("Active user not found. Please check the phone/ID or register the member.", "error"); return; }
-                window.moduleContext.loadProfileByPhoneOrId(user.id);
+                // If exact Admission ID typed, open directly
+                const exactIdMatch = users.find(u => !u.isDeleted && String(u.id).toLowerCase() === String(query).toLowerCase());
+                if (exactIdMatch) {
+                    window.moduleContext.loadProfileByPhoneOrId(exactIdMatch.id);
+                    return;
+                }
+                const matches = findUsersForAttendance(query);
+                if (!matches || matches.length === 0) {
+                    showNotice("Active user not found. Please check the phone/ID or register the member.", "error");
+                    return;
+                }
+                if (matches.length === 1) {
+                    window.moduleContext.loadProfileByPhoneOrId(matches[0].id);
+                } else {
+                    // Multiple users registered under the same phone number (Family combination) -> show all and prompt to select
+                    window.moduleContext.previewUserSearch(query);
+                    showNotice(`${matches.length} members found under this number. Please click the member you wish to view or edit below.`, "info");
+                }
             },
 
             // Fix #1: Fee Calendar strictly calculates from the month of admission onward
@@ -2720,10 +2873,7 @@
                 const upiSec = document.getElementById('pay-upi-section');
                 if(method === 'UPI' && amt > 0) {
                     upiSec.style.display = 'block';
-                    const s = storage.get('revive_settings_db', {});
-                    const activeUpiId = s.upiId || APP_CONFIG.upiId;
-                    const upiString = `upi://pay?pa=${activeUpiId}&pn=ReviveFitness&am=${amt}&cu=INR`;
-                    document.getElementById('pay-upi-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiString)}`;
+                    renderUpiQrToElement('pay-upi-qr', amt, 160);
                 } else { upiSec.style.display = 'none'; }
             },
             confirmPayment: function() {
@@ -2933,22 +3083,49 @@
                 window.appContext.switchView('admission');
             },
 
-            // Fix #5: Soft-delete user so their past payment and admission transactions are NEVER erased from P&L calculations
+            // Fix #2 & #5: Delete user from backend Google Sheet ('deleteUser') and active search while preserving their transactions for P&L reports
             deleteUser: function() {
                 if (!currentActiveUser) return;
+                const targetUser = { ...currentActiveUser };
                 window.appContext.askConfirm(
-                    "Archive / Delete Member",
-                    `Are you sure you want to remove ${currentActiveUser.fullName} (${currentActiveUser.id}) from active members? Their historical admission and fee transactions will be preserved for accurate accounting.`,
+                    "Delete Member",
+                    `Are you sure you want to delete ${targetUser.fullName} (${targetUser.id})? The member will be removed from Google Sheets and active searches, while their past financial transactions remain preserved in P&L reports.`,
                     function() {
-                        let users = storage.get('revive_users_db', []);
-                        const idx = users.findIndex(u => String(u.id) === String(currentActiveUser.id));
-                        if (idx !== -1) {
-                            users[idx].isDeleted = true;
-                            users[idx].deletedAt = new Date().toISOString();
-                            storage.set('revive_users_db', users);
-                            cloudSync.push('pushUser', users[idx]);
+                        // Save lightweight archive record locally so P&L admission revenue stays accurate
+                        let archived = storage.get('revive_archived_users_db', []);
+                        if (!archived.some(a => String(a.id) === String(targetUser.id))) {
+                            archived.push({
+                                id: targetUser.id,
+                                fullName: targetUser.fullName,
+                                primaryContact: targetUser.primaryContact,
+                                date: targetUser.date,
+                                _fy: targetUser._fy,
+                                _month: targetUser._month,
+                                admissionCategory: targetUser.admissionCategory,
+                                trainingCategory: targetUser.trainingCategory,
+                                admFeePaid: targetUser.admFeePaid,
+                                collectedBy: targetUser.collectedBy,
+                                isDeleted: true
+                            });
+                            storage.set('revive_archived_users_db', archived);
                         }
-                        showNotice("Member archived. All historical transactions preserved.", "success");
+
+                        // Record deleted ID so even if a cloud pull happens before Apps Script finishes, it won't reappear
+                        let deletedIds = storage.get('revive_deleted_ids_db', []);
+                        if (!deletedIds.includes(String(targetUser.id))) {
+                            deletedIds.push(String(targetUser.id));
+                            storage.set('revive_deleted_ids_db', deletedIds);
+                        }
+
+                        // Remove from active users DB
+                        let users = storage.get('revive_users_db', []);
+                        users = users.filter(u => String(u.id) !== String(targetUser.id));
+                        storage.set('revive_users_db', users);
+
+                        // Push deleteUser action to backend Google Sheet
+                        cloudSync.push('deleteUser', { id: targetUser.id, primaryContact: targetUser.primaryContact });
+
+                        showNotice(`Member ${targetUser.fullName} (${targetUser.id}) deleted from system & Google Sheet.`, "success");
                         window.appContext.goHome();
                     }
                 );
@@ -3143,8 +3320,10 @@
                     const today = new Date();
                     const currentScore = today.getFullYear() * 100 + today.getMonth();
 
-                    // 1. Admissions count & fee calculation (includes soft-deleted users so historical revenue is never lost)
-                    users.forEach(u => {
+                    // 1. Admissions count & fee calculation (includes archived/deleted users so historical revenue is never lost)
+                    const archivedUsers = storage.get('revive_archived_users_db', []);
+                    const allUsersForAdmReport = [...users, ...archivedUsers.filter(a => !users.some(u => String(u.id) === String(a.id)))];
+                    allUsersForAdmReport.forEach(u => {
                         if(!u || !u.date) return;
                         const uFy = u._fy || window.moduleContext.getFyFromDateStr(u.date);
                         if (uFy === targetFy && (targetMonth === 'All' || u._month === targetMonth)) {
@@ -3743,10 +3922,7 @@
                 if (method === 'UPI' && netAmt > 0) {
                     upiSec.style.display = 'block';
                     document.getElementById('supp-qr-amount-display').innerText = netAmt;
-                    const s = storage.get('revive_settings_db', {});
-                    const activeUpiId = s.upiId || APP_CONFIG.upiId;
-                    const upiString = `upi://pay?pa=${activeUpiId}&pn=ReviveFitness&am=${netAmt}&cu=INR`;
-                    document.getElementById('supp-upi-qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=${encodeURIComponent(upiString)}`;
+                    renderUpiQrToElement('supp-upi-qr-code', netAmt, 190);
                 } else {
                     upiSec.style.display = 'none';
                 }
@@ -4544,10 +4720,7 @@
                     upiSec.style.display = 'block';
                     document.getElementById('btn-validate-payment').innerText = 'Verify PIN & Validate UPI Payment';
                     document.getElementById('qr-amount-display').innerText = calculatedTotalFee;
-                    const s = storage.get('revive_settings_db', {});
-                    const activeUpiId = s.upiId || APP_CONFIG.upiId;
-                    const upiString = `upi://pay?pa=${activeUpiId}&pn=ReviveFitness&am=${calculatedTotalFee}&cu=INR`;
-                    document.getElementById('upi-qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`;
+                    renderUpiQrToElement('upi-qr-code', calculatedTotalFee, 200);
                 } else {
                     upiSec.style.display = 'none';
                     document.getElementById('btn-validate-payment').innerText = 'Verify PIN & Collect Cash';
@@ -4572,10 +4745,7 @@
                     upiSec.style.display = 'block';
                     document.getElementById('btn-validate-payment').innerText = 'Verify PIN & Validate UPI Payment';
                     document.getElementById('qr-amount-display').innerText = calculatedTotalFee;
-                    const s = storage.get('revive_settings_db', {});
-                    const activeUpiId = s.upiId || APP_CONFIG.upiId;
-                    const upiString = `upi://pay?pa=${activeUpiId}&pn=ReviveFitness&am=${calculatedTotalFee}&cu=INR`;
-                    document.getElementById('upi-qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`;
+                    renderUpiQrToElement('upi-qr-code', calculatedTotalFee, 200);
                 } else {
                     upiSec.style.display = 'none';
                     document.getElementById('btn-validate-payment').innerText = 'Verify PIN & Collect Cash';
