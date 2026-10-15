@@ -1206,28 +1206,31 @@
                             <div class="fee-row"><span>Admission Fee:</span> <strong>₹<span id="calc-admin-fee">0</span></strong></div>
                             <div class="fee-row"><span>Training Fee:</span> <strong>₹<span id="calc-monthly-fee">0</span></strong></div>
                             <div class="fee-row fee-total"><span>Total Payable <span id="calc-promo-badge"></span>:</span> <strong>₹<span id="calc-total-fee">0</span></strong></div>
-                            <div class="fee-row" style="margin-top:0.8rem; padding-top:0.8rem; border-top:1px dashed var(--border-color);">
-                                <span>Pending Balance (Due):</span>
-                                <strong style="color:var(--error-red); font-size:1.2rem;">₹<span id="adm-pending-balance">0</span></strong>
+                            
+                            <div style="margin-top:1rem; padding:1rem; background:#fff8f3; border:2px solid var(--accent-orange); border-radius:10px;">
+                                <label for="adm-pay-amount-now" style="color:var(--accent-orange); font-size:0.85rem; display:block; margin-bottom:0.5rem;">Enter Paying Amount Now (₹) — Edit if Partial Payment <span class="required">*</span></label>
+                                <div style="display:flex; gap:8px; align-items:center;">
+                                    <input type="number" id="adm-pay-amount-now" min="0" style="font-size:1.25rem; font-weight:900; color:var(--text-main); background:#fff;" oninput="window.moduleContext.updateAdmissionPaymentUI()" onchange="window.moduleContext.updateAdmissionPaymentUI()" required>
+                                    <button type="button" class="btn primary" style="width:auto; padding:0.85rem 1.2rem; font-size:0.8rem; white-space:nowrap;" onclick="window.moduleContext.updateAdmissionPaymentUI()">Update QR</button>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.75rem; padding-top:0.6rem; border-top:1px dashed #ffcc99; font-size:0.95rem;">
+                                    <span style="font-weight:700; color:var(--text-muted);">Shortfall / Pending Balance:</span>
+                                    <strong id="adm-shortfall-pill" style="color:var(--success-green); font-size:1.15rem;">₹<span id="adm-pending-balance">0</span> (Cleared)</strong>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="adm-pay-amount-now">Amount Paying Now (₹) <span class="required">*</span></label>
-                                <input type="number" id="adm-pay-amount-now" min="0" oninput="window.moduleContext.updateAdmissionPaymentUI()" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Select Payment Method <span class="required">*</span></label>
-                                <select id="paymentMethod" onchange="window.moduleContext.updateAdmissionPaymentUI()">
-                                    <option value="UPI">UPI Payment (QR Code)</option>
-                                    <option value="CASH">Cash Payment</option>
-                                </select>
-                            </div>
+                        <div class="form-group" style="margin-bottom: 1.2rem;">
+                            <label>Select Payment Method <span class="required">*</span></label>
+                            <select id="paymentMethod" onchange="window.moduleContext.updateAdmissionPaymentUI()">
+                                <option value="UPI">UPI Payment (QR Code)</option>
+                                <option value="CASH">Cash Payment</option>
+                            </select>
                         </div>
 
                         <div id="upi-section" style="text-align:center; margin: 1.5rem 0; padding: 1.2rem; background: var(--bg-main); border: 1px dashed var(--border-color); border-radius: 12px;">
-                            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1rem; text-transform:uppercase; letter-spacing:1px; font-weight:700;">Scan to pay <strong style="color:var(--accent-orange); font-size:1.4rem;">₹<span id="qr-amount-display"></span></strong></p>
+                            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:1px; font-weight:700;">Scan QR to Pay Now: <strong style="color:var(--accent-orange); font-size:1.4rem;">₹<span id="qr-amount-display"></span></strong></p>
+                            <p id="adm-qr-shortfall-note" style="font-size:0.85rem; font-weight:800; color:var(--error-red); margin-bottom:0.8rem; display:none;"></p>
                             <div class="qr-wrapper">
                                 <img id="upi-qr-code" src="" alt="UPI QR Code" style="width:190px; height:190px; display:block;">
                             </div>
@@ -1340,24 +1343,26 @@
                         <div class="fee-row"><span>Total MRP Value:</span> <strong>₹<span id="supp-pay-mrp">0</span></strong></div>
                         <div class="fee-row"><span>Total Offer Discount:</span> <strong style="color:var(--success-green);">- ₹<span id="supp-pay-disc">0</span></strong></div>
                         <div class="fee-row fee-total"><span>Net Payable Amount:</span> <strong>₹<span id="supp-pay-net">0</span></strong></div>
-                        <div class="fee-row" style="margin-top:0.8rem; padding-top:0.8rem; border-top:1px dashed var(--border-color);">
-                            <span>Pending Balance (Due):</span>
-                            <strong style="color:var(--error-red); font-size:1.2rem;">₹<span id="supp-pay-pending">0</span></strong>
+
+                        <div style="margin-top:1rem; padding:1rem; background:#fff8f3; border:2px solid var(--accent-orange); border-radius:10px;">
+                            <label for="supp-pay-amount-now" style="color:var(--accent-orange); font-size:0.85rem; display:block; margin-bottom:0.5rem;">Enter Paying Amount Now (₹) — Edit if Partial Payment <span class="required">*</span></label>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <input type="number" id="supp-pay-amount-now" min="0" style="font-size:1.25rem; font-weight:900; background:#fff;" oninput="window.moduleContext.updateSuppPaymentUI()" onchange="window.moduleContext.updateSuppPaymentUI()" required>
+                                <button type="button" class="btn primary" style="width:auto; padding:0.85rem 1.2rem; font-size:0.8rem; white-space:nowrap;" onclick="window.moduleContext.updateSuppPaymentUI()">Update QR</button>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.75rem; padding-top:0.6rem; border-top:1px dashed #ffcc99; font-size:0.95rem;">
+                                <span style="font-weight:700; color:var(--text-muted);">Shortfall / Pending Balance:</span>
+                                <strong style="color:var(--error-red); font-size:1.15rem;">₹<span id="supp-pay-pending">0</span></strong>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="supp-pay-amount-now">Amount Paying Now (₹) <span class="required">*</span></label>
-                            <input type="number" id="supp-pay-amount-now" min="0" oninput="window.moduleContext.updateSuppPaymentUI()" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Select Payment Method <span class="required">*</span></label>
-                            <select id="suppPaymentMethod" onchange="window.moduleContext.updateSuppPaymentUI()">
-                                <option value="UPI">UPI Payment (QR Code)</option>
-                                <option value="CASH">Cash Payment</option>
-                            </select>
-                        </div>
+                    <div class="form-group" style="margin-bottom: 1.2rem;">
+                        <label>Select Payment Method <span class="required">*</span></label>
+                        <select id="suppPaymentMethod" onchange="window.moduleContext.updateSuppPaymentUI()">
+                            <option value="UPI">UPI Payment (QR Code)</option>
+                            <option value="CASH">Cash Payment</option>
+                        </select>
                     </div>
 
                     <div id="supp-upi-section" style="text-align:center; margin: 1.5rem 0; padding: 1.2rem; background: var(--bg-main); border: 1px dashed var(--border-color); border-radius: 12px;">
@@ -1477,12 +1482,18 @@
                         <button type="button" id="btn-paymodal-view-rcpt" class="btn secondary" style="display:none; width:auto; padding:0.25rem 0.6rem; font-size:0.72rem;" onclick="window.moduleContext.viewPartialReceiptFromModal()">🧾 View Receipt</button>
                     </div>
                     <p style="margin-bottom: 4px;"><strong>Total Fee:</strong> ₹<span id="pay-total-due"></span> &nbsp;|&nbsp; <strong>Already Paid:</strong> ₹<span id="pay-already-paid"></span></p>
-                    <p style="color:var(--accent-orange); font-size:1rem; margin-top:6px;"><strong>Current Balance Due: ₹<span id="pay-balance"></span></strong></p>
-                    <p style="color:var(--error-red); font-size:0.95rem; margin-top:4px;"><strong>Pending After This Payment: ₹<span id="pay-pending-after">0</span></strong></p>
+                    <p style="color:var(--accent-orange); font-size:1.05rem; margin-top:6px;"><strong>Payable Balance Due: ₹<span id="pay-balance"></span></strong></p>
                 </div>
-                <div class="form-group" style="margin-bottom:0.9rem;">
-                    <label>Amount Paying Now (₹) <span class="required">*</span></label>
-                    <input type="number" id="pay-amount-now" min="1" oninput="window.moduleContext.updatePaymentModalUI()" required>
+                <div style="background:#fff8f3; border:2px solid var(--accent-orange); border-radius:10px; padding:0.9rem; margin-bottom:0.9rem;">
+                    <label for="pay-amount-now" style="color:var(--accent-orange); font-size:0.8rem; display:block; margin-bottom:0.4rem;">Enter Paying Amount Now (₹) — Edit if Partial <span class="required">*</span></label>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <input type="number" id="pay-amount-now" min="1" style="font-size:1.25rem; font-weight:900; background:#fff;" oninput="window.moduleContext.updatePaymentModalUI()" onchange="window.moduleContext.updatePaymentModalUI()" required>
+                        <button type="button" class="btn primary" style="width:auto; padding:0.75rem 1rem; font-size:0.78rem; white-space:nowrap;" onclick="window.moduleContext.updatePaymentModalUI()">Update QR</button>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.65rem; padding-top:0.55rem; border-top:1px dashed #ffcc99; font-size:0.9rem;">
+                        <span style="font-weight:700; color:var(--text-muted);">Shortfall / Pending Balance:</span>
+                        <strong id="pay-shortfall-pill" style="color:var(--success-green); font-size:1.05rem;">₹<span id="pay-pending-after">0</span> (Cleared)</strong>
+                    </div>
                 </div>
                 <div class="form-group" style="margin-bottom:0.9rem;">
                     <label>Payment Method <span class="required">*</span></label>
@@ -1491,7 +1502,9 @@
                         <option value="CASH">Cash Payment</option>
                     </select>
                 </div>
-                <div id="pay-upi-section" style="text-align:center; margin: 0.8rem 0; display:none;">
+                <div id="pay-upi-section" style="text-align:center; margin: 0.8rem 0; padding:0.8rem; background:var(--bg-main); border-radius:10px; border:1px dashed var(--border-color); display:none;">
+                    <div style="font-size:0.85rem; font-weight:800; color:var(--text-main); margin-bottom:4px;">Scan QR to Pay Now: <span style="color:var(--accent-orange); font-size:1.15rem;">₹<span id="pay-qr-amt-label">0</span></span></div>
+                    <div id="pay-qr-shortfall-label" style="font-size:0.78rem; font-weight:800; color:var(--error-red); margin-bottom:6px; display:none;"></div>
                     <div class="qr-wrapper"><img id="pay-upi-qr" src="" alt="Payment QR" style="width:145px; height:145px;"></div>
                 </div>
                 <!-- Fix #4: Staff/Admin PIN verification on fee collection -->
@@ -1760,25 +1773,34 @@
         </div>
     </div>
     <script>
-        const CLOUD_SYNC_URL = "https://script.google.com/macros/s/AKfycbxv-ri1TP3f7SzugYNLcz9DuFASuhssX6dZnqA_Me7WyOaM2rcH5WL7q6XdbW2WCstM/exec"; 
+        // Self-healing guard in case HTML is accidentally pasted twice in an editor
+        if (window.__REVIVE_PORTAL_LOADED__) {
+            document.querySelectorAll('#app-wrapper, #cloud-sync-overlay, #cloud-toast, #pdf-template-wrapper, #receipt-render-zone').forEach((el, idx, list) => {
+                const sameId = document.querySelectorAll('#' + el.id);
+                sameId.forEach((node, i) => { if (i > 0) node.remove(); });
+            });
+        }
+        window.__REVIVE_PORTAL_LOADED__ = true;
+
+        var CLOUD_SYNC_URL = "https://script.google.com/macros/s/AKfycbxv-ri1TP3f7SzugYNLcz9DuFASuhssX6dZnqA_Me7WyOaM2rcH5WL7q6XdbW2WCstM/exec"; 
         
-        const APP_CONFIG = { 
+        var APP_CONFIG = { 
             baseAdmissionFee: 850, 
             baseMonthlyFee: 800, 
             basePTFee: 1500,
             upiId: "revivefitness@upi"
         };
-        const tariffMonthsOrder = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
-        const tariffMonthIndices = [3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2]; 
+        var tariffMonthsOrder = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
+        var tariffMonthIndices = [3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2]; 
 
-        const DEFAULT_AVATAR_SVG = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#ff6600" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>');
-        const FALLBACK_LOGO_SVG = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="220" height="50" viewBox="0 0 220 50"><rect width="220" height="50" rx="6" fill="#ffffff"/><text x="12" y="32" font-family="Arial, sans-serif" font-weight="900" font-size="22" fill="#222222">REVIVE </text><text x="102" y="32" font-family="Arial, sans-serif" font-weight="900" font-size="22" fill="#ff6600">FITNESS</text></svg>');
+        var DEFAULT_AVATAR_SVG = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#ff6600" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>');
+        var FALLBACK_LOGO_SVG = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="220" height="50" viewBox="0 0 220 50"><rect width="220" height="50" rx="6" fill="#ffffff"/><text x="12" y="32" font-family="Arial, sans-serif" font-weight="900" font-size="22" fill="#222222">REVIVE </text><text x="102" y="32" font-family="Arial, sans-serif" font-weight="900" font-size="22" fill="#ff6600">FITNESS</text></svg>');
         window.FALLBACK_LOGO_SVG = FALLBACK_LOGO_SVG;
-        const FALLBACK_SEAL_SVG = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="320" height="110" viewBox="0 0 320 110"><rect x="4" y="4" width="312" height="102" rx="8" fill="none" stroke="#ff6600" stroke-width="3.5"/><rect x="10" y="10" width="300" height="90" rx="5" fill="none" stroke="#ff6600" stroke-width="1.2" stroke-dasharray="4,3"/><text x="160" y="40" font-family="Arial, sans-serif" font-weight="900" font-size="18" fill="#ff6600" text-anchor="middle" letter-spacing="1">REVIVE FITNESS STUDIO</text><text x="160" y="64" font-family="Arial, sans-serif" font-weight="800" font-size="13" fill="#222222" text-anchor="middle" letter-spacing="1.5">AUTHORIZED SIGNATORY &amp; SEAL</text><text x="160" y="86" font-family="Arial, sans-serif" font-weight="700" font-size="11" fill="#555555" text-anchor="middle">Keralapuram, Kollam • Ph: 8921698044</text></svg>');
+        var FALLBACK_SEAL_SVG = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="320" height="110" viewBox="0 0 320 110"><rect x="4" y="4" width="312" height="102" rx="8" fill="none" stroke="#ff6600" stroke-width="3.5"/><rect x="10" y="10" width="300" height="90" rx="5" fill="none" stroke="#ff6600" stroke-width="1.2" stroke-dasharray="4,3"/><text x="160" y="40" font-family="Arial, sans-serif" font-weight="900" font-size="18" fill="#ff6600" text-anchor="middle" letter-spacing="1">REVIVE FITNESS STUDIO</text><text x="160" y="64" font-family="Arial, sans-serif" font-weight="800" font-size="13" fill="#222222" text-anchor="middle" letter-spacing="1.5">AUTHORIZED SIGNATORY &amp; SEAL</text><text x="160" y="86" font-family="Arial, sans-serif" font-weight="700" font-size="11" fill="#555555" text-anchor="middle">Keralapuram, Kollam • Ph: 8921698044</text></svg>');
         window.FALLBACK_SEAL_SVG = FALLBACK_SEAL_SVG;
-        const BLANK_PIXEL = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
-        let cachedLogoDataUri = null;
-        let cachedSealDataUri = null;
+        var BLANK_PIXEL = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
+        var cachedLogoDataUri = null;
+        var cachedSealDataUri = null;
 
         // Preload logo.png and signature.png (company seal) from repository into Base64 Data URIs so html2pdf and html2canvas always capture them reliably
         function preloadLogoForCapture() {
@@ -1889,7 +1911,7 @@
         }
 
         // Safe localStorage wrapper
-        const storage = {
+        var storage = {
             get: function(key, fallback) {
                 try {
                     const raw = localStorage.getItem(key);
@@ -1913,7 +1935,7 @@
         };
 
         // Non-blocking in-page toast notification (replaces native alert())
-        let toastTimer = null;
+        var toastTimer = null;
         function showNotice(msg, type = 'info') {
             const toast = document.getElementById('cloud-toast');
             if (!toast) return;
@@ -1924,23 +1946,23 @@
             toastTimer = setTimeout(() => { toast.classList.remove('show'); }, 3200);
         }
 
-        let userLocationStr = "Kadayil Arcade, Keralapuram";
-        let currentMemberDetails = {};
-        let calculatedTotalFee = 0;
-        let calculatedAdmFeePart = 0;
-        let calculatedMonthlyFeePart = 0;
-        let preAdmissionId = "";
-        let currentActiveUser = null; 
-        let activePaymentConfig = null; 
-        let currentGeneratedReceiptBlob = null; 
-        let IS_EDIT_MODE = false;
-        let currentHubMode = 'details'; 
-        let pendingConfirmCallback = null;
-        let activePortraitStream = null;
-        let activeSigStream = null;
-        let supplementCart = {};
-        let selectedSuppMember = null;
-        let currentSuppSaleRecord = null;
+        var userLocationStr = "Kadayil Arcade, Keralapuram";
+        var currentMemberDetails = {};
+        var calculatedTotalFee = 0;
+        var calculatedAdmFeePart = 0;
+        var calculatedMonthlyFeePart = 0;
+        var preAdmissionId = "";
+        var currentActiveUser = null; 
+        var activePaymentConfig = null; 
+        var currentGeneratedReceiptBlob = null; 
+        var IS_EDIT_MODE = false;
+        var currentHubMode = 'details'; 
+        var pendingConfirmCallback = null;
+        var activePortraitStream = null;
+        var activeSigStream = null;
+        var supplementCart = {};
+        var selectedSuppMember = null;
+        var currentSuppSaleRecord = null;
 
         function ensureDefaultHolidays() {
             let hols = storage.get('revive_holidays_db', null);
@@ -2138,7 +2160,7 @@
             return null;
         }
 
-        const cloudSync = {
+        var cloudSync = {
             queue: [],
             isSyncing: false,
             
@@ -3930,7 +3952,7 @@
                     } else if (record && record.status === 'Partial') {
                         statusClass = 'status-partial'; 
                         let bal = Math.max(0, parseInt(record.totalDue, 10) - parseInt(record.amountPaid, 10)); 
-                        displayAmt = `Paid: ₹${record.amountPaid}<br>Pending: ₹${bal}${attBadge}`; 
+                        displayAmt = `Fee: ₹${record.totalDue}<br>Paid: ₹${record.amountPaid}<br>Shortfall: ₹${bal}${attBadge}`; 
                         if (!currentActiveUser || !currentActiveUser.isDeleted) {
                             action = `onclick="window.moduleContext.initPayment('${month}', '${fy}')"`;
                         } else {
@@ -3949,8 +3971,8 @@
                             }
                             due += parseInt(monthTariff.admFee, 10);
                         }
-                        displayAmt = `Due: ₹${due}${attBadge}`;
-                        if (currentHubMode === 'fee' && (!currentActiveUser || !currentActiveUser.isDeleted)) {
+                        displayAmt = `Fee: ₹${due}<br>Pending: ₹${due}${attBadge}`;
+                        if (!currentActiveUser || !currentActiveUser.isDeleted) {
                             action = `onclick="window.moduleContext.initPayment('${month}', '${fy}')"`;
                         }
                     }
@@ -4109,11 +4131,31 @@
             updatePaymentModalUI: function() {
                 const method = document.getElementById('pay-method').value;
                 const rawAmt = parseInt(document.getElementById('pay-amount-now').value, 10);
-                const amt = isNaN(rawAmt) ? 0 : Math.max(0, rawAmt);
-                const maxBal = activePaymentConfig ? activePaymentConfig.balance : amt;
+                const maxBal = activePaymentConfig ? activePaymentConfig.balance : (isNaN(rawAmt) ? 0 : rawAmt);
+                const amt = isNaN(rawAmt) ? 0 : Math.min(maxBal, Math.max(0, rawAmt));
                 const pendingAfter = Math.max(0, maxBal - amt);
-                const pendEl = document.getElementById('pay-pending-after');
-                if (pendEl) pendEl.innerText = pendingAfter;
+                const pillEl = document.getElementById('pay-shortfall-pill');
+                if (pillEl) {
+                    if (pendingAfter > 0) {
+                        pillEl.style.color = 'var(--error-red)';
+                        pillEl.innerHTML = `₹<span id="pay-pending-after">${pendingAfter}</span> (Shortfall / Pending)`;
+                    } else {
+                        pillEl.style.color = 'var(--success-green)';
+                        pillEl.innerHTML = `₹<span id="pay-pending-after">0</span> (Cleared)`;
+                    }
+                }
+
+                const qrAmtLbl = document.getElementById('pay-qr-amt-label');
+                if (qrAmtLbl) qrAmtLbl.innerText = amt;
+                const qrShortLbl = document.getElementById('pay-qr-shortfall-label');
+                if (qrShortLbl) {
+                    if (pendingAfter > 0) {
+                        qrShortLbl.style.display = 'block';
+                        qrShortLbl.innerText = `Shortfall / Pending Balance: ₹${pendingAfter}`;
+                    } else {
+                        qrShortLbl.style.display = 'none';
+                    }
+                }
 
                 const upiSec = document.getElementById('pay-upi-section');
                 if(method === 'UPI' && amt > 0) {
@@ -6328,7 +6370,25 @@
                 const rawPaying = parseInt(document.getElementById('adm-pay-amount-now').value, 10);
                 const payingNow = isNaN(rawPaying) ? 0 : Math.min(calculatedTotalFee, Math.max(0, rawPaying));
                 const pendingBal = Math.max(0, calculatedTotalFee - payingNow);
-                document.getElementById('adm-pending-balance').innerText = pendingBal;
+                const admPill = document.getElementById('adm-shortfall-pill');
+                if (admPill) {
+                    if (pendingBal > 0) {
+                        admPill.style.color = 'var(--error-red)';
+                        admPill.innerHTML = `₹<span id="adm-pending-balance">${pendingBal}</span> (Shortfall / Pending)`;
+                    } else {
+                        admPill.style.color = 'var(--success-green)';
+                        admPill.innerHTML = `₹<span id="adm-pending-balance">0</span> (Cleared)`;
+                    }
+                }
+                const qrShortNote = document.getElementById('adm-qr-shortfall-note');
+                if (qrShortNote) {
+                    if (pendingBal > 0) {
+                        qrShortNote.style.display = 'block';
+                        qrShortNote.innerText = `Shortfall / Pending Balance: ₹${pendingBal}`;
+                    } else {
+                        qrShortNote.style.display = 'none';
+                    }
+                }
 
                 const upiSec = document.getElementById('upi-section');
                 if (method === 'UPI' && payingNow > 0) {
@@ -6412,27 +6472,25 @@
                 if(!payDb[currentMemberDetails.id][currentMemberDetails._fy]) payDb[currentMemberDetails.id][currentMemberDetails._fy] = {};
                 
                 const method = document.getElementById('paymentMethod').value;
-                if (payingNow > 0) {
-                    const pData = {
-                        userId: currentMemberDetails.id,
-                        fullName: currentMemberDetails.fullName,
-                        primaryContact: currentMemberDetails.primaryContact,
-                        fy: currentMemberDetails._fy,
-                        month: currentMemberDetails._month,
-                        totalDue: calculatedTotalFee,
-                        amountPaid: payingNow,
-                        balanceDue: pendingBal,
-                        lastPaidAmount: payingNow,
-                        admFeeIncluded: calculatedAdmFeePart,
-                        status: payStatus,
-                        method: method,
-                        collectedBy: currentMemberDetails.collectedBy || 'Admin',
-                        lastDate: new Date().toISOString()
-                    };
-                    payDb[currentMemberDetails.id][currentMemberDetails._fy][currentMemberDetails._month] = pData;
-                    storage.set('revive_payments_db', payDb);
-                    cloudSync.push('pushPayment', pData);
-                }
+                const pData = {
+                    userId: currentMemberDetails.id,
+                    fullName: currentMemberDetails.fullName,
+                    primaryContact: currentMemberDetails.primaryContact,
+                    fy: currentMemberDetails._fy,
+                    month: currentMemberDetails._month,
+                    totalDue: calculatedTotalFee,
+                    amountPaid: payingNow,
+                    balanceDue: pendingBal,
+                    lastPaidAmount: payingNow,
+                    admFeeIncluded: calculatedAdmFeePart,
+                    status: pendingBal === 0 ? 'Paid' : 'Partial',
+                    method: method,
+                    collectedBy: currentMemberDetails.collectedBy || 'Admin',
+                    lastDate: new Date().toISOString()
+                };
+                payDb[currentMemberDetails.id][currentMemberDetails._fy][currentMemberDetails._month] = pData;
+                storage.set('revive_payments_db', payDb);
+                cloudSync.push('pushPayment', pData);
 
                 const currentCount = parseInt(preAdmissionId.split('-')[1], 10);
                 try { localStorage.setItem('revive_admission_count', String(currentCount)); } catch (e) {}
