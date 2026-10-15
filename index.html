@@ -182,6 +182,18 @@
         .staff-verify-box { background: #fff8f3; border: 2px solid var(--accent-orange); border-radius: 10px; padding: 1.2rem; margin-top: 1.2rem; }
         .staff-verify-box label { color: var(--accent-orange); }
 
+        .hr-punch-card { background: var(--bg-panel); border: 2px solid var(--accent-orange); border-radius: 14px; padding: 1.5rem; max-width: 900px; margin: 0 auto 2rem auto; box-shadow: 0 8px 25px rgba(255,102,0,0.08); }
+        .hr-punch-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.2rem; }
+        .hr-status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .hr-pill-working { background: #eefbf3; color: #1b9f4a; border: 1px solid #b7ebc9; }
+        .hr-pill-holiday { background: #fff4e5; color: #d97706; border: 1px solid #fde68a; }
+        .hr-pill-absent { background: #fdecea; color: var(--error-red); border: 1px solid #f5b7b1; }
+        .hr-punch-btns { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .btn.checkin-btn { background-color: var(--success-green); color: #fff; }
+        .btn.checkin-btn:disabled, .btn.checkout-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn.checkout-btn { background-color: var(--error-red); color: #fff; }
+        .hr-section-label { max-width: 900px; margin: 1.8rem auto 0.8rem auto; font-size: 0.88rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.2px; border-left: 4px solid var(--accent-orange); padding-left: 10px; }
+
         .calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); gap: 10px; margin-top: 1rem; }
         .cal-month { padding: 14px 6px; border-radius: 8px; text-align: center; border: 2px solid transparent; cursor: pointer; color: #fff; transition: transform 0.2s; }
         .cal-month:hover { transform: scale(1.04); }
@@ -251,10 +263,17 @@
         .pdf-table td { padding: 8px; border-bottom: 1px solid #ddd; font-weight: 700; color: #000; }
         .pdf-declaration h4 { color: var(--accent-orange); font-size: 12px; margin: 0 0 5px 0; text-transform: uppercase; }
         .pdf-declaration p { font-size: 10px; line-height: 1.4; margin: 0 0 15px 0; text-align: justify; color: #333; }
-        .pdf-sigs-container { display: flex; justify-content: space-between; margin-bottom: 15px; }
-        .pdf-sig-block { width: 45%; display: flex; flex-direction: column; align-items: center; }
-        .pdf-sig-image-box { height: 45px; display: flex; align-items: flex-end; justify-content: center; margin-bottom: 5px; }
-        .pdf-sig-image-box img { max-height: 40px; max-width: 100%; object-fit: contain; }
+        .pdf-sigs-container { display: flex; justify-content: space-between; margin-bottom: 14px; align-items: flex-end; }
+        .pdf-sig-block { width: 46%; display: flex; flex-direction: column; align-items: center; }
+        .pdf-sig-image-box { height: 72px; width: 100%; display: flex; align-items: center; justify-content: center; margin-bottom: 4px; }
+        .pdf-sig-image-box img { max-height: 68px; max-width: 225px; width: auto; height: auto; object-fit: contain; image-rendering: -webkit-optimize-contrast; }
+        #pdf-official-seal { max-height: 70px; max-width: 235px; }
+        #pdf-member-sig { max-height: 64px; max-width: 220px; }
+
+        .sig-crop-stage { position: relative; width: 100%; max-width: 440px; height: 220px; margin: 0 auto 1rem auto; background: #1a1a1a; border-radius: 8px; overflow: hidden; user-select: none; touch-action: none; border: 2px solid var(--border-color); }
+        .sig-crop-stage canvas { width: 100%; height: 100%; display: block; }
+        .sig-guide-overlay { position: absolute; inset: 18% 10%; border: 2px dashed var(--accent-orange); border-radius: 6px; pointer-events: none; z-index: 3; box-shadow: 0 0 0 9999px rgba(0,0,0,0.38); display: none; }
+        .sig-guide-overlay span { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: var(--accent-orange); color: #fff; font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; white-space: nowrap; letter-spacing: 0.5px; }
         .pdf-sig-line { border-top: 1px solid #000; width: 100%; text-align: center; padding-top: 5px; font-weight: 800; font-size: 11px; }
         .pdf-sig-meta { width: 100%; font-size: 9px; color: #555; margin-top: 5px; line-height: 1.3; }
         .pdf-rules-container { border-top: 2px solid var(--accent-orange); padding-top: 10px; flex-grow: 1; }
@@ -281,7 +300,7 @@
     <div id="cloud-sync-overlay">
         <div class="spinner"></div>
         <h2 style="color:var(--accent-orange); letter-spacing:1px;">CONNECTING TO SERVER...</h2>
-        <p style="color:var(--text-muted); margin-top:10px;">Syncing latest records & clearing stale cache</p>
+        <p style="color:var(--text-muted); margin-top:10px;">Syncing records...</p>
     </div>
     <div id="cloud-toast">Syncing to cloud...</div>
 
@@ -299,7 +318,7 @@
         <main id="view-home" class="view-section active-view">
             <div class="dashboard-header">
                 <h1>WELCOME TO <span>REVIVE</span></h1>
-                <p style="color: var(--text-muted); font-size: 1rem;">Portal Access Selection</p>
+                
             </div>
             <div class="compact-grid">
                 <div class="module-card" onclick="window.appContext.startAdmission()">
@@ -346,16 +365,59 @@
         <main id="view-dashboard" class="view-section">
             <div class="dashboard-header">
                 <h1 id="dashboard-title">STAFF <span>PORTAL</span></h1>
-                <p style="color: var(--text-muted); font-size: 1rem;">Select a module to continue</p>
+                <p id="dashboard-subtitle" style="color: var(--text-muted); font-size: 0.9rem;"></p>
             </div>
-            <div class="compact-grid">
-                <div class="module-card" onclick="window.moduleContext.openUserSearch('fee')">
+
+            <!-- Staff-Only HR Attendance Punch-In / Punch-Out Panel -->
+            <div id="staff-hr-punch-panel" class="hr-punch-card" style="display:none;">
+                <div class="hr-punch-header">
+                    <div>
+                        <div style="font-size:0.78rem; font-weight:800; color:var(--accent-orange); text-transform:uppercase; letter-spacing:1px;">Daily Attendance</div>
+                        <h3 id="staff-punch-date-title" style="font-size:1.15rem; color:var(--text-main); margin-top:3px;">Today</h3>
+                        <p id="staff-punch-substatus" style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;"></p>
+                    </div>
+                    <div id="staff-day-type-badge"></div>
+                </div>
+                <div class="hr-punch-btns">
+                    <button type="button" id="btn-staff-checkin" class="btn checkin-btn" onclick="window.moduleContext.staffPunchIn()">
+                        ✔ Check-In (Punch In)
+                    </button>
+                    <button type="button" id="btn-staff-checkout" class="btn checkout-btn" onclick="window.moduleContext.staffPunchOut()">
+                        ⏹ Check-Out (Punch Out)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Staff-Only HR Self-Service Modules (Attendance Details & Holiday Calendar) -->
+            <div id="staff-hr-section-label" class="hr-section-label" style="display:none;">HR Portal</div>
+            <div id="staff-hr-modules-grid" class="compact-grid" style="display:none; margin-bottom:2rem;">
+                <div class="module-card" onclick="window.appContext.switchView('staff-my-attendance')">
+                    <svg class="module-icon-svg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M9 16l2 2 4-4"></path></svg>
+                    <h3>Attendance Details</h3>
+                </div>
+                <div class="module-card" onclick="window.appContext.switchView('staff-holiday-calendar')">
+                    <svg class="module-icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <h3>Holiday Calendar</h3>
+                </div>
+            </div>
+
+            <div id="staff-ops-section-label" class="hr-section-label" style="display:none;">Studio Operations</div>
+            <div id="staff-ops-locked-notice" class="analysis-box" style="display:none; max-width:900px; margin:0 auto 1.5rem auto; background:#fff8f3; border-left:4px solid var(--error-red); text-align:center;">
+                <div style="font-weight:800; color:var(--error-red); font-size:1rem; margin-bottom:4px;" id="staff-ops-locked-title">🔒 Studio Operations Locked</div>
+                <div style="font-size:0.86rem; color:var(--text-muted);" id="staff-ops-locked-desc">Mark Check-In above to unlock Fee Collection & User Details.</div>
+            </div>
+            <div class="compact-grid" id="main-operations-grid">
+                <div class="module-card staff-shift-gated" onclick="window.moduleContext.openUserSearch('fee')">
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
                     <h3>Fee Collection</h3>
                 </div>
-                <div class="module-card" onclick="window.moduleContext.openUserSearch('details')">
+                <div class="module-card staff-shift-gated" onclick="window.moduleContext.openUserSearch('details')">
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     <h3>User Details</h3>
+                </div>
+                <div class="module-card admin-only" onclick="window.appContext.switchView('admin-staff-attendance')">
+                    <svg class="module-icon-svg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M9 16l2 2 4-4"></path></svg>
+                    <h3>Staff Attendance</h3>
                 </div>
                 <div class="module-card admin-only" onclick="window.appContext.switchView('supplement-admin')">
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
@@ -464,8 +526,8 @@
                 <form id="attendanceForm" onsubmit="window.moduleContext.markAttendance(event); return false;">
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Enter Phone Number, Admission ID, or Name <span class="required">*</span></label>
-                            <input type="text" id="att-input" placeholder="e.g. 9999999999, REV-0001, or John" oninput="window.moduleContext.previewMemberName(this.value)" required autocomplete="off">
+                            <label>Phone / Admission ID / Name <span class="required">*</span></label>
+                            <input type="text" id="att-input" placeholder="Search member..." oninput="window.moduleContext.previewMemberName(this.value)" required autocomplete="off">
                             <div id="att-live-preview" style="margin-top: 6px;"></div>
                         </div>
                         <div class="form-group" style="max-width: 150px; justify-content: flex-end;">
@@ -505,8 +567,8 @@
                 </div>
                 <form id="userSearchForm" onsubmit="window.moduleContext.fetchUserHub(event); return false;">
                     <div class="form-group" style="margin-bottom:1rem;">
-                        <label>Member Phone Number, Admission ID, or Name <span class="required">*</span></label>
-                        <input type="text" id="search-phone" placeholder="Enter 10-digit Phone, REV-XXXX, or Name" oninput="window.moduleContext.previewUserSearch(this.value)" required autocomplete="off">
+                        <label>Phone / Admission ID / Name <span class="required">*</span></label>
+                        <input type="text" id="search-phone" placeholder="Search member..." oninput="window.moduleContext.previewUserSearch(this.value)" required autocomplete="off">
                         <div id="search-user-live-preview" style="margin-top: 8px;"></div>
                     </div>
                     <div class="form-group">
@@ -635,7 +697,7 @@
 
                     <div class="report-section">
                         <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:10px;">
-                            <h3 style="margin:0; border:none;">Admissions Register (Includes Archived Users)</h3>
+                            <h3 style="margin:0; border:none;">Admissions</h3>
                         </div>
                         <div class="table-responsive">
                             <table class="data-table" id="table-admissions">
@@ -647,7 +709,7 @@
 
                     <div class="report-section">
                         <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:10px;">
-                            <h3 style="margin:0; border:none; color:var(--success-green);">Fee Collections Register (Credit - Preserved On User Delete)</h3>
+                            <h3 style="margin:0; border:none; color:var(--success-green);">Fee Collections</h3>
                         </div>
                         <div class="table-responsive">
                             <table class="data-table" id="table-fees">
@@ -659,7 +721,7 @@
 
                     <div class="report-section">
                         <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:10px;">
-                            <h3 style="margin:0; border:none; color:var(--success-green);">Supplement Sales Register (Credit / Revenue)</h3>
+                            <h3 style="margin:0; border:none; color:var(--success-green);">Supplement Sales</h3>
                         </div>
                         <div class="table-responsive">
                             <table class="data-table" id="table-supp-sales-report">
@@ -671,7 +733,7 @@
 
                     <div class="report-section">
                         <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:10px;">
-                            <h3 style="margin:0; border:none; color:var(--error-red);">Supplement Purchase Register (Debit / Stock Cost)</h3>
+                            <h3 style="margin:0; border:none; color:var(--error-red);">Supplement Purchases</h3>
                         </div>
                         <div class="table-responsive">
                             <table class="data-table" id="table-supp-purchases-report">
@@ -683,7 +745,7 @@
 
                     <div class="report-section">
                         <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:10px;">
-                            <h3 style="margin:0; border:none; color:var(--error-red);">General Expense Register (Debit)</h3>
+                            <h3 style="margin:0; border:none; color:var(--error-red);">Expenses</h3>
                         </div>
                         <div class="table-responsive">
                             <table class="data-table" id="table-expenses-report">
@@ -695,13 +757,13 @@
 
                     <div class="report-section" id="shortfall-report-section">
                         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
-                            <h3 style="margin:0; border:none; color:var(--warning-yellow);">Due / Shortfall & Unpaid Summary (Active Members)</h3>
+                            <h3 style="margin:0; border:none; color:var(--warning-yellow);">Pending Dues Summary</h3>
                             <button type="button" class="btn primary" style="width:auto; padding:0.65rem 1.2rem; font-size:0.82rem;" onclick="window.moduleContext.downloadFullReportCsv()">⬇ Download Full Report with All Unpaid List (CSV)</button>
                         </div>
                         <div class="analysis-box" id="unpaid-summary-box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
                             <div>
-                                <div style="font-weight:800; color:var(--text-main); font-size:1rem;">Individual Unpaid & Shortfall list is hidden on screen for faster scrolling.</div>
-                                <div style="color:var(--text-muted); font-size:0.85rem; margin-top:4px;" id="unpaid-summary-text">Download the full report above to view all individual unpaid and shortfall member records.</div>
+                                
+                                <div style="color:var(--text-muted); font-size:0.85rem; margin-top:4px;" id="unpaid-summary-text"></div>
                             </div>
                         </div>
                     </div>
@@ -743,33 +805,193 @@
         </main>
 
         <main id="view-staff-editor" class="view-section">
-            <div class="form-layout" style="max-width: 600px;">
+            <div class="form-layout" style="max-width: 850px;">
                 <div class="module-toolbar">
                     <button class="back-btn" onclick="window.appContext.goHome()" type="button"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>Back</button>
-                    <h2 class="module-title">Staff Access Management</h2>
+                    <h2 class="module-title">Staff & Holiday Configuration</h2>
                 </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:1rem;">
+                    <h3 id="staff-form-heading" style="color:var(--accent-orange); font-size:1.05rem; text-transform:uppercase; margin:0;">Add / Edit Staff</h3>
+                    <button type="button" class="btn secondary" style="width:auto; padding:0.5rem 1rem; font-size:0.8rem; border-color:var(--accent-orange); color:var(--accent-orange);" onclick="window.appContext.switchView('admin-staff-attendance')">📊 View Staff Attendance Reports →</button>
+                </div>
+
                 <form id="staffForm" onsubmit="window.moduleContext.saveStaff(event); return false;">
+                    <input type="hidden" id="staff-edit-id" value="">
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Staff Name <span class="required">*</span></label>
-                            <input type="text" id="staff-name" placeholder="e.g. Rahul" required>
+                            <label>Staff Full Name <span class="required">*</span></label>
+                            <input type="text" id="staff-name" placeholder="e.g. Rahul Krishnan" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Joining Date <span class="required">*</span></label>
+                            <input type="date" id="staff-joining-date" required>
                         </div>
                         <div class="form-group">
                             <label>Login & Verification PIN <span class="required">*</span></label>
                             <input type="password" id="staff-pin" placeholder="Create PIN (4-6 digits)" maxlength="6" pattern="\d{4,6}" required>
                         </div>
                     </div>
-                    <div class="action-row"><button type="submit" class="btn primary">+ Add Staff Member</button></div>
+                    <div class="action-row" style="margin-top:1rem;">
+                        <button type="submit" id="btn-save-staff" class="btn primary">+ Add Staff Member</button>
+                        <button type="button" id="btn-cancel-staff-edit" class="btn secondary" style="display:none;" onclick="window.moduleContext.resetStaffForm()">Cancel Edit</button>
+                    </div>
                 </form>
 
                 <div style="margin-top: 2rem; padding-top:1.5rem; border-top:1px solid var(--border-color);">
-                    <h3 style="color:var(--accent-orange); margin-bottom:1rem; font-size:1.1rem; text-transform:uppercase;">Active Staff Accounts</h3>
+                    <h3 style="color:var(--accent-orange); margin-bottom:0.8rem; font-size:1.05rem; text-transform:uppercase;">Staff Accounts</h3>
                     <div class="table-responsive">
                         <table class="data-table" id="table-staff-list">
-                            <thead><tr><th>Staff Name</th><th>Verification PIN</th><th>Action</th></tr></thead>
+                            <thead><tr><th>Staff Name</th><th>Joining Date</th><th>Verification PIN</th><th>Action</th></tr></thead>
                             <tbody></tbody>
                         </table>
                     </div>
+                </div>
+
+                <!-- Admin Holiday Calendar -->
+                <div style="margin-top: 2.5rem; padding: 1.5rem; background: var(--bg-main); border-radius: 10px; border: 1px dashed var(--accent-orange);">
+                    <h3 style="color:var(--accent-orange); margin-bottom:0.4rem; font-size:1.05rem; text-transform:uppercase;">Holiday Calendar</h3>
+                    
+
+                    <form id="holidayForm" onsubmit="window.moduleContext.saveHoliday(event); return false;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Holiday Date <span class="required">*</span></label>
+                                <input type="date" id="holiday-date" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Holiday / Occasion Name <span class="required">*</span></label>
+                                <input type="text" id="holiday-name" placeholder="e.g. Thiruvonam / Vishu / Republic Day" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Details / Note</label>
+                                <input type="text" id="holiday-desc" placeholder="e.g. Studio closed for festival">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn secondary" style="width:auto; padding:0.75rem 1.5rem; border-color:var(--accent-orange); color:var(--accent-orange);">+ Add Holiday to Yearly Calendar</button>
+                    </form>
+
+                    <div class="table-responsive" style="margin-top:1.2rem;">
+                        <table class="data-table" id="table-admin-holidays">
+                            <thead><tr><th>Date</th><th>Day</th><th>Occasion Name</th><th>Details</th><th>Action</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Staff Self-Service View 1: My Attendance Details -->
+        <main id="view-staff-my-attendance" class="view-section">
+            <div class="form-layout" style="max-width: 900px;">
+                <div class="module-toolbar">
+                    <button class="back-btn" onclick="window.appContext.goHome()" type="button"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>Back to Portal</button>
+                    <h2 class="module-title">My Attendance Details</h2>
+                </div>
+
+                <div class="form-row" style="background:var(--bg-main); padding:1rem; border-radius:8px; border:1px solid var(--border-color); align-items:flex-end;">
+                    <div class="form-group">
+                        <label>Year</label>
+                        <select id="staff-my-att-year" onchange="window.moduleContext.populateStaffMyAttMonths()"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Month (From Joining Date)</label>
+                        <select id="staff-my-att-month" onchange="window.moduleContext.renderStaffMyAttendance()"></select>
+                    </div>
+                </div>
+
+                <div class="report-kpi-grid" style="margin-top:1.2rem;">
+                    <div class="kpi-card">
+                        <h4>Joining Date</h4>
+                        <div class="val" id="my-att-kpi-joined" style="font-size:1.25rem;">-</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h4>Present Days</h4>
+                        <div class="val" id="my-att-kpi-present" style="color:var(--success-green);">0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h4>Absent Days</h4>
+                        <div class="val" id="my-att-kpi-absent" style="color:var(--error-red);">0</div>
+                    </div>
+                    <div class="kpi-card">
+                        <h4>Sundays & Holidays</h4>
+                        <div class="val" id="my-att-kpi-holidays" style="color:var(--warning-yellow);">0</div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="data-table" id="table-staff-my-attendance">
+                        <thead><tr><th>Date</th><th>Day</th><th>Status</th><th>Check-In</th><th>Check-Out</th><th>Duration / Note</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- Staff Self-Service View 2: Annual Holiday Calendar -->
+        <main id="view-staff-holiday-calendar" class="view-section">
+            <div class="form-layout" style="max-width: 850px;">
+                <div class="module-toolbar">
+                    <button class="back-btn" onclick="window.appContext.goHome()" type="button"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>Back to Portal</button>
+                    <h2 class="module-title">Annual Holiday Calendar</h2>
+                </div>
+
+
+
+                <div class="form-row" style="max-width:260px;">
+                    <div class="form-group">
+                        <label>Filter by Year</label>
+                        <select id="staff-hol-year-filter" onchange="window.moduleContext.renderStaffHolidayCalendar()"></select>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="data-table" id="table-staff-holidays">
+                        <thead><tr><th>Date</th><th>Day</th><th>Holiday / Occasion</th><th>Details</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- Admin View: Staff Attendance Monitor & Monthly CSV Download -->
+        <main id="view-admin-staff-attendance" class="view-section">
+            <div class="form-layout" style="max-width: 1000px;">
+                <div class="module-toolbar">
+                    <button class="back-btn" onclick="window.appContext.goHome()" type="button"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>Back</button>
+                    <h2 class="module-title">Staff Attendance & HR Reports</h2>
+                </div>
+
+                <div class="form-row" style="background:var(--bg-main); padding:1rem; border-radius:8px; border:1px solid var(--border-color); align-items:flex-end;">
+                    <div class="form-group">
+                        <label>Select Staff Member</label>
+                        <select id="admin-att-staff-select" onchange="window.moduleContext.renderAdminStaffAttendance()"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Year</label>
+                        <select id="admin-att-year" onchange="window.moduleContext.renderAdminStaffAttendance()"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Month</label>
+                        <select id="admin-att-month" onchange="window.moduleContext.renderAdminStaffAttendance()"></select>
+                    </div>
+                    <button type="button" class="btn primary" style="max-width:240px; padding:0.95rem 1.2rem;" onclick="window.moduleContext.downloadStaffAttendanceCsv()">⬇ Download Month View (CSV)</button>
+                </div>
+
+                <h3 style="color:var(--accent-orange); margin:1.5rem 0 0.8rem 0; font-size:1.05rem; text-transform:uppercase;">Monthly Summary</h3>
+                <div class="table-responsive" style="margin-bottom:2rem;">
+                    <table class="data-table" id="table-admin-staff-summary">
+                        <thead><tr><th>Staff Name</th><th>Joining Date</th><th>Working Days</th><th>Present</th><th>Absent</th><th>Sundays / Holidays</th><th>Attendance %</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <h3 style="color:var(--accent-orange); margin:1.5rem 0 0.8rem 0; font-size:1.05rem; text-transform:uppercase;">Daily Attendance Log</h3>
+                <div class="table-responsive">
+                    <table class="data-table" id="table-admin-staff-daily">
+                        <thead><tr><th>Date</th><th>Day</th><th>Staff Name</th><th>Status</th><th>Check-In</th><th>Check-Out</th><th>Hours / Remarks</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
         </main>
@@ -783,7 +1005,7 @@
 
                 <div style="background:var(--bg-main); padding: 1.5rem; border-radius: 8px; border: 1px dashed var(--accent-orange); margin-bottom: 2.5rem;">
                     <h3 style="color:var(--accent-orange); margin-bottom: 0.5rem; font-size: 1.1rem; text-transform: uppercase;">Special Date / Promo Tariffs</h3>
-                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.5rem;">Define custom rates for specific dates. The system will auto-apply these rates over standard monthly rates if an admission or payment happens within these dates.</p>
+                    
                     
                     <form id="promoTariffForm" onsubmit="window.moduleContext.addSpecialTariff(event); return false;">
                         <div class="form-row">
@@ -835,15 +1057,15 @@
                                 <label for="admissionTypeSelect">Admission Type <span class="required">*</span></label>
                                 <select id="admissionTypeSelect" required>
                                     <option value="New Admission">New Admission</option>
-                                    <option value="Re-Admission">Re-Admission (6+ Months Gap)</option>
+                                    <option value="Re-Admission">Re-Admission</option>
                                 </select>
                             </div>
                         </div>
 
                         <div id="reAdmissionSection">
-                            <label style="color: var(--accent-orange); margin-bottom: 0.8rem; display: block; font-weight: 800;">Validate Previous Registration (6+ Months Eligibility)</label>
+                            <label style="color: var(--accent-orange); margin-bottom: 0.8rem; display: block; font-weight: 800;">Previous Mobile Number</label>
                             <div class="val-group">
-                                <input type="tel" id="prevPhoneInput" placeholder="Enter previous 10-digit mobile number" pattern="\d{10}" maxlength="10">
+                                <input type="tel" id="prevPhoneInput" placeholder="10-digit mobile number" pattern="\d{10}" maxlength="10">
                                 <button type="button" onclick="window.moduleContext.validateReadmission()" class="btn secondary">Validate</button>
                             </div>
                             <div id="validationResultBox" style="display:none; font-size: 0.9rem; line-height: 1.5; padding: 1rem; background: var(--bg-panel); border-radius: 6px; border: 1px solid var(--border-color);"></div>
@@ -911,10 +1133,10 @@
                     </div>
 
                     <div id="step-2" class="step-container">
-                        <div class="step-indicator" id="step-2-ind">Step 2 of 3: Digital Verification (True Un-Mirrored Camera)</div>
+                        <div class="step-indicator" id="step-2-ind">Step 2 of 3: Photo & Signature</div>
                         
                         <div class="verification-group">
-                            <label>1. Live Portrait Capture (Un-Mirrored) <span class="required">*</span></label>
+                            <label>1. Member Photo <span class="required">*</span></label>
                             <div class="camera-container">
                                 <div class="camera-placeholder" id="selfie-placeholder">
                                     <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
@@ -935,14 +1157,15 @@
 
                         <!-- Fix #8 & #9: Signature Upload with Live Camera Capture or Image File Upload -->
                         <div class="verification-group">
-                            <label>2. Member Signature (Live Camera Capture or Image Upload) <span class="required">*</span></label>
-                            <p style="font-size:0.8rem; color:var(--text-muted); text-align:center; max-width:420px; margin-bottom:0.5rem;">Sign on white paper and capture via live camera, or upload a clear photo of the signature.</p>
+                            <label>2. Member Signature <span class="required">*</span></label>
+                            
                             <div class="sig-camera-container">
                                 <div class="camera-placeholder" id="sig-placeholder" style="text-align:center; color:var(--text-muted); font-size:0.82rem;">
                                     <svg viewBox="0 0 24 24" style="width:36px; height:36px; margin-bottom:4px;"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                                     <div>No signature captured yet</div>
                                 </div>
                                 <video id="sig-camera-stream" autoplay playsinline style="display:none;"></video>
+                                <div class="sig-guide-overlay" id="sig-camera-guide"><span>ALIGN SIGNATURE INSIDE BOX</span></div>
                                 <canvas id="sig-canvas-snapshot" style="display:none;"></canvas>
                                 <img id="sig-preview" style="display:none;" alt="Signature Preview" />
                             </div>
@@ -952,6 +1175,7 @@
                                 <button type="button" id="btn-capture-sig" class="btn primary" style="display:none; flex:1; font-size:0.82rem; padding:0.75rem;">Capture Signature</button>
                                 <button type="button" id="btn-upload-sig-gallery" class="btn secondary" style="flex:1; font-size:0.82rem; padding:0.75rem;">📁 Choose from Gallery / Storage</button>
                                 <input type="file" id="sig-file-input" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,application/octet-stream" style="display:none;">
+                                <button type="button" id="btn-edit-sig-crop" class="btn secondary" style="display:none; flex:1; font-size:0.82rem; padding:0.75rem; border-color:var(--accent-orange); color:var(--accent-orange);">✂ Crop / Enhance</button>
                                 <button type="button" id="btn-retake-sig" class="btn danger" style="display:none; flex:1; font-size:0.82rem; padding:0.75rem;">Clear / Retake</button>
                             </div>
                             <input type="hidden" id="sig-data" required>
@@ -964,13 +1188,13 @@
                     </div>
 
                     <div id="step-3" class="step-container">
-                        <div class="step-indicator" id="step-3-ind">Step 3 of 3: Initial Payment & Staff Verification</div>
+                        <div class="step-indicator" id="step-3-ind">Step 3 of 3: Payment & PIN</div>
                         
                         <div class="fee-summary-box">
                             <h3 style="color:var(--accent-orange); text-align:center; margin-bottom:1.2rem; letter-spacing:1px;">FEE SUMMARY (<span id="calc-adm-month-label"></span>)</h3>
                             <div class="fee-row"><span>Synced Admission ID:</span> <strong id="calc-admission-id" style="color:var(--accent-orange);">REV-0000</strong></div>
                             <div class="fee-row"><span>Admission Fee:</span> <strong>₹<span id="calc-admin-fee">0</span></strong></div>
-                            <div class="fee-row"><span>Training Fee (From Admission Month):</span> <strong>₹<span id="calc-monthly-fee">0</span></strong></div>
+                            <div class="fee-row"><span>Training Fee:</span> <strong>₹<span id="calc-monthly-fee">0</span></strong></div>
                             <div class="fee-row fee-total"><span>Total Payable <span id="calc-promo-badge"></span>:</span> <strong>₹<span id="calc-total-fee">0</span></strong></div>
                         </div>
 
@@ -992,9 +1216,9 @@
                         <!-- Fix #4: Staff/Admin PIN verification required to finalize admission & fee -->
                         <div class="staff-verify-box">
                             <div class="form-group">
-                                <label for="adm-staff-pin">Staff / Admin Verification PIN (Collected By) <span class="required">*</span></label>
+                                <label for="adm-staff-pin">Authorization PIN <span class="required">*</span></label>
                                 <input type="password" id="adm-staff-pin" class="pin-input" placeholder="Enter Staff or Admin PIN" inputmode="numeric" maxlength="6" autocomplete="off" oninput="window.moduleContext.previewPinIdentity(this.value, 'adm-pin-identity')">
-                                <div id="adm-pin-identity" style="margin-top:6px; font-size:0.85rem; font-weight:700; text-align:center; color:var(--text-muted);">Enter your PIN to authorize and stamp this registration</div>
+                                <div id="adm-pin-identity" style="margin-top:6px; font-size:0.85rem; font-weight:700; text-align:center; color:var(--text-muted);"></div>
                             </div>
                         </div>
 
@@ -1021,7 +1245,7 @@
 
                 <!-- Step 1: Browse Products & Add Multiple Quantities to Cart -->
                 <div id="supp-step-1" class="step-container active-step">
-                    <div class="step-indicator">Step 1 of 3: Select Supplements & Quantities</div>
+                    <div class="step-indicator">Step 1 of 3: Select Supplements</div>
                     <div id="supp-catalog-grid" class="supp-grid"></div>
 
                     <div class="cart-summary-bar" id="supp-cart-bar">
@@ -1038,13 +1262,13 @@
 
                 <!-- Step 2: Validate Member (Phone, Admission ID, or Name) & Confirm Invoice Details -->
                 <div id="supp-step-2" class="step-container">
-                    <div class="step-indicator">Step 2 of 3: Member Validation & Invoice Details</div>
+                    <div class="step-indicator">Step 2 of 3: Member Details</div>
 
                     <div style="background:var(--bg-main); padding:1.2rem; border-radius:10px; border:1px dashed var(--accent-orange); margin-bottom:1.5rem;">
-                        <label style="color:var(--accent-orange); display:block; margin-bottom:0.5rem;">Search Member by Phone Number, Admission ID, or Name <span class="required">*</span></label>
+                        <label style="color:var(--accent-orange); display:block; margin-bottom:0.5rem;">Search Member (Phone / ID / Name) <span class="required">*</span></label>
                         <div class="form-row" style="margin-bottom:0;">
                             <div class="form-group">
-                                <input type="text" id="supp-member-search" placeholder="e.g. 9999999999, REV-0001, or Rahul" oninput="window.moduleContext.previewSuppMember(this.value)" autocomplete="off">
+                                <input type="text" id="supp-member-search" placeholder="Search member..." oninput="window.moduleContext.previewSuppMember(this.value)" autocomplete="off">
                                 <div id="supp-member-live-preview" style="margin-top:6px;"></div>
                             </div>
                         </div>
@@ -1053,21 +1277,21 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Member Admission ID <span class="required">*</span></label>
-                            <input type="text" id="supp-cust-id" readonly placeholder="Select member above">
+                            <input type="text" id="supp-cust-id" readonly placeholder="-">
                         </div>
                         <div class="form-group">
                             <label>Member Full Name <span class="required">*</span></label>
-                            <input type="text" id="supp-cust-name" readonly placeholder="Auto-fetched on selection">
+                            <input type="text" id="supp-cust-name" readonly placeholder="-">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Phone Number <span class="required">*</span></label>
-                            <input type="text" id="supp-cust-phone" readonly placeholder="Auto-fetched on selection">
+                            <input type="text" id="supp-cust-phone" readonly placeholder="-">
                         </div>
                         <div class="form-group">
-                            <label>Billing Address (For Invoice) <span class="required">*</span></label>
-                            <input type="text" id="supp-cust-address" placeholder="Auto-fetched residential address">
+                            <label>Billing Address <span class="required">*</span></label>
+                            <input type="text" id="supp-cust-address" placeholder="Address">
                         </div>
                     </div>
 
@@ -1087,7 +1311,7 @@
 
                 <!-- Step 3: Payment & Staff/Admin PIN Verification -->
                 <div id="supp-step-3" class="step-container">
-                    <div class="step-indicator">Step 3 of 3: Supplement Payment & Seller PIN Verification</div>
+                    <div class="step-indicator">Step 3 of 3: Payment & PIN</div>
 
                     <div class="fee-summary-box">
                         <h3 style="color:var(--accent-orange); text-align:center; margin-bottom:1.2rem; letter-spacing:1px;">SUPPLEMENT INVOICE SUMMARY</h3>
@@ -1115,9 +1339,9 @@
 
                     <div class="staff-verify-box">
                         <div class="form-group">
-                            <label for="supp-staff-pin">Staff / Admin Verification PIN (Sold By) <span class="required">*</span></label>
+                            <label for="supp-staff-pin">Authorization PIN <span class="required">*</span></label>
                             <input type="password" id="supp-staff-pin" class="pin-input" placeholder="Enter Staff or Admin PIN" inputmode="numeric" maxlength="6" autocomplete="off" oninput="window.moduleContext.previewPinIdentity(this.value, 'supp-pin-identity')">
-                            <div id="supp-pin-identity" style="margin-top:6px; font-size:0.85rem; font-weight:700; text-align:center; color:var(--text-muted);">Enter Staff or Admin PIN to authorize and record who completed this sale</div>
+                            <div id="supp-pin-identity" style="margin-top:6px; font-size:0.85rem; font-weight:700; text-align:center; color:var(--text-muted);"></div>
                         </div>
                     </div>
 
@@ -1142,7 +1366,7 @@
 
                 <div style="background:var(--bg-main); padding:1.5rem; border-radius:10px; border:1px dashed var(--accent-orange); margin-bottom:2rem;">
                     <h3 id="supp-inv-form-title" style="color:var(--accent-orange); margin-bottom:0.5rem; font-size:1.1rem; text-transform:uppercase;">Add New Product / Record Stock Purchase</h3>
-                    <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:1.2rem;">Add new supplement products, restock existing items (automatically recorded in the P&L Purchase Report), or update pricing details.</p>
+                    
 
                     <form id="suppInventoryForm" onsubmit="window.moduleContext.saveSupplementInventory(event); return false;">
                         <input type="hidden" id="supp-inv-id" value="">
@@ -1195,7 +1419,7 @@
                     </form>
                 </div>
 
-                <h3 style="color:var(--accent-orange); margin-bottom:0.8rem; font-size:1.05rem; text-transform:uppercase;">Live Supplement Stock Inventory</h3>
+                <h3 style="color:var(--accent-orange); margin-bottom:0.8rem; font-size:1.05rem; text-transform:uppercase;">Stock Inventory</h3>
                 <div class="table-responsive" style="margin-bottom:2.2rem;">
                     <table class="data-table" id="table-supp-inventory">
                         <thead><tr><th>ID</th><th>Product Name</th><th>Unit Cost</th><th>MRP</th><th>Offer Price</th><th>Live Stock</th><th>Actions</th></tr></thead>
@@ -1203,7 +1427,7 @@
                     </table>
                 </div>
 
-                <h3 style="color:var(--error-red); margin-bottom:0.8rem; font-size:1.05rem; text-transform:uppercase;">Recent Supplement Stock Purchases (P&L Debit Log)</h3>
+                <h3 style="color:var(--error-red); margin-bottom:0.8rem; font-size:1.05rem; text-transform:uppercase;">Stock Purchase Log</h3>
                 <div class="table-responsive">
                     <table class="data-table" id="table-supp-purchases-admin">
                         <thead><tr><th>Date</th><th>Purchase ID</th><th>Product</th><th>Qty Added</th><th>Unit Cost</th><th>Mode</th><th>Total Purchase Cost</th></tr></thead>
@@ -1242,7 +1466,7 @@
                     <div class="form-group">
                         <label for="pay-staff-pin" style="font-size:0.78rem;">Collector PIN (Staff / Admin) <span class="required">*</span></label>
                         <input type="password" id="pay-staff-pin" class="pin-input" style="font-size:1.4rem; padding:0.6rem;" placeholder="Enter PIN" inputmode="numeric" maxlength="6" autocomplete="off" oninput="window.moduleContext.previewPinIdentity(this.value, 'pay-pin-identity')">
-                        <div id="pay-pin-identity" style="margin-top:4px; font-size:0.8rem; font-weight:700; text-align:center; color:var(--text-muted);">Required to record who collected this fee</div>
+                        <div id="pay-pin-identity" style="margin-top:4px; font-size:0.8rem; font-weight:700; text-align:center; color:var(--text-muted);"></div>
                     </div>
                 </div>
                 <div class="action-row" style="margin-top:1.2rem;">
@@ -1314,6 +1538,47 @@
                 <div class="modal-actions">
                     <button type="button" id="btn-share-supp-invoice" class="btn whatsapp" onclick="window.moduleContext.shareSupplementInvoice()">Share / Download Invoice Receipt</button>
                     <button type="button" class="btn secondary" onclick="window.appContext.closeModal()">Close & Return</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Signature Crop & Document Scanner Clean Modal -->
+        <div id="signatureCropModal" class="modal">
+            <div class="modal-content" style="max-width: 520px; text-align: left; padding: 1.5rem;">
+                <h3 class="orange-text" style="text-align:center; margin-top:0; font-size:1.2rem;">✂ Crop & Enhance Signature</h3>
+                
+
+                <div class="sig-crop-stage" id="sig-crop-stage">
+                    <canvas id="sig-crop-interactive-canvas"></canvas>
+                </div>
+
+                <div style="background:var(--bg-main); padding:0.85rem; border-radius:8px; border:1px solid var(--border-color); margin-bottom:0.9rem;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:8px;">
+                        <label style="margin:0; display:flex; align-items:center; gap:6px; cursor:pointer; color:var(--text-main); font-size:0.8rem;">
+                            <input type="checkbox" id="sig-clean-bg-toggle" checked style="width:16px; height:16px;" onchange="window.moduleContext.updateSigCropPreview()">
+                            ✨ Auto-Clean Background
+                        </label>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <span style="font-size:0.72rem; font-weight:700; color:var(--text-muted);">Ink Contrast:</span>
+                            <input type="range" id="sig-contrast-slider" min="90" max="210" value="155" style="width:90px; padding:0;" oninput="window.moduleContext.updateSigCropPreview()">
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.72rem; color:var(--text-muted); font-weight:700;">
+                        <div>Left/Right Crop: <input type="range" id="sig-pad-x" min="0" max="38" value="8" style="padding:0;" oninput="window.moduleContext.applySliderCropBounds()"></div>
+                        <div>Top/Bottom Crop: <input type="range" id="sig-pad-y" min="0" max="38" value="12" style="padding:0;" oninput="window.moduleContext.applySliderCropBounds()"></div>
+                    </div>
+                </div>
+
+                <div style="text-align:center; margin-bottom:1rem;">
+                    <div style="font-size:0.72rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px;">Signature Preview</div>
+                    <div style="background:#ffffff; border:2px solid var(--accent-orange); border-radius:6px; padding:6px; height:80px; display:flex; align-items:center; justify-content:center;">
+                        <img id="sig-cropped-live-result" src="" alt="Cropped Signature Preview" style="max-height:66px; max-width:100%; object-fit:contain;">
+                    </div>
+                </div>
+
+                <div class="action-row" style="margin-top:0.5rem;">
+                    <button type="button" class="btn secondary" onclick="window.moduleContext.cancelSigCrop()">Cancel</button>
+                    <button type="button" class="btn primary" onclick="window.moduleContext.applySigCrop()">✔ Apply Cropped Signature</button>
                 </div>
             </div>
         </div>
@@ -1423,7 +1688,7 @@
             <div class="rcpt-header">
                 <img data-logo-src="logo.png" src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22220%22%20height%3D%2250%22%20viewBox%3D%220%200%20220%2050%22%3E%3Crect%20width%3D%22220%22%20height%3D%2250%22%20rx%3D%226%22%20fill%3D%22%23ffffff%22%2F%3E%3Ctext%20x%3D%2212%22%20y%3D%2232%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%20fill%3D%22%23222222%22%3EREVIVE%20%3C%2Ftext%3E%3Ctext%20x%3D%22102%22%20y%3D%2232%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%20fill%3D%22%23ff6600%22%3EFITNESS%3C%2Ftext%3E%3C%2Fsvg%3E" class="brand-logo-img" alt="REVIVE FITNESS STUDIO" onerror="this.onerror=null; this.src=window.FALLBACK_LOGO_SVG;">
                 <div class="rcpt-address">Kadayil Arcade, Thanal Nagar, Keralapuram, Keralam 691504<br>Ph: 8921698044</div>
-                <h3 class="rcpt-title">SUPPLEMENT TAX INVOICE</h3>
+                <h3 class="rcpt-title">SUPPLEMENT INVOICE</h3>
             </div>
             <table class="rcpt-table" style="font-size:12px; line-height:1.7;">
                 <tr><td><strong>Invoice No:</strong></td><td id="sinv-id" style="text-align:right; font-weight:bold; color:var(--accent-orange);"></td></tr>
@@ -1472,7 +1737,7 @@
         const DEFAULT_AVATAR_SVG = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#ff6600" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>');
         const FALLBACK_LOGO_SVG = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="220" height="50" viewBox="0 0 220 50"><rect width="220" height="50" rx="6" fill="#ffffff"/><text x="12" y="32" font-family="Arial, sans-serif" font-weight="900" font-size="22" fill="#222222">REVIVE </text><text x="102" y="32" font-family="Arial, sans-serif" font-weight="900" font-size="22" fill="#ff6600">FITNESS</text></svg>');
         window.FALLBACK_LOGO_SVG = FALLBACK_LOGO_SVG;
-        const FALLBACK_SEAL_SVG = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="140" height="45" viewBox="0 0 140 45"><rect x="2" y="2" width="136" height="41" rx="4" fill="none" stroke="#ff6600" stroke-width="2"/><text x="70" y="20" font-family="Arial, sans-serif" font-weight="900" font-size="10" fill="#ff6600" text-anchor="middle">REVIVE FITNESS STUDIO</text><text x="70" y="34" font-family="Arial, sans-serif" font-weight="700" font-size="8.5" fill="#222222" text-anchor="middle">AUTHORIZED SEAL</text></svg>');
+        const FALLBACK_SEAL_SVG = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="320" height="110" viewBox="0 0 320 110"><rect x="4" y="4" width="312" height="102" rx="8" fill="none" stroke="#ff6600" stroke-width="3.5"/><rect x="10" y="10" width="300" height="90" rx="5" fill="none" stroke="#ff6600" stroke-width="1.2" stroke-dasharray="4,3"/><text x="160" y="40" font-family="Arial, sans-serif" font-weight="900" font-size="18" fill="#ff6600" text-anchor="middle" letter-spacing="1">REVIVE FITNESS STUDIO</text><text x="160" y="64" font-family="Arial, sans-serif" font-weight="800" font-size="13" fill="#222222" text-anchor="middle" letter-spacing="1.5">AUTHORIZED SIGNATORY &amp; SEAL</text><text x="160" y="86" font-family="Arial, sans-serif" font-weight="700" font-size="11" fill="#555555" text-anchor="middle">Keralapuram, Kollam • Ph: 8921698044</text></svg>');
         window.FALLBACK_SEAL_SVG = FALLBACK_SEAL_SVG;
         const BLANK_PIXEL = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
         let cachedLogoDataUri = null;
@@ -1515,11 +1780,18 @@
             sealImg.crossOrigin = "anonymous";
             sealImg.onload = function() {
                 try {
+                    const natW = sealImg.naturalWidth || 320;
+                    const natH = sealImg.naturalHeight || 120;
+                    // Upscale small seal images to at least 600px width with high-quality smoothing so PDF rendering is razor-sharp
+                    const scaleFactor = natW < 600 ? Math.ceil(600 / natW) : 1;
                     const c = document.createElement('canvas');
-                    c.width = sealImg.naturalWidth || 160;
-                    c.height = sealImg.naturalHeight || 60;
-                    c.getContext('2d').drawImage(sealImg, 0, 0);
-                    cachedSealDataUri = c.toDataURL('image/png');
+                    c.width = natW * scaleFactor;
+                    c.height = natH * scaleFactor;
+                    const ctx = c.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(sealImg, 0, 0, c.width, c.height);
+                    cachedSealDataUri = c.toDataURL('image/png', 1.0);
                     document.querySelectorAll('.brand-seal-img').forEach(el => { el.src = cachedSealDataUri; });
                 } catch (e) {
                     cachedSealDataUri = 'signature.png';
@@ -1632,6 +1904,83 @@
         let supplementCart = {};
         let selectedSuppMember = null;
         let currentSuppSaleRecord = null;
+
+        function ensureDefaultHolidays() {
+            let hols = storage.get('revive_holidays_db', null);
+            const yr = new Date().getFullYear();
+            if (!hols || !Array.isArray(hols) || hols.length === 0) {
+                hols = [
+                    { id: 'HOL-1', date: `${yr}-01-26`, name: 'Republic Day', desc: 'National Holiday' },
+                    { id: 'HOL-2', date: `${yr}-04-14`, name: 'Vishu / Dr. Ambedkar Jayanti', desc: 'Regional & Festival Holiday' },
+                    { id: 'HOL-3', date: `${yr}-05-01`, name: 'May Day (Labour Day)', desc: 'Public Holiday' },
+                    { id: 'HOL-4', date: `${yr}-08-15`, name: 'Independence Day', desc: 'National Holiday' },
+                    { id: 'HOL-5', date: `${yr}-08-26`, name: 'Thiruvonam', desc: 'Onam Festival Holiday' },
+                    { id: 'HOL-6', date: `${yr}-10-02`, name: 'Gandhi Jayanti', desc: 'National Holiday' },
+                    { id: 'HOL-7', date: `${yr}-10-20`, name: 'Mahanavami / Vijayadashami', desc: 'Festival Holiday' },
+                    { id: 'HOL-8', date: `${yr}-12-25`, name: 'Christmas Day', desc: 'Festival Holiday' }
+                ];
+                storage.set('revive_holidays_db', hols);
+            }
+            return hols;
+        }
+
+        function toIsoDateKey(dObj) {
+            return `${dObj.getFullYear()}-${String(dObj.getMonth() + 1).padStart(2, '0')}-${String(dObj.getDate()).padStart(2, '0')}`;
+        }
+
+        function normalizeStaffJoiningIso(joiningDateVal) {
+            if (!joiningDateVal) return '2026-01-01';
+            const s = String(joiningDateVal).trim().split('T')[0];
+            if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+            const info = parseAdmissionDateInfo(s);
+            return `${info.year}-${String(info.monthIdx + 1).padStart(2, '0')}-${String(info.day).padStart(2, '0')}`;
+        }
+
+        function ensureStaffObject(st, idx = 0) {
+            if (!st) return null;
+            const cleanName = String(st.name || st.Name || st.staffName || 'Staff').trim();
+            const cleanPin = String(st.pin != null ? st.pin : (st.PIN != null ? st.PIN : '')).trim();
+            const cleanId = String(st.id || st.ID || st.staffId || (`STF-${cleanPin || (idx + 1)}`)).trim();
+            const rawJoin = st.joiningDate || st.JoiningDate || st.date || '2026-01-01';
+            return {
+                ...st,
+                id: cleanId,
+                name: cleanName,
+                pin: cleanPin,
+                joiningDate: normalizeStaffJoiningIso(rawJoin)
+            };
+        }
+
+        function getNormalizedStaffDb() {
+            const rawList = storage.get('revive_staff_db', []);
+            if (!Array.isArray(rawList)) return [];
+            const normList = rawList.map((s, idx) => ensureStaffObject(s, idx)).filter(Boolean);
+            storage.set('revive_staff_db', normList);
+            return normList;
+        }
+
+        function getDayHolidayInfo(isoDateStr) {
+            const parts = String(isoDateStr).split('-');
+            const dObj = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+            const hols = ensureDefaultHolidays();
+            const customHol = hols.find(h => String(h.date) === String(isoDateStr));
+            if (customHol) {
+                return { isHoliday: true, type: 'Public/Festival Holiday', name: customHol.name, desc: customHol.desc || 'Annual Non-Working Day' };
+            }
+            if (dObj.getDay() === 0) {
+                return { isHoliday: true, type: 'Weekly Off', name: 'Sunday Holiday', desc: 'Weekly Non-Working Day' };
+            }
+            return { isHoliday: false, type: 'Working Day', name: '', desc: '' };
+        }
+
+        function syncHrBackupToSettings() {
+            const s = storage.get('revive_settings_db', {});
+            s.holidaysBackup = storage.get('revive_holidays_db', []);
+            s.staffAttendanceBackup = storage.get('revive_staff_attendance_db', {});
+            s.staffBackup = storage.get('revive_staff_db', []);
+            storage.set('revive_settings_db', s);
+            cloudSync.push('pushSettings', s);
+        }
 
         function ensureDefaultSupplements() {
             let supps = storage.get('revive_supplements_db', null);
@@ -1769,8 +2118,46 @@
                     const data = await res.json();
                     
                     // Fix #6: Clear stale local caches and hydrate cleanly from server while preserving soft-deleted records
-                    if(data.settings) storage.set('revive_settings_db', data.settings);
-                    if(data.staff) storage.set('revive_staff_db', data.staff);
+                    if(data.settings) {
+                        storage.set('revive_settings_db', data.settings);
+                        if (data.settings.holidaysBackup && !data.holidays) {
+                            storage.set('revive_holidays_db', data.settings.holidaysBackup);
+                        }
+                        if (data.settings.staffAttendanceBackup && !data.staffAttendance) {
+                            storage.set('revive_staff_attendance_db', data.settings.staffAttendanceBackup);
+                        }
+                    }
+                    if(data.holidays && Array.isArray(data.holidays)) {
+                        storage.set('revive_holidays_db', data.holidays);
+                    }
+                    if(data.staffAttendance) {
+                        if (Array.isArray(data.staffAttendance)) {
+                            const saObj = {};
+                            data.staffAttendance.forEach(r => {
+                                if (!r || !r.staffId || !r.dateKey) return;
+                                if (!saObj[r.staffId]) saObj[r.staffId] = {};
+                                saObj[r.staffId][r.dateKey] = r;
+                            });
+                            storage.set('revive_staff_attendance_db', saObj);
+                        } else {
+                            storage.set('revive_staff_attendance_db', data.staffAttendance);
+                        }
+                    }
+                    if(data.staff && Array.isArray(data.staff)) {
+                        const localStaff = storage.get('revive_staff_db', []);
+                        const backupStaff = (data.settings && Array.isArray(data.settings.staffBackup)) ? data.settings.staffBackup : [];
+                        const mergedStaff = data.staff.map((st, idx) => {
+                            const normSt = ensureStaffObject(st, idx);
+                            const matchLocal = localStaff.find(ls => String(ls.id) === String(normSt.id) || String(ls.pin) === String(normSt.pin))
+                                || backupStaff.find(bs => String(bs.id) === String(normSt.id) || String(bs.pin) === String(normSt.pin));
+                            return ensureStaffObject({
+                                ...normSt,
+                                id: (matchLocal && matchLocal.id) || normSt.id,
+                                joiningDate: st.joiningDate || (matchLocal && matchLocal.joiningDate) || '2026-01-01'
+                            }, idx);
+                        });
+                        storage.set('revive_staff_db', mergedStaff);
+                    }
                     if(data.tariffs) storage.set('revive_tariffs', data.tariffs);
                     if(data.specialTariffs) storage.set('revive_special_tariffs', data.specialTariffs);
                     if(data.expenses) storage.set('revive_expenses_db', data.expenses);
@@ -1965,6 +2352,7 @@
         var appContext = {
             currentRole: null,
             currentStaffName: null,
+            currentStaffObj: null,
             pendingRole: null, 
             switchView: function(viewName) {
                 if (viewName !== 'user-hub' && viewName !== 'admission') {
@@ -1975,6 +2363,7 @@
                 document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
                 const target = document.getElementById(`view-${viewName}`);
                 if(target) { target.classList.add('active-view'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+                if(viewName === 'dashboard') window.moduleContext.refreshDashboardHrState();
                 if(viewName === 'tariff-editor') window.moduleContext.initTariffEditor();
                 if(viewName === 'upi-editor') window.moduleContext.initUpiEditor();
                 if(viewName === 'pin-editor') window.moduleContext.initPinEditor();
@@ -1984,6 +2373,9 @@
                 if(viewName === 'expense') window.moduleContext.initExpenseView();
                 if(viewName === 'supplement-store') window.moduleContext.initSupplementStore();
                 if(viewName === 'supplement-admin') window.moduleContext.initSupplementAdmin();
+                if(viewName === 'staff-my-attendance') window.moduleContext.initStaffMyAttendance();
+                if(viewName === 'staff-holiday-calendar') window.moduleContext.initStaffHolidayCalendar();
+                if(viewName === 'admin-staff-attendance') window.moduleContext.initAdminStaffAttendance();
                 if(viewName !== 'admission') { IS_EDIT_MODE = false; }
             },
             goHome: function() {
@@ -2012,13 +2404,14 @@
                 const adminPin = settings.adminPin != null ? String(settings.adminPin) : '1234';
 
                 if (appContext.pendingRole === 'staff') {
-                    const staffDb = storage.get('revive_staff_db', []);
+                    const staffDb = getNormalizedStaffDb();
                     const matchingStaff = staffDb.find(s => String(s.pin) === pin);
                     
                     if (matchingStaff) {
                         appContext.currentRole = 'staff'; 
                         appContext.currentStaffName = matchingStaff.name;
-                        window.appContext.loadDashboard(`STAFF (${matchingStaff.name.toUpperCase()})`); 
+                        appContext.currentStaffObj = ensureStaffObject(matchingStaff);
+                        window.appContext.loadDashboard(matchingStaff.name); 
                     } else {
                         showNotice('Invalid Staff PIN. Please try again.', 'error');
                     }
@@ -2026,18 +2419,37 @@
                 else if (appContext.pendingRole === 'admin' && pin === adminPin) { 
                     appContext.currentRole = 'admin'; 
                     appContext.currentStaffName = 'Admin';
+                    appContext.currentStaffObj = null;
                     window.appContext.loadDashboard('ADMIN'); 
                 } 
                 else { showNotice('Invalid PIN. Please try again.', 'error'); }
             },
             loadDashboard: function(roleTitle) {
-                document.getElementById('dashboard-title').innerHTML = `${roleTitle} <span>PORTAL</span>`;
+                const subEl = document.getElementById('dashboard-subtitle');
+                if (appContext.currentRole === 'staff' && appContext.currentStaffObj) {
+                    const st = appContext.currentStaffObj;
+                    document.getElementById('dashboard-title').innerHTML = `WELCOME, <span>${st.name.toUpperCase()}</span>`;
+                    if (subEl) subEl.innerHTML = `Joined: <strong>${formatDateStr(st.joiningDate)}</strong>`;
+                    document.getElementById('staff-hr-punch-panel').style.display = 'block';
+                    document.getElementById('staff-hr-section-label').style.display = 'block';
+                    document.getElementById('staff-hr-modules-grid').style.display = 'grid';
+                    document.getElementById('staff-ops-section-label').style.display = 'block';
+                } else {
+                    document.getElementById('dashboard-title').innerHTML = `ADMIN <span>PORTAL</span>`;
+                    if (subEl) subEl.innerText = '';
+                    document.getElementById('staff-hr-punch-panel').style.display = 'none';
+                    document.getElementById('staff-hr-section-label').style.display = 'none';
+                    document.getElementById('staff-hr-modules-grid').style.display = 'none';
+                    document.getElementById('staff-ops-section-label').style.display = 'none';
+                    window.moduleContext.setStaffOperationsAccess(true);
+                }
                 document.querySelectorAll('.admin-only').forEach(el => { el.style.display = appContext.currentRole === 'admin' ? 'flex' : 'none'; });
                 window.appContext.switchView('dashboard');
             },
             logout: function() {
                 appContext.currentRole = null;
                 appContext.currentStaffName = null;
+                appContext.currentStaffObj = null;
                 appContext.pendingRole = null;
                 clearRuntimeCache(false);
                 window.appContext.switchView('home');
@@ -2068,7 +2480,7 @@
                 }
                 document.getElementById('form-main-title').innerText = "Admission Registration";
                 document.getElementById('step-1-ind').innerText = "Step 1 of 3: Member Details";
-                document.getElementById('step-2-ind').innerText = "Step 2 of 3: Digital Verification (True Un-Mirrored Camera)";
+                document.getElementById('step-2-ind').innerText = "Step 2 of 3: Photo & Signature";
                 
                 document.getElementById('btn-next-step').innerText = "Proceed to Verification →";
                 document.getElementById('btn-next-step-2').innerText = "Proceed to Payment →";
@@ -2095,6 +2507,10 @@
                 document.getElementById('btn-start-sig-camera').style.display = 'inline-flex';
                 document.getElementById('btn-switch-sig-camera').style.display = 'none';
                 document.getElementById('btn-capture-sig').style.display = 'none';
+                const editCropBtn = document.getElementById('btn-edit-sig-crop');
+                if (editCropBtn) editCropBtn.style.display = 'none';
+                const sigGuideEl = document.getElementById('sig-camera-guide');
+                if (sigGuideEl) sigGuideEl.style.display = 'none';
                 document.getElementById('btn-retake-sig').style.display = 'none';
 
                 document.getElementById('reAdmissionSection').style.display = 'none';
@@ -2342,29 +2758,67 @@
             },
 
             initStaffEditor: function() {
-                document.getElementById('staffForm').reset();
+                ensureDefaultHolidays();
+                window.moduleContext.resetStaffForm();
                 window.moduleContext.renderStaffList();
+                window.moduleContext.renderAdminHolidays();
+            },
+            resetStaffForm: function() {
+                const f = document.getElementById('staffForm');
+                if (f) f.reset();
+                document.getElementById('staff-edit-id').value = '';
+                document.getElementById('staff-joining-date').value = toIsoDateKey(new Date());
+                document.getElementById('staff-form-heading').innerText = 'Add / Edit Staff';
+                document.getElementById('btn-save-staff').innerText = '+ Add Staff Member';
+                document.getElementById('btn-cancel-staff-edit').style.display = 'none';
+            },
+            editStaffMember: function(id) {
+                const db = storage.get('revive_staff_db', []);
+                const st = db.find(s => String(s.id) === String(id));
+                if (!st) return;
+                document.getElementById('staff-edit-id').value = st.id;
+                document.getElementById('staff-name').value = st.name;
+                document.getElementById('staff-joining-date').value = normalizeStaffJoiningIso(st.joiningDate);
+                document.getElementById('staff-pin').value = st.pin;
+                document.getElementById('staff-form-heading').innerText = `Edit Staff: ${st.name}`;
+                document.getElementById('btn-save-staff').innerText = 'Update Staff Details';
+                document.getElementById('btn-cancel-staff-edit').style.display = 'inline-flex';
             },
             saveStaff: function(e) {
                 if(e) e.preventDefault();
+                const editId = document.getElementById('staff-edit-id').value.trim();
                 const name = document.getElementById('staff-name').value.trim();
+                const joiningDate = normalizeStaffJoiningIso(document.getElementById('staff-joining-date').value);
                 const pin = document.getElementById('staff-pin').value.trim();
                 
                 let db = storage.get('revive_staff_db', []);
                 const s = storage.get('revive_settings_db', {});
                 const adminPin = s.adminPin != null ? String(s.adminPin) : '1234';
 
-                if (pin === adminPin || db.some(st => String(st.pin) === pin)) {
+                if (pin === adminPin || db.some(st => String(st.pin) === pin && String(st.id) !== editId)) {
                     showNotice("This PIN is already in use. Choose a unique PIN.", "error");
                     return;
                 }
 
-                const staffMember = { id: 'STF-' + Date.now(), name: name, pin: pin };
-                db.push(staffMember);
-                storage.set('revive_staff_db', db);
-                cloudSync.push('pushStaff', staffMember);
-                
-                showNotice(`Staff member ${name} added.`, "success");
+                if (editId) {
+                    const idx = db.findIndex(st => String(st.id) === editId);
+                    if (idx !== -1) {
+                        db[idx].name = name;
+                        db[idx].joiningDate = joiningDate;
+                        db[idx].pin = pin;
+                        storage.set('revive_staff_db', db);
+                        cloudSync.push('pushStaff', db[idx]);
+                        syncHrBackupToSettings();
+                        showNotice(`Staff member ${name} updated.`, "success");
+                    }
+                } else {
+                    const staffMember = { id: 'STF-' + Date.now(), name: name, joiningDate: joiningDate, pin: pin };
+                    db.push(staffMember);
+                    storage.set('revive_staff_db', db);
+                    cloudSync.push('pushStaff', staffMember);
+                    syncHrBackupToSettings();
+                    showNotice(`Staff member ${name} added (Attendance active from ${formatDateStr(joiningDate)}).`, "success");
+                }
                 window.moduleContext.initStaffEditor();
             },
             deleteStaff: function(id) {
@@ -2376,6 +2830,7 @@
                         db = db.filter(s => s.id !== id);
                         storage.set('revive_staff_db', db);
                         cloudSync.push('deleteStaff', { id: id });
+                        syncHrBackupToSettings();
                         window.moduleContext.renderStaffList();
                         showNotice("Staff access revoked.", "info");
                     }
@@ -2387,18 +2842,672 @@
                 tbody.innerHTML = '';
                 
                 if(db.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">No staff accounts configured.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No staff accounts configured.</td></tr>';
                     return;
                 }
                 
                 db.forEach(staff => {
+                    const jDate = formatDateStr(normalizeStaffJoiningIso(staff.joiningDate));
                     tbody.innerHTML += `
                     <tr>
                         <td><strong>${staff.name}</strong></td>
+                        <td><span style="font-weight:700; color:var(--success-green);">${jDate}</span></td>
                         <td style="letter-spacing: 2px;">••••${String(staff.pin).slice(-2)}</td>
-                        <td><button type="button" class="btn danger" style="padding:0.4rem 1rem; width:auto; border:none;" onclick="window.moduleContext.deleteStaff('${staff.id}')">Remove</button></td>
+                        <td>
+                            <div style="display:flex; gap:6px;">
+                                <button type="button" class="btn secondary" style="padding:0.35rem 0.8rem; font-size:0.75rem; width:auto;" onclick="window.moduleContext.editStaffMember('${staff.id}')">Edit</button>
+                                <button type="button" class="btn danger" style="padding:0.35rem 0.8rem; font-size:0.75rem; width:auto; border:none;" onclick="window.moduleContext.deleteStaff('${staff.id}')">Remove</button>
+                            </div>
+                        </td>
                     </tr>`;
                 });
+            },
+
+            // Admin Yearly Holiday Calendar Management
+            saveHoliday: function(e) {
+                if (e) e.preventDefault();
+                const dVal = document.getElementById('holiday-date').value;
+                const nameVal = document.getElementById('holiday-name').value.trim();
+                const descVal = document.getElementById('holiday-desc').value.trim() || 'Annual Non-Working Holiday';
+                if (!dVal || !nameVal) return;
+
+                let hols = ensureDefaultHolidays();
+                const existingIdx = hols.findIndex(h => String(h.date) === String(dVal));
+                const holObj = { id: 'HOL-' + Date.now(), date: dVal, name: nameVal, desc: descVal };
+                if (existingIdx !== -1) {
+                    hols[existingIdx] = holObj;
+                } else {
+                    hols.push(holObj);
+                }
+                hols.sort((a, b) => new Date(a.date) - new Date(b.date));
+                storage.set('revive_holidays_db', hols);
+                cloudSync.push('pushHoliday', holObj);
+                syncHrBackupToSettings();
+
+                document.getElementById('holidayForm').reset();
+                window.moduleContext.renderAdminHolidays();
+                showNotice(`Holiday "${nameVal}" (${formatDateStr(dVal)}) saved to Yearly Calendar!`, "success");
+            },
+            deleteHoliday: function(id) {
+                let hols = ensureDefaultHolidays();
+                hols = hols.filter(h => String(h.id) !== String(id));
+                storage.set('revive_holidays_db', hols);
+                cloudSync.push('deleteHoliday', { id });
+                syncHrBackupToSettings();
+                window.moduleContext.renderAdminHolidays();
+                showNotice("Holiday removed from Yearly Calendar.", "info");
+            },
+            renderAdminHolidays: function() {
+                const hols = ensureDefaultHolidays();
+                const tbody = document.querySelector('#table-admin-holidays tbody');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                if (hols.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No custom holidays configured. Sundays are automatically holidays.</td></tr>';
+                    return;
+                }
+                hols.sort((a, b) => new Date(a.date) - new Date(b.date)).forEach(h => {
+                    const p = String(h.date).split('-');
+                    const dObj = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+                    const dayName = dObj.toLocaleDateString('en-IN', { weekday: 'long' });
+                    tbody.innerHTML += `<tr>
+                        <td><strong>${formatDateStr(h.date)}</strong></td>
+                        <td>${dayName}</td>
+                        <td style="color:var(--accent-orange); font-weight:800;">${h.name}</td>
+                        <td>${h.desc || '-'}</td>
+                        <td><button type="button" class="btn danger" style="padding:0.35rem 0.8rem; font-size:0.75rem; width:auto; border:none;" onclick="window.moduleContext.deleteHoliday('${h.id}')">Remove</button></td>
+                    </tr>`;
+                });
+            },
+
+            // Staff HR Portal: Live Check-In & Check-Out State & Actions
+            resolveActiveStaff: function() {
+                const staffDb = getNormalizedStaffDb();
+                if (appContext.currentStaffObj) {
+                    const found = staffDb.find(s => String(s.id) === String(appContext.currentStaffObj.id) || String(s.pin) === String(appContext.currentStaffObj.pin) || String(s.name).toLowerCase() === String(appContext.currentStaffObj.name || '').toLowerCase());
+                    if (found) {
+                        appContext.currentStaffObj = ensureStaffObject(found);
+                        return appContext.currentStaffObj;
+                    }
+                    appContext.currentStaffObj = ensureStaffObject(appContext.currentStaffObj);
+                    return appContext.currentStaffObj;
+                }
+                if (appContext.currentStaffName) {
+                    const byName = staffDb.find(s => String(s.name).toLowerCase() === String(appContext.currentStaffName).toLowerCase());
+                    if (byName) {
+                        appContext.currentStaffObj = ensureStaffObject(byName);
+                        return appContext.currentStaffObj;
+                    }
+                    appContext.currentStaffObj = ensureStaffObject({ name: appContext.currentStaffName, pin: '0000', joiningDate: '2026-01-01' });
+                    return appContext.currentStaffObj;
+                }
+                return null;
+            },
+
+            getTodayStaffPunchRecord: function(st, todayKey) {
+                if (!st) return null;
+                let saDb = storage.get('revive_staff_attendance_db', {});
+                if (!saDb || typeof saDb !== 'object' || Array.isArray(saDb)) saDb = {};
+                if (saDb[st.id] && saDb[st.id][todayKey]) return saDb[st.id][todayKey];
+                // Fallback lookup by staff PIN or name in case ID changed after cloud sync
+                for (const k of Object.keys(saDb)) {
+                    const dayMap = saDb[k];
+                    if (dayMap && dayMap[todayKey]) {
+                        const r = dayMap[todayKey];
+                        if (String(r.staffName || '').toLowerCase() === String(st.name || '').toLowerCase() || String(r.staffPin || '') === String(st.pin || '')) {
+                            if (!saDb[st.id]) saDb[st.id] = {};
+                            saDb[st.id][todayKey] = r;
+                            storage.set('revive_staff_attendance_db', saDb);
+                            return r;
+                        }
+                    }
+                }
+                return null;
+            },
+
+            refreshDashboardHrState: function() {
+                if (appContext.currentRole !== 'staff') return;
+                const st = window.moduleContext.resolveActiveStaff();
+                if (!st) return;
+
+                const now = new Date();
+                const todayKey = toIsoDateKey(now);
+                const todayPretty = now.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
+                document.getElementById('staff-punch-date-title').innerText = todayPretty;
+
+                const holInfo = getDayHolidayInfo(todayKey);
+                const badgeEl = document.getElementById('staff-day-type-badge');
+                const subEl = document.getElementById('staff-punch-substatus');
+                const btnIn = document.getElementById('btn-staff-checkin');
+                const btnOut = document.getElementById('btn-staff-checkout');
+
+                const todayRec = window.moduleContext.getTodayStaffPunchRecord(st, todayKey);
+
+                // Check if today is Sunday or a configured Yearly Holiday
+                if (holInfo.isHoliday) {
+                    badgeEl.innerHTML = `<span class="hr-status-pill hr-pill-holiday">🎉 ${holInfo.name}</span>`;
+                    subEl.innerText = `Holiday — Attendance Inactive`;
+                    btnIn.disabled = true;
+                    btnOut.disabled = true;
+                    btnIn.innerText = '✔ Check-In (Holiday)';
+                    btnOut.innerText = '⏹ Check-Out (Holiday)';
+                    window.moduleContext.setStaffOperationsAccess(false, `🔒 Holiday (${holInfo.name})`, 'Operations are locked on non-working days.');
+                    return;
+                }
+
+                badgeEl.innerHTML = `<span class="hr-status-pill hr-pill-working">● Working Day</span>`;
+                if (!todayRec || !todayRec.checkIn) {
+                    subEl.innerHTML = `Status: <strong style="color:var(--error-red);">Not Checked In</strong>`;
+                    btnIn.disabled = false;
+                    btnOut.disabled = true;
+                    btnIn.innerText = '✔ Check-In';
+                    btnOut.innerText = '⏹ Check-Out';
+                    window.moduleContext.setStaffOperationsAccess(false, '🔒 Check In Required', 'Mark Check-In above to unlock Fee Collection & User Details.');
+                } else if (todayRec.checkIn && !todayRec.checkOut) {
+                    subEl.innerHTML = `Checked In: <strong style="color:var(--success-green);">${todayRec.checkIn}</strong> (On Shift)`;
+                    btnIn.disabled = true;
+                    btnOut.disabled = false;
+                    btnIn.innerText = `✔ In (${todayRec.checkIn})`;
+                    btnOut.innerText = '⏹ Check-Out';
+                    window.moduleContext.setStaffOperationsAccess(true);
+                } else {
+                    subEl.innerHTML = `In: <strong>${todayRec.checkIn}</strong> &nbsp;|&nbsp; Out: <strong>${todayRec.checkOut}</strong> (${todayRec.duration || 'Done'})`;
+                    btnIn.disabled = true;
+                    btnOut.disabled = true;
+                    btnIn.innerText = `✔ In (${todayRec.checkIn})`;
+                    btnOut.innerText = `⏹ Out (${todayRec.checkOut})`;
+                    window.moduleContext.setStaffOperationsAccess(false, `🔒 Checked Out (${todayRec.checkOut})`, 'Operations are locked after Check-Out.');
+                }
+            },
+
+            setStaffOperationsAccess: function(unlocked, lockTitle, lockDesc) {
+                const gatedCards = document.querySelectorAll('.staff-shift-gated');
+                const lockNotice = document.getElementById('staff-ops-locked-notice');
+                if (appContext.currentRole !== 'staff') {
+                    gatedCards.forEach(el => { el.style.display = 'flex'; });
+                    if (lockNotice) lockNotice.style.display = 'none';
+                    return;
+                }
+                if (unlocked) {
+                    gatedCards.forEach(el => { el.style.display = 'flex'; });
+                    if (lockNotice) lockNotice.style.display = 'none';
+                } else {
+                    gatedCards.forEach(el => { el.style.display = 'none'; });
+                    if (lockNotice) {
+                        lockNotice.style.display = 'block';
+                        if (lockTitle) document.getElementById('staff-ops-locked-title').innerText = lockTitle;
+                        if (lockDesc) document.getElementById('staff-ops-locked-desc').innerText = lockDesc;
+                    }
+                }
+            },
+
+            isStaffOnActiveShift: function() {
+                if (appContext.currentRole === 'admin') return true;
+                if (appContext.currentRole !== 'staff') return false;
+                const st = window.moduleContext.resolveActiveStaff();
+                if (!st) return false;
+                const todayKey = toIsoDateKey(new Date());
+                const holInfo = getDayHolidayInfo(todayKey);
+                if (holInfo.isHoliday) return false;
+                const todayRec = window.moduleContext.getTodayStaffPunchRecord(st, todayKey);
+                return !!(todayRec && todayRec.checkIn && !todayRec.checkOut);
+            },
+
+            staffPunchIn: function() {
+                if (appContext.currentRole !== 'staff') return;
+                const st = window.moduleContext.resolveActiveStaff();
+                if (!st) {
+                    showNotice("Session expired. Please log in again.", "error");
+                    return;
+                }
+                const now = new Date();
+                const todayKey = toIsoDateKey(now);
+                const holInfo = getDayHolidayInfo(todayKey);
+                if (holInfo.isHoliday) {
+                    showNotice(`Today is ${holInfo.name}. Attendance is inactive on holidays.`, "warning");
+                    return;
+                }
+
+                // If staff joiningDate was set later than today, auto-align joiningDate to today so check-in never fails
+                if (todayKey < st.joiningDate) {
+                    st.joiningDate = todayKey;
+                    const db = getNormalizedStaffDb();
+                    const idx = db.findIndex(s => String(s.id) === String(st.id));
+                    if (idx !== -1) {
+                        db[idx].joiningDate = todayKey;
+                        storage.set('revive_staff_db', db);
+                    }
+                }
+
+                const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+                let saDb = storage.get('revive_staff_attendance_db', {});
+                if (!saDb || typeof saDb !== 'object' || Array.isArray(saDb)) saDb = {};
+                if (!saDb[st.id]) saDb[st.id] = {};
+
+                const rec = {
+                    id: `SATT-${st.id}-${todayKey}`,
+                    staffId: st.id,
+                    staffName: st.name,
+                    staffPin: st.pin,
+                    dateKey: todayKey,
+                    checkIn: timeStr,
+                    checkInIso: now.toISOString(),
+                    checkOut: '',
+                    checkOutIso: '',
+                    duration: '',
+                    status: 'Present'
+                };
+                saDb[st.id][todayKey] = rec;
+                storage.set('revive_staff_attendance_db', saDb);
+                cloudSync.push('pushStaffAttendance', rec);
+                syncHrBackupToSettings();
+
+                showNotice(`Checked in at ${timeStr}! Studio Operations unlocked.`, "success");
+                window.moduleContext.refreshDashboardHrState();
+            },
+
+            staffPunchOut: function() {
+                if (appContext.currentRole !== 'staff') return;
+                const st = window.moduleContext.resolveActiveStaff();
+                if (!st) return;
+                const now = new Date();
+                const todayKey = toIsoDateKey(now);
+                let saDb = storage.get('revive_staff_attendance_db', {});
+                if (!saDb || typeof saDb !== 'object' || Array.isArray(saDb)) saDb = {};
+                const rec = window.moduleContext.getTodayStaffPunchRecord(st, todayKey);
+                if (!rec || !rec.checkIn) {
+                    showNotice("Please Check-In first.", "error");
+                    return;
+                }
+
+                const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+                rec.checkOut = timeStr;
+                rec.checkOutIso = now.toISOString();
+
+                if (rec.checkInIso) {
+                    const diffMs = Math.max(0, now.getTime() - new Date(rec.checkInIso).getTime());
+                    const hrs = Math.floor(diffMs / 3600000);
+                    const mins = Math.floor((diffMs % 3600000) / 60000);
+                    rec.duration = `${hrs}h ${mins}m`;
+                } else {
+                    rec.duration = 'Completed';
+                }
+
+                if (!saDb[st.id]) saDb[st.id] = {};
+                saDb[st.id][todayKey] = rec;
+                storage.set('revive_staff_attendance_db', saDb);
+                cloudSync.push('pushStaffAttendance', rec);
+                syncHrBackupToSettings();
+
+                showNotice(`Checked out at ${timeStr} (${rec.duration}). Operations locked.`, "success");
+                window.moduleContext.refreshDashboardHrState();
+            },
+
+            // Helper: Build day-by-day attendance rows for a staff member in a given year & month (0-indexed monthIdx)
+            buildStaffMonthAttendanceRows: function(staffObj, year, monthIdx) {
+                const jDateIso = normalizeStaffJoiningIso(staffObj.joiningDate);
+                const jp = jDateIso.split('-');
+                const jYear = parseInt(jp[0], 10);
+                const jMonth = parseInt(jp[1], 10) - 1;
+                const jScore = jYear * 100 + jMonth;
+
+                const today = new Date();
+                const todayIso = toIsoDateKey(today);
+                const currScore = today.getFullYear() * 100 + today.getMonth();
+                const targetScore = year * 100 + monthIdx;
+
+                if (targetScore < jScore || targetScore > currScore) {
+                    return { rows: [], present: 0, absent: 0, holidays: 0, workingDays: 0 };
+                }
+
+                const saDb = storage.get('revive_staff_attendance_db', {});
+                const staffRecs = saDb[staffObj.id] || {};
+                const daysInMonth = new Date(year, monthIdx + 1, 0).getDate();
+
+                let present = 0, absent = 0, holidays = 0, workingDays = 0;
+                const rows = [];
+
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dateIso = `${year}-${String(monthIdx + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                    // Strictly from Joining Date up to Today
+                    if (dateIso < jDateIso || dateIso > todayIso) continue;
+
+                    const dObj = new Date(year, monthIdx, d);
+                    const dayName = dObj.toLocaleDateString('en-IN', { weekday: 'short' });
+                    const holInfo = getDayHolidayInfo(dateIso);
+                    const punch = staffRecs[dateIso];
+
+                    if (holInfo.isHoliday) {
+                        holidays++;
+                        rows.push({
+                            dateIso,
+                            dateFormatted: formatDateStr(dateIso),
+                            dayName,
+                            staffId: staffObj.id,
+                            staffName: staffObj.name,
+                            status: 'Holiday',
+                            statusDetail: `${holInfo.name} (${holInfo.type})`,
+                            checkIn: punch ? punch.checkIn : '-',
+                            checkOut: punch ? punch.checkOut : '-',
+                            duration: holInfo.desc || 'Non-Working Day'
+                        });
+                    } else {
+                        workingDays++;
+                        if (punch && punch.checkIn) {
+                            present++;
+                            rows.push({
+                                dateIso,
+                                dateFormatted: formatDateStr(dateIso),
+                                dayName,
+                                staffId: staffObj.id,
+                                staffName: staffObj.name,
+                                status: 'Present',
+                                statusDetail: 'Present',
+                                checkIn: punch.checkIn,
+                                checkOut: punch.checkOut || 'On Shift',
+                                duration: punch.duration || (punch.checkOut ? 'Completed' : 'Active')
+                            });
+                        } else {
+                            absent++;
+                            rows.push({
+                                dateIso,
+                                dateFormatted: formatDateStr(dateIso),
+                                dayName,
+                                staffId: staffObj.id,
+                                staffName: staffObj.name,
+                                status: 'Absent',
+                                statusDetail: 'Absent (Not Punched)',
+                                checkIn: '-',
+                                checkOut: '-',
+                                duration: 'No Punch Recorded'
+                            });
+                        }
+                    }
+                }
+                return { rows, present, absent, holidays, workingDays };
+            },
+
+            // Staff Self-Service: My Attendance View
+            initStaffMyAttendance: function() {
+                if (!appContext.currentStaffObj) return;
+                const st = appContext.currentStaffObj;
+                const jIso = normalizeStaffJoiningIso(st.joiningDate);
+                const jYear = parseInt(jIso.split('-')[0], 10);
+                const nowYear = new Date().getFullYear();
+
+                const yrSel = document.getElementById('staff-my-att-year');
+                yrSel.innerHTML = '';
+                for (let y = jYear; y <= nowYear; y++) {
+                    const opt = document.createElement('option');
+                    opt.value = y;
+                    opt.innerText = y;
+                    if (y === nowYear) opt.selected = true;
+                    yrSel.appendChild(opt);
+                }
+                document.getElementById('my-att-kpi-joined').innerText = formatDateStr(jIso);
+                window.moduleContext.populateStaffMyAttMonths();
+            },
+
+            populateStaffMyAttMonths: function() {
+                if (!appContext.currentStaffObj) return;
+                const st = appContext.currentStaffObj;
+                const jIso = normalizeStaffJoiningIso(st.joiningDate);
+                const jYear = parseInt(jIso.split('-')[0], 10);
+                const jMonth = parseInt(jIso.split('-')[1], 10) - 1;
+
+                const now = new Date();
+                const selYear = parseInt(document.getElementById('staff-my-att-year').value, 10) || now.getFullYear();
+                const mSel = document.getElementById('staff-my-att-month');
+                mSel.innerHTML = '';
+
+                const startM = (selYear === jYear) ? jMonth : 0;
+                const endM = (selYear === now.getFullYear()) ? now.getMonth() : 11;
+
+                for (let m = startM; m <= endM; m++) {
+                    const mName = new Date(selYear, m, 1).toLocaleString('default', { month: 'long' });
+                    const opt = document.createElement('option');
+                    opt.value = m;
+                    opt.innerText = mName;
+                    if (m === endM) opt.selected = true;
+                    mSel.appendChild(opt);
+                }
+                window.moduleContext.renderStaffMyAttendance();
+            },
+
+            renderStaffMyAttendance: function() {
+                if (!appContext.currentStaffObj) return;
+                const st = appContext.currentStaffObj;
+                const year = parseInt(document.getElementById('staff-my-att-year').value, 10);
+                const monthIdx = parseInt(document.getElementById('staff-my-att-month').value, 10);
+                const data = window.moduleContext.buildStaffMonthAttendanceRows(st, year, monthIdx);
+
+                document.getElementById('my-att-kpi-present').innerText = data.present;
+                document.getElementById('my-att-kpi-absent').innerText = data.absent;
+                document.getElementById('my-att-kpi-holidays').innerText = data.holidays;
+
+                const tbody = document.querySelector('#table-staff-my-attendance tbody');
+                tbody.innerHTML = '';
+                if (data.rows.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No attendance records for this period.</td></tr>';
+                    return;
+                }
+
+                [...data.rows].reverse().forEach(r => {
+                    let badgeHtml = '';
+                    if (r.status === 'Present') {
+                        badgeHtml = `<span class="hr-status-pill hr-pill-working">✔ Present</span>`;
+                    } else if (r.status === 'Holiday') {
+                        badgeHtml = `<span class="hr-status-pill hr-pill-holiday">🎉 ${r.statusDetail}</span>`;
+                    } else {
+                        badgeHtml = `<span class="hr-status-pill hr-pill-absent">✖ Absent</span>`;
+                    }
+                    tbody.innerHTML += `<tr>
+                        <td><strong>${r.dateFormatted}</strong></td>
+                        <td>${r.dayName}</td>
+                        <td>${badgeHtml}</td>
+                        <td style="font-weight:700; color:var(--success-green);">${r.checkIn}</td>
+                        <td style="font-weight:700; color:var(--accent-orange);">${r.checkOut}</td>
+                        <td>${r.duration}</td>
+                    </tr>`;
+                });
+            },
+
+            // Staff Self-Service: Holiday Calendar View
+            initStaffHolidayCalendar: function() {
+                ensureDefaultHolidays();
+                const currYear = new Date().getFullYear();
+                const sel = document.getElementById('staff-hol-year-filter');
+                sel.innerHTML = '';
+                for (let y = currYear - 1; y <= currYear + 1; y++) {
+                    const opt = document.createElement('option');
+                    opt.value = y;
+                    opt.innerText = `Year ${y}`;
+                    if (y === currYear) opt.selected = true;
+                    sel.appendChild(opt);
+                }
+                window.moduleContext.renderStaffHolidayCalendar();
+            },
+
+            renderStaffHolidayCalendar: function() {
+                const hols = ensureDefaultHolidays();
+                const yr = document.getElementById('staff-hol-year-filter').value;
+                const filtered = hols.filter(h => String(h.date).startsWith(String(yr))).sort((a, b) => new Date(a.date) - new Date(b.date));
+                const tbody = document.querySelector('#table-staff-holidays tbody');
+                tbody.innerHTML = '';
+
+                tbody.innerHTML += `<tr style="background:#fff8f3;">
+                    <td><strong>All Sundays (${yr})</strong></td>
+                    <td>Sunday</td>
+                    <td style="color:var(--accent-orange); font-weight:800;">Weekly Off Holiday</td>
+                    <td>Regular weekly non-working day for all staff (Attendance marking inactive)</td>
+                </tr>`;
+
+                filtered.forEach(h => {
+                    const p = String(h.date).split('-');
+                    const dObj = new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10));
+                    const dayName = dObj.toLocaleDateString('en-IN', { weekday: 'long' });
+                    tbody.innerHTML += `<tr>
+                        <td><strong>${formatDateStr(h.date)}</strong></td>
+                        <td>${dayName}</td>
+                        <td style="color:var(--accent-orange); font-weight:800;">${h.name}</td>
+                        <td>${h.desc || 'Annual Non-Working Holiday'}</td>
+                    </tr>`;
+                });
+            },
+
+            // Admin Staff Attendance Monitor & Monthly View Download
+            initAdminStaffAttendance: function() {
+                ensureDefaultHolidays();
+                const staffDb = storage.get('revive_staff_db', []);
+                const staffSel = document.getElementById('admin-att-staff-select');
+                staffSel.innerHTML = '<option value="ALL">All Active Staff</option>';
+                staffDb.forEach(st => {
+                    const opt = document.createElement('option');
+                    opt.value = st.id;
+                    opt.innerText = `${st.name} (Joined: ${formatDateStr(normalizeStaffJoiningIso(st.joiningDate))})`;
+                    staffSel.appendChild(opt);
+                });
+
+                const now = new Date();
+                const currYear = now.getFullYear();
+                const yrSel = document.getElementById('admin-att-year');
+                yrSel.innerHTML = '';
+                for (let y = currYear - 1; y <= currYear; y++) {
+                    const opt = document.createElement('option');
+                    opt.value = y;
+                    opt.innerText = y;
+                    if (y === currYear) opt.selected = true;
+                    yrSel.appendChild(opt);
+                }
+
+                const mSel = document.getElementById('admin-att-month');
+                mSel.innerHTML = '';
+                for (let m = 0; m < 12; m++) {
+                    const mName = new Date(currYear, m, 1).toLocaleString('default', { month: 'long' });
+                    const opt = document.createElement('option');
+                    opt.value = m;
+                    opt.innerText = mName;
+                    if (m === now.getMonth()) opt.selected = true;
+                    mSel.appendChild(opt);
+                }
+                window.moduleContext.renderAdminStaffAttendance();
+            },
+
+            renderAdminStaffAttendance: function() {
+                const staffDb = storage.get('revive_staff_db', []);
+                const selStaffId = document.getElementById('admin-att-staff-select').value;
+                const year = parseInt(document.getElementById('admin-att-year').value, 10);
+                const monthIdx = parseInt(document.getElementById('admin-att-month').value, 10);
+                const monthName = new Date(year, monthIdx, 1).toLocaleString('default', { month: 'long' });
+
+                const sumTbody = document.querySelector('#table-admin-staff-summary tbody');
+                const dailyTbody = document.querySelector('#table-admin-staff-daily tbody');
+                sumTbody.innerHTML = '';
+                dailyTbody.innerHTML = '';
+
+                const targetStaffList = selStaffId === 'ALL'
+                    ? staffDb
+                    : staffDb.filter(s => String(s.id) === String(selStaffId));
+
+                if (targetStaffList.length === 0) {
+                    sumTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No active staff configured. Add staff in Staff Access first.</td></tr>';
+                    dailyTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No attendance records to display.</td></tr>';
+                    window._lastAdminStaffAttReport = null;
+                    return;
+                }
+
+                const summaryList = [];
+                let allDailyRows = [];
+
+                targetStaffList.forEach(st => {
+                    const stNorm = { ...st, joiningDate: normalizeStaffJoiningIso(st.joiningDate) };
+                    const res = window.moduleContext.buildStaffMonthAttendanceRows(stNorm, year, monthIdx);
+                    const pct = res.workingDays > 0 ? Math.round((res.present / res.workingDays) * 100) : 0;
+
+                    summaryList.push({
+                        staffName: stNorm.name,
+                        joiningDate: formatDateStr(stNorm.joiningDate),
+                        workingDays: res.workingDays,
+                        present: res.present,
+                        absent: res.absent,
+                        holidays: res.holidays,
+                        pct: pct
+                    });
+                    allDailyRows = allDailyRows.concat(res.rows);
+
+                    sumTbody.innerHTML += `<tr>
+                        <td><strong>${stNorm.name}</strong></td>
+                        <td>${formatDateStr(stNorm.joiningDate)}</td>
+                        <td><strong>${res.workingDays}</strong></td>
+                        <td style="color:var(--success-green); font-weight:800;">${res.present}</td>
+                        <td style="color:var(--error-red); font-weight:800;">${res.absent}</td>
+                        <td style="color:var(--warning-yellow); font-weight:700;">${res.holidays}</td>
+                        <td><strong>${pct}%</strong></td>
+                    </tr>`;
+                });
+
+                allDailyRows.sort((a, b) => a.dateIso.localeCompare(b.dateIso) || a.staffName.localeCompare(b.staffName));
+
+                if (allDailyRows.length === 0) {
+                    dailyTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No billable attendance dates for this month (check staff Joining Date or selected month).</td></tr>';
+                } else {
+                    [...allDailyRows].reverse().forEach(r => {
+                        let statusHtml = '';
+                        if (r.status === 'Present') statusHtml = `<span class="hr-status-pill hr-pill-working">✔ Present</span>`;
+                        else if (r.status === 'Holiday') statusHtml = `<span class="hr-status-pill hr-pill-holiday">🎉 ${r.statusDetail}</span>`;
+                        else statusHtml = `<span class="hr-status-pill hr-pill-absent">✖ Absent</span>`;
+
+                        dailyTbody.innerHTML += `<tr>
+                            <td><strong>${r.dateFormatted}</strong></td>
+                            <td>${r.dayName}</td>
+                            <td><strong>${r.staffName}</strong></td>
+                            <td>${statusHtml}</td>
+                            <td style="color:var(--success-green); font-weight:700;">${r.checkIn}</td>
+                            <td style="color:var(--accent-orange); font-weight:700;">${r.checkOut}</td>
+                            <td>${r.duration}</td>
+                        </tr>`;
+                    });
+                }
+
+                window._lastAdminStaffAttReport = {
+                    year,
+                    monthName,
+                    summaryList,
+                    allDailyRows
+                };
+            },
+
+            downloadStaffAttendanceCsv: function() {
+                if (!window._lastAdminStaffAttReport) {
+                    window.moduleContext.renderAdminStaffAttendance();
+                }
+                const rep = window._lastAdminStaffAttReport;
+                if (!rep) {
+                    showNotice("No staff attendance data available to download.", "error");
+                    return;
+                }
+                const esc = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+                const lines = [];
+
+                lines.push(['REVIVE FITNESS STUDIO - STAFF MONTHLY ATTENDANCE REPORT', `Month: ${rep.monthName} ${rep.year}`].map(esc).join(','));
+                lines.push([]);
+                lines.push(['1. STAFF MONTHLY ATTENDANCE SUMMARY'].map(esc).join(','));
+                lines.push(['Staff Name', 'Joining Date', 'Working Days Elapsed', 'Present Days', 'Absent Days', 'Sundays & Holidays', 'Attendance %'].map(esc).join(','));
+                rep.summaryList.forEach(s => {
+                    lines.push([s.staffName, s.joiningDate, s.workingDays, s.present, s.absent, s.holidays, `${s.pct}%`].map(esc).join(','));
+                });
+                lines.push([]);
+
+                lines.push(['2. DAY-BY-DAY STAFF ATTENDANCE REGISTER (MONTH VIEW)'].map(esc).join(','));
+                lines.push(['Date', 'Day', 'Staff Name', 'Attendance Status', 'Check-In Time', 'Check-Out Time', 'Duration / Remarks'].map(esc).join(','));
+                rep.allDailyRows.forEach(r => {
+                    lines.push([r.dateFormatted, r.dayName, r.staffName, r.statusDetail, r.checkIn, r.checkOut, r.duration].map(esc).join(','));
+                });
+
+                const csvContent = lines.join('\r\n');
+                const base64Csv = window.btoa(unescape(encodeURIComponent(csvContent)));
+                const fileName = `Revive_Staff_Attendance_${rep.monthName}_${rep.year}.csv`;
+                window.moduleContext.triggerDirectStorageDownload(base64Csv, fileName);
             },
 
             initTariffEditor: function() {
@@ -2549,6 +3658,11 @@
             },
 
             openUserSearch: function(mode) {
+                if (appContext.currentRole === 'staff' && !window.moduleContext.isStaffOnActiveShift()) {
+                    showNotice("Access restricted: You must be actively Checked-In (and not Checked-Out) to access client details or fee collection.", "error");
+                    window.appContext.switchView('dashboard');
+                    return;
+                }
                 currentHubMode = mode;
                 const fySelect = document.getElementById('search-fy');
                 const currYear = new Date().getFullYear();
@@ -2689,20 +3803,20 @@
                 document.getElementById('hub-name').innerHTML = user.fullName + (user.isDeleted ? ' <span class="deleted-badge">Archived</span>' : '');
                 document.getElementById('hub-id').innerText = user.id;
                 document.getElementById('hub-details').innerText = `${user.admissionType || 'New Admission'} | ${user.admissionCategory} - ${user.trainingCategory}`;
-                document.getElementById('hub-doj').innerText = `Date of Admission: ${dInfo.formattedDate} (Billing starts: ${dInfo.monthName} ${actualAdmFy})`;
-                document.getElementById('hub-registered-by').innerText = `Registered & Verified By: ${user.collectedBy || 'System Admin'}`;
+                document.getElementById('hub-doj').innerText = `Joined: ${dInfo.formattedDate}`;
+                document.getElementById('hub-registered-by').innerText = `By: ${user.collectedBy || 'Admin'}`;
                 document.getElementById('hub-fy-label').innerText = currentActiveUser.selectedFY;
                 document.getElementById('hub-actions').style.display = 'flex';
                 
                 if (currentHubMode === 'fee') {
                     document.getElementById('hub-instruction').style.display = 'block';
-                    document.getElementById('hub-instruction').innerText = "Billing starts strictly from the month of admission. Click yellow/red months to collect fee (requires Staff/Admin PIN). Click green months for receipt.";
+                    document.getElementById('hub-instruction').style.display = "none";
                     document.getElementById('btn-hub-edit').style.display = 'none';
                     document.getElementById('btn-hub-pdf').style.display = 'none';
                     document.getElementById('btn-hub-delete').style.display = 'none';
                 } else {
                     document.getElementById('hub-instruction').style.display = 'block';
-                    document.getElementById('hub-instruction').innerText = "Click on any paid green month to view or share its payment receipt.";
+                    document.getElementById('hub-instruction').style.display = "none";
                     document.getElementById('btn-hub-edit').style.display = user.isDeleted ? 'none' : 'flex'; 
                     document.getElementById('btn-hub-pdf').style.display = appContext.currentRole === 'admin' ? 'flex' : 'none';
                     document.getElementById('btn-hub-delete').style.display = (appContext.currentRole === 'admin' && !user.isDeleted) ? 'flex' : 'none';
@@ -2863,7 +3977,7 @@
                 document.getElementById('pay-method').value = 'UPI';
                 document.getElementById('pay-staff-pin').value = '';
                 document.getElementById('pay-pin-identity').style.color = 'var(--text-muted)';
-                document.getElementById('pay-pin-identity').innerText = 'Required to record who collected this fee';
+                document.getElementById('pay-pin-identity').innerText = '';
                 window.moduleContext.updatePaymentModalUI();
                 document.getElementById('paymentProcessModal').style.display = 'flex';
             },
@@ -3036,6 +4150,11 @@
             },
 
             editUser: function() {
+                if (appContext.currentRole === 'staff' && !window.moduleContext.isStaffOnActiveShift()) {
+                    showNotice("Access restricted: You must be actively Checked-In to edit member details.", "error");
+                    window.appContext.switchView('dashboard');
+                    return;
+                }
                 IS_EDIT_MODE = true;
                 const u = currentActiveUser;
                 document.getElementById('form-main-title').innerText = "Edit Member Details";
@@ -3078,6 +4197,8 @@
                     document.getElementById('sig-placeholder').style.display = 'none';
                     document.getElementById('btn-start-sig-camera').style.display = 'none';
                     document.getElementById('btn-switch-sig-camera').style.display = 'none';
+                    const editCropBtn = document.getElementById('btn-edit-sig-crop');
+                    if (editCropBtn) editCropBtn.style.display = 'inline-flex';
                     document.getElementById('btn-retake-sig').style.display = 'inline-flex';
                 }
                 window.appContext.switchView('admission');
@@ -3907,7 +5028,7 @@
 
                 document.getElementById('supp-staff-pin').value = '';
                 document.getElementById('supp-pin-identity').style.color = 'var(--text-muted)';
-                document.getElementById('supp-pin-identity').innerText = 'Enter Staff or Admin PIN to authorize and record who completed this sale';
+                document.getElementById('supp-pin-identity').innerText = '';
 
                 window.moduleContext.updateSuppPaymentUI();
                 document.getElementById('supp-step-2').classList.remove('active-step');
@@ -4310,6 +5431,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             preloadLogoForCapture();
             ensureDefaultSupplements();
+            ensureDefaultHolidays();
             const fyEl = document.getElementById('footer-year');
             if (fyEl) fyEl.innerText = new Date().getFullYear();
             cloudSync.pullInitial();
@@ -4439,34 +5561,44 @@
                 startCamera();
             });
 
-            // Fix #8 & #9: Signature Live Camera & File Upload (Replaces canvas drawing, un-mirrored)
+            // Fix #8 & #9: High-Resolution Signature Live Camera, Interactive Cropper & Auto-Whiten Document Scanner Filter
             const sigVideo = document.getElementById('sig-camera-stream');
+            const sigGuide = document.getElementById('sig-camera-guide');
             const sigCanvas = document.getElementById('sig-canvas-snapshot');
             const sigPreview = document.getElementById('sig-preview');
             const sigPlaceholder = document.getElementById('sig-placeholder');
             const btnStartSigCam = document.getElementById('btn-start-sig-camera');
             const btnSwitchSigCam = document.getElementById('btn-switch-sig-camera');
             const btnCaptureSig = document.getElementById('btn-capture-sig');
+            const btnEditSigCrop = document.getElementById('btn-edit-sig-crop');
             const btnRetakeSig = document.getElementById('btn-retake-sig');
             const sigFileInput = document.getElementById('sig-file-input');
             const sigData = document.getElementById('sig-data');
             let sigFacingMode = 'environment';
+            let rawSignatureSourceImg = null;
+            let sigCropBox = { x: 0.10, y: 0.18, w: 0.80, h: 0.64 }; // Normalized 0..1 coordinates
+            let sigDragMode = null;
+            let sigDragStart = { x: 0, y: 0, box: null };
 
             async function startSigCamera() {
                 if(activeSigStream) activeSigStream.getTracks().forEach(t => t.stop());
                 try {
-                    activeSigStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: sigFacingMode } });
+                    activeSigStream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: sigFacingMode, width: { ideal: 1280 }, height: { ideal: 720 } }
+                    });
                     sigVideo.srcObject = activeSigStream;
                     sigVideo.style.transform = 'scaleX(1)';
                     sigVideo.style.display = 'block';
+                    if (sigGuide) sigGuide.style.display = 'block';
                     sigPlaceholder.style.display = 'none';
                     sigPreview.style.display = 'none';
                     btnStartSigCam.style.display = 'none';
                     btnSwitchSigCam.style.display = 'inline-flex';
                     btnCaptureSig.style.display = 'inline-flex';
+                    if (btnEditSigCrop) btnEditSigCrop.style.display = 'none';
                     btnRetakeSig.style.display = 'none';
                 } catch (err) {
-                    showNotice("Camera unavailable. Please use 'Upload Image' to select a signature photo.", "warning");
+                    showNotice("Camera unavailable. Please use 'Choose from Gallery / Storage' to select a signature photo.", "warning");
                 }
             }
 
@@ -4477,23 +5609,23 @@
             });
 
             if(btnCaptureSig) btnCaptureSig.addEventListener('click', () => {
-                const vw = sigVideo.videoWidth || 450;
-                const vh = sigVideo.videoHeight || 160;
-                sigCanvas.width = 450;
-                sigCanvas.height = 160;
-                const ctx = sigCanvas.getContext('2d');
-                ctx.setTransform(1, 0, 0, 1, 0, 0); // Un-mirrored
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, sigCanvas.width, sigCanvas.height);
-                ctx.drawImage(sigVideo, 0, 0, vw, vh, 0, 0, 450, 160);
-                sigData.value = sigCanvas.toDataURL('image/jpeg', 0.7);
-                sigPreview.src = sigData.value;
+                const vw = sigVideo.videoWidth || 960;
+                const vh = sigVideo.videoHeight || 540;
+                const tempC = document.createElement('canvas');
+                tempC.width = vw;
+                tempC.height = vh;
+                const tCtx = tempC.getContext('2d');
+                tCtx.setTransform(1, 0, 0, 1, 0, 0);
+                tCtx.drawImage(sigVideo, 0, 0, vw, vh);
+                const fullFrameDataUrl = tempC.toDataURL('image/png', 1.0);
+
+                if(activeSigStream) { activeSigStream.getTracks().forEach(t => t.stop()); activeSigStream = null; }
                 sigVideo.style.display = 'none';
-                sigPreview.style.display = 'block';
+                if (sigGuide) sigGuide.style.display = 'none';
                 btnCaptureSig.style.display = 'none';
                 btnSwitchSigCam.style.display = 'none';
-                btnRetakeSig.style.display = 'inline-flex';
-                if(activeSigStream) { activeSigStream.getTracks().forEach(t => t.stop()); activeSigStream = null; }
+
+                window.moduleContext.openSigCropperWithSource(fullFrameDataUrl, { x: 0.10, y: 0.18, w: 0.80, h: 0.64 });
             });
 
             const btnUploadSigGallery = document.getElementById('btn-upload-sig-gallery');
@@ -4502,6 +5634,7 @@
                     e.preventDefault();
                     if (activeSigStream) { activeSigStream.getTracks().forEach(t => t.stop()); activeSigStream = null; }
                     sigVideo.style.display = 'none';
+                    if (sigGuide) sigGuide.style.display = 'none';
                     sigFileInput.removeAttribute('capture');
                     sigFileInput.value = '';
                     sigFileInput.click();
@@ -4514,45 +5647,253 @@
                 if(activeSigStream) { activeSigStream.getTracks().forEach(t => t.stop()); activeSigStream = null; }
                 const reader = new FileReader();
                 reader.onload = function(evt) {
-                    const img = new Image();
-                    img.onload = function() {
-                        sigCanvas.width = 450;
-                        sigCanvas.height = 160;
-                        const ctx = sigCanvas.getContext('2d');
-                        ctx.setTransform(1, 0, 0, 1, 0, 0);
-                        ctx.fillStyle = '#ffffff';
-                        ctx.fillRect(0, 0, 450, 160);
-                        const scale = Math.min(450 / img.width, 160 / img.height);
-                        const dw = img.width * scale;
-                        const dh = img.height * scale;
-                        ctx.drawImage(img, (450 - dw) / 2, (160 - dh) / 2, dw, dh);
-                        sigData.value = sigCanvas.toDataURL('image/jpeg', 0.75);
-                        sigPreview.src = sigData.value;
-                        sigVideo.style.display = 'none';
-                        sigPlaceholder.style.display = 'none';
-                        sigPreview.style.display = 'block';
-                        btnStartSigCam.style.display = 'none';
-                        btnSwitchSigCam.style.display = 'none';
-                        btnCaptureSig.style.display = 'none';
-                        btnRetakeSig.style.display = 'inline-flex';
-                    };
-                    img.src = evt.target.result;
+                    window.moduleContext.openSigCropperWithSource(evt.target.result, { x: 0.08, y: 0.12, w: 0.84, h: 0.76 });
                 };
                 reader.readAsDataURL(file);
             });
 
+            if (btnEditSigCrop) {
+                btnEditSigCrop.addEventListener('click', () => {
+                    if (rawSignatureSourceImg) {
+                        document.getElementById('signatureCropModal').style.display = 'flex';
+                        window.moduleContext.drawInteractiveCropCanvas();
+                        window.moduleContext.updateSigCropPreview();
+                    } else if (sigData.value) {
+                        window.moduleContext.openSigCropperWithSource(sigData.value, { x: 0.05, y: 0.05, w: 0.90, h: 0.90 });
+                    }
+                });
+            }
+
             if(btnRetakeSig) btnRetakeSig.addEventListener('click', () => {
                 if(activeSigStream) { activeSigStream.getTracks().forEach(t => t.stop()); activeSigStream = null; }
                 sigData.value = '';
+                rawSignatureSourceImg = null;
                 sigFileInput.value = '';
                 sigPreview.style.display = 'none';
                 sigVideo.style.display = 'none';
+                if (sigGuide) sigGuide.style.display = 'none';
                 sigPlaceholder.style.display = 'block';
                 btnStartSigCam.style.display = 'inline-flex';
                 btnSwitchSigCam.style.display = 'none';
                 btnCaptureSig.style.display = 'none';
+                if (btnEditSigCrop) btnEditSigCrop.style.display = 'none';
                 btnRetakeSig.style.display = 'none';
             });
+
+            // Interactive Crop Canvas Pointer/Touch Handlers
+            const cropCanvasEl = document.getElementById('sig-crop-interactive-canvas');
+            function getCropCanvasNormCoords(evt) {
+                const rect = cropCanvasEl.getBoundingClientRect();
+                const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+                const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+                return {
+                    nx: Math.max(0, Math.min(1, (clientX - rect.left) / (rect.width || 1))),
+                    ny: Math.max(0, Math.min(1, (clientY - rect.top) / (rect.height || 1)))
+                };
+            }
+            function onCropDown(evt) {
+                if (!rawSignatureSourceImg) return;
+                evt.preventDefault();
+                const { nx, ny } = getCropCanvasNormCoords(evt);
+                const b = sigCropBox;
+                const cornerTol = 0.08;
+                if (Math.abs(nx - (b.x + b.w)) < cornerTol && Math.abs(ny - (b.y + b.h)) < cornerTol) {
+                    sigDragMode = 'se';
+                } else if (Math.abs(nx - b.x) < cornerTol && Math.abs(ny - b.y) < cornerTol) {
+                    sigDragMode = 'nw';
+                } else if (nx >= b.x && nx <= b.x + b.w && ny >= b.y && ny <= b.y + b.h) {
+                    sigDragMode = 'move';
+                } else {
+                    // Start a new crop box around tap point
+                    sigCropBox = {
+                        x: Math.max(0.02, Math.min(0.65, nx - 0.15)),
+                        y: Math.max(0.02, Math.min(0.65, ny - 0.15)),
+                        w: 0.30,
+                        h: 0.30
+                    };
+                    sigDragMode = 'se';
+                }
+                sigDragStart = { x: nx, y: ny, box: { ...sigCropBox } };
+            }
+            function onCropMove(evt) {
+                if (!sigDragMode || !rawSignatureSourceImg) return;
+                evt.preventDefault();
+                const { nx, ny } = getCropCanvasNormCoords(evt);
+                const dx = nx - sigDragStart.x;
+                const dy = ny - sigDragStart.y;
+                const orig = sigDragStart.box;
+
+                if (sigDragMode === 'move') {
+                    sigCropBox.x = Math.max(0, Math.min(1 - orig.w, orig.x + dx));
+                    sigCropBox.y = Math.max(0, Math.min(1 - orig.h, orig.y + dy));
+                } else if (sigDragMode === 'se') {
+                    sigCropBox.w = Math.max(0.15, Math.min(1 - orig.x, orig.w + dx));
+                    sigCropBox.h = Math.max(0.15, Math.min(1 - orig.y, orig.h + dy));
+                } else if (sigDragMode === 'nw') {
+                    const newX = Math.max(0, Math.min(orig.x + orig.w - 0.15, orig.x + dx));
+                    const newY = Math.max(0, Math.min(orig.y + orig.h - 0.15, orig.y + dy));
+                    sigCropBox.w = (orig.x + orig.w) - newX;
+                    sigCropBox.h = (orig.y + orig.h) - newY;
+                    sigCropBox.x = newX;
+                    sigCropBox.y = newY;
+                }
+                window.moduleContext.drawInteractiveCropCanvas();
+                window.moduleContext.updateSigCropPreview();
+            }
+            function onCropUp() {
+                sigDragMode = null;
+            }
+            if (cropCanvasEl) {
+                cropCanvasEl.addEventListener('mousedown', onCropDown);
+                window.addEventListener('mousemove', onCropMove);
+                window.addEventListener('mouseup', onCropUp);
+                cropCanvasEl.addEventListener('touchstart', onCropDown, { passive: false });
+                cropCanvasEl.addEventListener('touchmove', onCropMove, { passive: false });
+                cropCanvasEl.addEventListener('touchend', onCropUp);
+            }
+
+            window.moduleContext.openSigCropperWithSource = function(srcDataUrl, initialBox) {
+                const img = new Image();
+                img.onload = function() {
+                    rawSignatureSourceImg = img;
+                    sigCropBox = initialBox || { x: 0.08, y: 0.12, w: 0.84, h: 0.76 };
+                    document.getElementById('sig-pad-x').value = Math.round(sigCropBox.x * 100);
+                    document.getElementById('sig-pad-y').value = Math.round(sigCropBox.y * 100);
+                    document.getElementById('signatureCropModal').style.display = 'flex';
+                    window.moduleContext.drawInteractiveCropCanvas();
+                    window.moduleContext.updateSigCropPreview();
+                };
+                img.src = srcDataUrl;
+            };
+
+            window.moduleContext.applySliderCropBounds = function() {
+                const px = parseInt(document.getElementById('sig-pad-x').value || '8', 10) / 100;
+                const py = parseInt(document.getElementById('sig-pad-y').value || '12', 10) / 100;
+                sigCropBox = {
+                    x: px,
+                    y: py,
+                    w: Math.max(0.20, 1 - 2 * px),
+                    h: Math.max(0.20, 1 - 2 * py)
+                };
+                window.moduleContext.drawInteractiveCropCanvas();
+                window.moduleContext.updateSigCropPreview();
+            };
+
+            window.moduleContext.drawInteractiveCropCanvas = function() {
+                if (!rawSignatureSourceImg || !cropCanvasEl) return;
+                const cw = 440, ch = 220;
+                cropCanvasEl.width = cw;
+                cropCanvasEl.height = ch;
+                const ctx = cropCanvasEl.getContext('2d');
+                ctx.clearRect(0, 0, cw, ch);
+                ctx.drawImage(rawSignatureSourceImg, 0, 0, cw, ch);
+
+                // Darken outside crop box
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.52)';
+                ctx.fillRect(0, 0, cw, ch);
+
+                const bx = sigCropBox.x * cw;
+                const by = sigCropBox.y * ch;
+                const bw = sigCropBox.w * cw;
+                const bh = sigCropBox.h * ch;
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(bx, by, bw, bh);
+                ctx.clip();
+                ctx.drawImage(rawSignatureSourceImg, 0, 0, cw, ch);
+                ctx.restore();
+
+                // Orange border & corner handles
+                ctx.strokeStyle = '#ff6600';
+                ctx.lineWidth = 2.5;
+                ctx.strokeRect(bx, by, bw, bh);
+
+                ctx.fillStyle = '#ff6600';
+                const hs = 12;
+                ctx.fillRect(bx - hs/2, by - hs/2, hs, hs);
+                ctx.fillRect(bx + bw - hs/2, by + bh - hs/2, hs, hs);
+            };
+
+            window.moduleContext.updateSigCropPreview = function() {
+                if (!rawSignatureSourceImg) return;
+                const outW = 700, outH = 240;
+                sigCanvas.width = outW;
+                sigCanvas.height = outH;
+                const ctx = sigCanvas.getContext('2d');
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, outW, outH);
+
+                const sx = sigCropBox.x * rawSignatureSourceImg.width;
+                const sy = sigCropBox.y * rawSignatureSourceImg.height;
+                const sw = Math.max(10, sigCropBox.w * rawSignatureSourceImg.width);
+                const sh = Math.max(10, sigCropBox.h * rawSignatureSourceImg.height);
+
+                const scale = Math.min((outW - 24) / sw, (outH - 20) / sh);
+                const dw = sw * scale;
+                const dh = sh * scale;
+                const dx = (outW - dw) / 2;
+                const dy = (outH - dh) / 2;
+
+                ctx.drawImage(rawSignatureSourceImg, sx, sy, sw, sh, dx, dy, dw, dh);
+
+                // Document Scanner Auto-Whiten Background Filter (removes gray paper background & shadows while sharpening ink)
+                const cleanBg = document.getElementById('sig-clean-bg-toggle') && document.getElementById('sig-clean-bg-toggle').checked;
+                const thresh = parseInt((document.getElementById('sig-contrast-slider') && document.getElementById('sig-contrast-slider').value) || '155', 10);
+
+                if (cleanBg) {
+                    const imgData = ctx.getImageData(0, 0, outW, outH);
+                    const d = imgData.data;
+                    for (let i = 0; i < d.length; i += 4) {
+                        const r = d[i], g = d[i + 1], b = d[i + 2];
+                        const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+                        if (lum > thresh) {
+                            // Paper background -> pure crisp white
+                            d[i] = 255; d[i + 1] = 255; d[i + 2] = 255;
+                        } else {
+                            // Ink stroke -> deepen contrast for sharp PDF appearance
+                            const ratio = Math.max(0, (lum / thresh) * 0.45);
+                            d[i] = Math.round(r * ratio);
+                            d[i + 1] = Math.round(g * ratio);
+                            d[i + 2] = Math.round(b * ratio);
+                        }
+                    }
+                    ctx.putImageData(imgData, 0, 0);
+                }
+
+                const previewImgEl = document.getElementById('sig-cropped-live-result');
+                if (previewImgEl) {
+                    previewImgEl.src = sigCanvas.toDataURL('image/jpeg', 0.92);
+                }
+            };
+
+            window.moduleContext.applySigCrop = function() {
+                window.moduleContext.updateSigCropPreview();
+                const finalDataUrl = sigCanvas.toDataURL('image/jpeg', 0.92);
+                sigData.value = finalDataUrl;
+                sigPreview.src = finalDataUrl;
+                sigVideo.style.display = 'none';
+                if (sigGuide) sigGuide.style.display = 'none';
+                sigPlaceholder.style.display = 'none';
+                sigPreview.style.display = 'block';
+                btnStartSigCam.style.display = 'none';
+                btnSwitchSigCam.style.display = 'none';
+                btnCaptureSig.style.display = 'none';
+                if (btnEditSigCrop) btnEditSigCrop.style.display = 'inline-flex';
+                btnRetakeSig.style.display = 'inline-flex';
+                document.getElementById('signatureCropModal').style.display = 'none';
+                showNotice("Signature cropped & enhanced for crisp PDF output!", "success");
+            };
+
+            window.moduleContext.cancelSigCrop = function() {
+                document.getElementById('signatureCropModal').style.display = 'none';
+                if (!sigData.value) {
+                    sigPlaceholder.style.display = 'block';
+                    btnStartSigCam.style.display = 'inline-flex';
+                }
+            };
 
             const step1 = document.getElementById('step-1');
             const step2 = document.getElementById('step-2');
@@ -4712,7 +6053,7 @@
 
                 document.getElementById('adm-staff-pin').value = '';
                 document.getElementById('adm-pin-identity').style.color = 'var(--text-muted)';
-                document.getElementById('adm-pin-identity').innerText = 'Enter your PIN to authorize and stamp this registration';
+                document.getElementById('adm-pin-identity').innerText = '';
 
                 const method = document.getElementById('paymentMethod').value;
                 const upiSec = document.getElementById('upi-section');
