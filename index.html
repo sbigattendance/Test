@@ -574,6 +574,7 @@
                         </select>
                     </div>
                     <button type="button" class="btn primary" onclick="window.moduleContext.generateReport()" style="max-width:150px; padding: 1rem;">Generate</button>
+                    <button type="button" id="btn-download-full-report" class="btn secondary" onclick="window.moduleContext.downloadFullReportCsv()" style="display:none; max-width:220px; padding: 1rem; border-color:var(--accent-orange); color:var(--accent-orange);">⬇ Download Report (CSV)</button>
                 </div>
 
                 <div id="report-content" style="display:none; margin-top:2rem;">
@@ -690,14 +691,15 @@
                     </div>
 
                     <div class="report-section" id="shortfall-report-section">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:10px;">
-                            <h3 style="margin:0; border:none; color:var(--warning-yellow);">Due / Shortfall & Unpaid Register (Active Members)</h3>
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+                            <h3 style="margin:0; border:none; color:var(--warning-yellow);">Due / Shortfall & Unpaid Summary (Active Members)</h3>
+                            <button type="button" class="btn primary" style="width:auto; padding:0.65rem 1.2rem; font-size:0.82rem;" onclick="window.moduleContext.downloadFullReportCsv()">⬇ Download Full Report with All Unpaid List (CSV)</button>
                         </div>
-                        <div class="table-responsive">
-                            <table class="data-table" id="table-shortfalls">
-                                <thead><tr><th>Status / Last Paid</th><th>ID & Name</th><th>Month</th><th>Pending Amt</th></tr></thead>
-                                <tbody></tbody>
-                            </table>
+                        <div class="analysis-box" id="unpaid-summary-box" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+                            <div>
+                                <div style="font-weight:800; color:var(--text-main); font-size:1rem;">Individual Unpaid & Shortfall list is hidden on screen for faster scrolling.</div>
+                                <div style="color:var(--text-muted); font-size:0.85rem; margin-top:4px;" id="unpaid-summary-text">Download the full report above to view all individual unpaid and shortfall member records.</div>
+                            </div>
                         </div>
                     </div>
 
@@ -1704,7 +1706,7 @@
                             const rawId = u.id || u.admissionId || u.AdmissionID || u['Admission ID'] || u.userId || `REV-${String(idx + 1).padStart(4, '0')}`;
                             const num = extractRevNumber(rawId);
                             const cleanId = num > 0 ? `REV-${String(num).padStart(4, '0')}` : String(rawId).trim();
-                            return { ...u, id: cleanId };
+                            const dInfo = parseAdmissionDateInfo(u.date || u.dateOfAdmission, u._month, u._fy); return { ...u, id: cleanId, date: dInfo.formattedDate, _fy: dInfo.fy, _month: dInfo.monthName };
                         });
                         storage.set('revive_users_db', normalizedUsers);
                     }
@@ -1783,8 +1785,78 @@
         };
         window.cloudSync = cloudSync;
 
+        function maskPhoneLast4(phone) {
+            const s = String(phone || '').replace(/\D/g, '');
+            if (!s) return '******';
+            return '******' + s.slice(-4);
+        }
+
+        // Universal parser for member admission date (handles DD-MM-YYYY, YYYY-MM-DD, ISO timestamps, DD/MM/YYYY, and fallback _month/_fy)
+        function parseAdmissionDateInfo(dateStr, fallbackMonthName, fallbackFy) {
+            const today = new Date();
+            let day = 1, monthIdx = today.getMonth(), year = today.getFullYear();
+            let parsedOk = false;
+
+            if (dateStr) {
+                const clean = String(dateStr).trim().split('T')[0].replace(/\//g, '-');
+                const parts = clean.split('-');
+                if (parts.length === 3) {
+                    const p0 = parseInt(parts[0], 10);
+                    const p1 = parseInt(parts[1], 10);
+                    const p2 = parseInt(parts[2], 10);
+                    if (p0 >= 1900 && p1 >= 1 && p1 <= 12) {
+                        year = p0;
+                        monthIdx = p1 - 1;
+                        day = p2 || 1;
+                        parsedOk = true;
+                    } else if (p2 >= 1900 && p1 >= 1 && p1 <= 12) {
+                        day = p0 || 1;
+                        monthIdx = p1 - 1;
+                        year = p2;
+                        parsedOk = true;
+                    }
+                }
+                if (!parsedOk) {
+                    const dObj = new Date(dateStr);
+                    if (!isNaN(dObj.getTime()) && dObj.getFullYear() >= 1900) {
+                        day = dObj.getDate();
+                        monthIdx = dObj.getMonth();
+                        year = dObj.getFullYear();
+                        parsedOk = true;
+                    }
+                }
+            }
+
+            if (!parsedOk && fallbackMonthName && fallbackFy) {
+                const mOrderIdx = tariffMonthsOrder.indexOf(fallbackMonthName);
+                const fyStart = parseInt(String(fallbackFy).split('-')[0], 10);
+                if (mOrderIdx !== -1 && !isNaN(fyStart)) {
+                    monthIdx = tariffMonthIndices[mOrderIdx];
+                    year = monthIdx >= 3 ? fyStart : fyStart + 1;
+                    day = 1;
+                    parsedOk = true;
+                }
+            }
+
+            const fyStart = monthIdx >= 3 ? year : year - 1;
+            const fyString = `${fyStart}-${fyStart + 1}`;
+            const monthName = new Date(year, monthIdx, 1).toLocaleString('default', { month: 'long' });
+            const formattedDate = `${String(day).padStart(2, '0')}-${String(monthIdx + 1).padStart(2, '0')}-${year}`;
+            return {
+                day,
+                monthIdx,
+                year,
+                score: year * 100 + monthIdx,
+                fy: fyString,
+                monthName,
+                formattedDate
+            };
+        }
+
         function formatDateStr(isoStr) {
             if(!isoStr) return '';
+            const info = parseAdmissionDateInfo(isoStr);
+            if(info && info.year >= 1900) return info.formattedDate;
             const d = new Date(isoStr);
             if(isNaN(d.getTime())) return String(isoStr);
             return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
@@ -1905,7 +1977,7 @@
                                     const rawId = u.id || u.admissionId || u.AdmissionID || u['Admission ID'] || u.userId || `REV-${String(idx + 1).padStart(4, '0')}`;
                                     const num = extractRevNumber(rawId);
                                     const cleanId = num > 0 ? `REV-${String(num).padStart(4, '0')}` : String(rawId).trim();
-                                    return { ...u, id: cleanId };
+                                    const dInfo = parseAdmissionDateInfo(u.date || u.dateOfAdmission, u._month, u._fy); return { ...u, id: cleanId, date: dInfo.formattedDate, _fy: dInfo.fy, _month: dInfo.monthName };
                                 });
                                 storage.set('revive_users_db', normalizedUsers);
                                 syncAdmissionCounter();
@@ -2032,17 +2104,7 @@
             },
 
             getFyFromDateStr: function(ddmmyyyy) {
-                if (!ddmmyyyy || !ddmmyyyy.includes('-')) {
-                    const y = new Date().getFullYear();
-                    const m = new Date().getMonth();
-                    const fyStart = m >= 3 ? y : y - 1;
-                    return `${fyStart}-${fyStart + 1}`;
-                }
-                const parts = ddmmyyyy.split('-');
-                const m = parseInt(parts[1], 10) - 1;
-                const y = parseInt(parts[2], 10);
-                const fyStart = m >= 3 ? y : y - 1;
-                return `${fyStart}-${fyStart + 1}`;
+                return parseAdmissionDateInfo(ddmmyyyy).fy;
             },
 
             getApplicableTariff: function(targetDateObj, monthName, fyString) {
@@ -2329,7 +2391,7 @@
                             <img src="${photoUrl}" alt="${user.fullName}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-orange);">
                             <div style="flex:1;">
                                 <div style="color:var(--text-main); font-weight:800; font-size:1rem;">${user.fullName}</div>
-                                <div style="font-size:0.8rem; color:var(--text-muted);">ID: ${user.id} | Ph: ${user.primaryContact}</div>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">ID: ${user.id} | Ph: ${maskPhoneLast4(user.primaryContact)}</div>
                             </div>
                         </div>`;
                     });
@@ -2412,7 +2474,7 @@
                 const currMonth = new Date().getMonth();
                 const defaultFyStart = currMonth >= 3 ? currYear : currYear - 1;
                 fySelect.innerHTML = '';
-                for(let i = -2; i <= 1; i++) {
+                for(let i = -2; i <= 0; i++) {
                     const y = defaultFyStart + i; const opt = document.createElement('option'); opt.value = `${y}-${y+1}`; opt.innerText = `${y}-${y+1}`;
                     if(i === 0) opt.selected = true; fySelect.appendChild(opt);
                 }
@@ -2446,10 +2508,17 @@
                 currentActiveUser = user;
                 currentActiveUser.selectedFY = fy;
 
-                // Populate Hub FY Switcher from user's admission FY up to current FY + 1
-                const admFyStart = parseInt(userAdmFy.split('-')[0], 10) || new Date().getFullYear();
-                const nowYear = new Date().getFullYear();
-                const maxFyStart = Math.max(admFyStart, nowYear) + 1;
+                // Populate Hub FY Switcher strictly from user's admission FY up to current active FY (no prior or future FYs)
+                const dInfo = parseAdmissionDateInfo(user.date, user._month, user._fy);
+                const actualAdmFy = dInfo.fy;
+                const admFyStart = parseInt(actualAdmFy.split('-')[0], 10);
+                const nowD = new Date();
+                const currFyStart = nowD.getMonth() >= 3 ? nowD.getFullYear() : nowD.getFullYear() - 1;
+                const maxFyStart = Math.max(admFyStart, currFyStart);
+                if (parseInt(fy.split('-')[0], 10) < admFyStart || parseInt(fy.split('-')[0], 10) > maxFyStart) {
+                    currentActiveUser.selectedFY = `${maxFyStart}-${maxFyStart + 1}`;
+                }
+                const activeFy = currentActiveUser.selectedFY;
                 const hubFySwitcher = document.getElementById('hub-fy-switcher');
                 if (hubFySwitcher) {
                     hubFySwitcher.innerHTML = '';
@@ -2458,7 +2527,7 @@
                         const opt = document.createElement('option');
                         opt.value = fyOptVal;
                         opt.innerText = `FY ${fyOptVal}`;
-                        if (fyOptVal === fy) opt.selected = true;
+                        if (fyOptVal === activeFy) opt.selected = true;
                         hubFySwitcher.appendChild(opt);
                     }
                 }
@@ -2482,9 +2551,9 @@
                 document.getElementById('hub-name').innerHTML = user.fullName + (user.isDeleted ? ' <span class="deleted-badge">Archived</span>' : '');
                 document.getElementById('hub-id').innerText = user.id;
                 document.getElementById('hub-details').innerText = `${user.admissionType || 'New Admission'} | ${user.admissionCategory} - ${user.trainingCategory}`;
-                document.getElementById('hub-doj').innerText = `Date of Admission: ${user.date} (Billing starts: ${user._month || ''} ${userAdmFy})`;
+                document.getElementById('hub-doj').innerText = `Date of Admission: ${dInfo.formattedDate} (Billing starts: ${dInfo.monthName} ${actualAdmFy})`;
                 document.getElementById('hub-registered-by').innerText = `Registered & Verified By: ${user.collectedBy || 'System Admin'}`;
-                document.getElementById('hub-fy-label').innerText = fy;
+                document.getElementById('hub-fy-label').innerText = currentActiveUser.selectedFY;
                 document.getElementById('hub-actions').style.display = 'flex';
                 
                 if (currentHubMode === 'fee') {
@@ -2501,7 +2570,7 @@
                     document.getElementById('btn-hub-delete').style.display = (appContext.currentRole === 'admin' && !user.isDeleted) ? 'flex' : 'none';
                 }
                 
-                window.moduleContext.renderFeeCalendar(user.id, fy, user.trainingCategory, user.date);
+                window.moduleContext.renderFeeCalendar(user.id, currentActiveUser.selectedFY, user.trainingCategory, dInfo.formattedDate);
                 window.appContext.switchView('user-hub');
             },
 
@@ -2523,11 +2592,11 @@
                 const today = new Date();
                 const currentScore = today.getFullYear() * 100 + today.getMonth(); 
 
-                const p = (adDateStr || '01-04-2025').split('-');
-                const adDay = parseInt(p[0], 10) || 1;
-                const adMonthIdx = (parseInt(p[1], 10) || 1) - 1;
-                const adYear = parseInt(p[2], 10) || today.getFullYear();
-                const adScore = adYear * 100 + adMonthIdx; 
+                const adInfo = parseAdmissionDateInfo(adDateStr, currentActiveUser ? currentActiveUser._month : null, currentActiveUser ? currentActiveUser._fy : null);
+                const adDay = adInfo.day;
+                const adMonthIdx = adInfo.monthIdx;
+                const adYear = adInfo.year;
+                const adScore = adInfo.score; 
                 const fyStartYear = parseInt(fy.split('-')[0], 10);
 
                 let renderedAny = false;
@@ -2537,10 +2606,10 @@
                     const mYear = monthIdx >= 3 ? fyStartYear : fyStartYear + 1;
                     const mScore = mYear * 100 + monthIdx;
 
-                    // Strictly start fee calculation from month of admission (never before adScore, and not beyond current month unless already paid)
-                    const record = userFyData[month];
+                    // Strictly start fee calculation from month of admission: prior months and future unstarted months are never displayed
                     if (mScore < adScore) return;
-                    if (mScore > currentScore && !record) return;
+                    if (mScore > currentScore) return;
+                    const record = userFyData[month];
 
                     renderedAny = true;
                     const attCount = window.moduleContext.getUserMonthAttendanceCount(userId, month, fy);
@@ -2595,11 +2664,11 @@
                 let totalDue, alreadyPaid, balance;
                 document.getElementById('pay-promo-badge').innerHTML = ''; 
 
-                const p = (currentActiveUser.date || '01-04-2025').split('-');
-                const adDay = parseInt(p[0], 10) || 1;
-                const adMonthIdx = (parseInt(p[1], 10) || 1) - 1;
-                const adYear = parseInt(p[2], 10) || new Date().getFullYear();
-                const adScore = adYear * 100 + adMonthIdx;
+                const adInfo = parseAdmissionDateInfo(currentActiveUser.date, currentActiveUser._month, currentActiveUser._fy);
+                const adDay = adInfo.day;
+                const adMonthIdx = adInfo.monthIdx;
+                const adYear = adInfo.year;
+                const adScore = adInfo.score;
 
                 const fyStartYear = parseInt(fy.split('-')[0], 10);
                 const mIdx = tariffMonthIndices[tariffMonthsOrder.indexOf(month)];
@@ -3032,10 +3101,12 @@
                 const currMonth = new Date().getMonth();
                 const defaultFyStart = currMonth >= 3 ? currYear : currYear - 1;
                 fySelect.innerHTML = '';
-                for(let i = -2; i <= 2; i++) {
+                for(let i = -2; i <= 0; i++) {
                     const y = defaultFyStart + i; const opt = document.createElement('option'); opt.value = `${y}-${y+1}`; opt.innerText = `${y}-${y+1}`;
                     if(i === 0) opt.selected = true; fySelect.appendChild(opt);
                 }
+                const dlRepBtn = document.getElementById('btn-download-full-report');
+                if (dlRepBtn) dlRepBtn.style.display = 'none';
                 monthSelect.innerHTML = '<option value="All">Entire Year (All Months)</option>';
                 tariffMonthsOrder.forEach(month => {
                     const opt = document.createElement('option'); opt.value = month; opt.innerText = month;
@@ -3109,14 +3180,14 @@
                         });
                     });
 
-                    // 3. Shortfalls & Unpaid Dues for ACTIVE users strictly from their month of admission (adScore)
+                    // 3. Shortfalls & Unpaid Dues for ACTIVE users strictly from their month of admission (adScore) up to current month
                     users.forEach(u => {
                         if (!u || !u.date || u.isDeleted) return;
-                        const p = u.date.split('-');
-                        const adDay = parseInt(p[0], 10) || 1;
-                        const adMonthIdx = (parseInt(p[1], 10) || 1) - 1;
-                        const adYear = parseInt(p[2], 10);
-                        const adScore = adYear * 100 + adMonthIdx;
+                        const adInfo = parseAdmissionDateInfo(u.date, u._month, u._fy);
+                        const adDay = adInfo.day;
+                        const adMonthIdx = adInfo.monthIdx;
+                        const adYear = adInfo.year;
+                        const adScore = adInfo.score;
 
                         tariffMonthsOrder.forEach((mName, index) => {
                             if (targetMonth !== 'All' && targetMonth !== mName) return;
@@ -3145,6 +3216,7 @@
                                 s.shortRows.push({
                                     userId: u.id,
                                     fullName: u.fullName,
+                                    primaryContact: u.primaryContact || '',
                                     month: mName,
                                     pendingAmt: dueAmt,
                                     statusLabel: 'Unpaid',
@@ -3159,9 +3231,10 @@
                                     s.shortRows.push({
                                         userId: u.id,
                                         fullName: u.fullName,
+                                        primaryContact: u.primaryContact || '',
                                         month: mName,
                                         pendingAmt: totalDue - paid,
-                                        statusLabel: `Partial (Paid ₹${paid})`,
+                                        statusLabel: `Partial (Paid Rs.${paid})`,
                                         lastDate: record.lastDate
                                     });
                                 }
@@ -3265,8 +3338,13 @@
                 const expTbody = document.querySelector('#table-expenses-report tbody');
                 expTbody.innerHTML = currStats.expRows.length ? currStats.expRows.map(ex => `<tr><td>${formatDateStr(ex.date)}</td><td>${ex.category}</td><td>${ex.desc || '-'}</td><td>${ex.mode}</td><td style="color:var(--error-red); font-weight:bold;">₹${ex.amount}</td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;">No expenses recorded for this period.</td></tr>';
 
-                const shortTbody = document.querySelector('#table-shortfalls tbody');
-                shortTbody.innerHTML = currStats.shortRows.length ? currStats.shortRows.map(p => `<tr onclick="window.moduleContext.loadProfileByPhoneOrId('${p.userId}')" title="Click to view member profile"><td>${p.lastDate ? new Date(p.lastDate).toLocaleDateString('en-IN') + ' (' + p.statusLabel + ')' : p.statusLabel}</td><td><strong>${p.userId}</strong> - ${p.fullName}</td><td>${p.month}</td><td style="color:red; font-weight:bold;">₹${p.pendingAmt}</td></tr>`).join('') : '<tr><td colspan="4" style="text-align:center;">No shortfalls or unpaid dues found.</td></tr>';
+                window._lastGeneratedReport = { fy, month, stats: currStats };
+                const dlRepBtn = document.getElementById('btn-download-full-report');
+                if (dlRepBtn) dlRepBtn.style.display = 'inline-flex';
+                const unpaidSumEl = document.getElementById('unpaid-summary-text');
+                if (unpaidSumEl) {
+                    unpaidSumEl.innerHTML = `<strong>Shortfall (Partial) Count:</strong> ${currStats.shortCount} (₹${currStats.shortAmt.toLocaleString()}) &nbsp;|&nbsp; <strong>Unpaid Count:</strong> ${currStats.unpaidCount} (₹${currStats.unpaidAmt.toLocaleString()}) &nbsp;|&nbsp; <strong>Total Pending Records in Download:</strong> ${currStats.shortRows.length}`;
+                }
 
                 let yoyMsg = '', momMsg = '';
                 const prevFyStart = parseInt(fy.split('-')[0], 10) - 1; const prevFy = `${prevFyStart}-${prevFyStart+1}`;
@@ -3286,6 +3364,90 @@
 
                 document.getElementById('yoy-analysis-content').innerHTML = yoyMsg + momMsg;
                 document.getElementById('report-content').style.display = 'block';
+            },
+
+            downloadFullReportCsv: function() {
+                if (!window._lastGeneratedReport || !window._lastGeneratedReport.stats) {
+                    window.moduleContext.generateReport();
+                }
+                const rep = window._lastGeneratedReport;
+                if (!rep || !rep.stats) return;
+                const s = rep.stats;
+                const esc = (v) => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+                const lines = [];
+
+                lines.push(['REVIVE FITNESS STUDIO - FINANCIAL & P&L REPORT', `FY: ${rep.fy}`, `Period: ${rep.month}`].map(esc).join(','));
+                lines.push([]);
+                lines.push(['SUMMARY KPI', 'COUNT', 'AMOUNT (INR)'].map(esc).join(','));
+                lines.push(['Total Revenue (Credit)', '-', s.rev].map(esc).join(','));
+                lines.push(['Total Expenses (Debit)', '-', s.exp].map(esc).join(','));
+                lines.push(['Net Profit (P&L)', '-', s.pnl].map(esc).join(','));
+                lines.push(['Admissions', s.admCount, s.admAmt].map(esc).join(','));
+                lines.push(['Monthly Fees Collected', s.feeCount, s.feeAmt].map(esc).join(','));
+                lines.push(['Supplement Sales (Credit)', s.suppSalesCount, s.suppSalesAmt].map(esc).join(','));
+                lines.push(['Supplement Purchases (Debit)', s.suppPurchCount, s.suppPurchAmt].map(esc).join(','));
+                lines.push(['Due / Shortfall (Partial)', s.shortCount, s.shortAmt].map(esc).join(','));
+                lines.push(['Fee Unpaid', s.unpaidCount, s.unpaidAmt].map(esc).join(','));
+                lines.push([]);
+
+                lines.push(['1. COMPLETE UNPAID & SHORTFALL REGISTER (ALL PENDING MEMBERS)'].map(esc).join(','));
+                lines.push(['Member ID', 'Member Name', 'Phone Number', 'Billing Month', 'Status', 'Last Paid Date', 'Pending Amount (INR)'].map(esc).join(','));
+                if (s.shortRows.length === 0) {
+                    lines.push(['No unpaid or shortfall dues for this period'].map(esc).join(','));
+                } else {
+                    s.shortRows.forEach(r => {
+                        lines.push([
+                            r.userId,
+                            r.fullName,
+                            r.primaryContact || '',
+                            r.month,
+                            r.statusLabel,
+                            r.lastDate ? formatDateStr(r.lastDate) : '-',
+                            r.pendingAmt
+                        ].map(esc).join(','));
+                    });
+                }
+                lines.push([]);
+
+                lines.push(['2. ADMISSIONS REGISTER'].map(esc).join(','));
+                lines.push(['Admission Date', 'Admission ID', 'Full Name', 'Primary Contact', 'Category', 'Training Type', 'Registered By'].map(esc).join(','));
+                s.admRows.forEach(u => {
+                    lines.push([u.date, u.id, u.fullName, u.primaryContact, u.admissionCategory, u.trainingCategory, u.collectedBy || 'Admin'].map(esc).join(','));
+                });
+                lines.push([]);
+
+                lines.push(['3. FEE COLLECTIONS REGISTER (CREDIT)'].map(esc).join(','));
+                lines.push(['Paid Date', 'Member ID', 'Member Name', 'Month', 'Amount Paid (INR)', 'Payment Method', 'Collected By'].map(esc).join(','));
+                s.feeRows.forEach(p => {
+                    lines.push([p.lastDate ? formatDateStr(p.lastDate) : '-', p.userId, p.fullName, p.month, p.amountPaid, p.method || 'CASH', p.collectedBy || 'Admin'].map(esc).join(','));
+                });
+                lines.push([]);
+
+                lines.push(['4. SUPPLEMENT SALES REGISTER (CREDIT)'].map(esc).join(','));
+                lines.push(['Date', 'Invoice ID', 'Member ID', 'Member Name', 'Items Sold', 'Payment Method', 'Sold By', 'Total Sale (INR)'].map(esc).join(','));
+                s.suppSalesRows.forEach(sale => {
+                    const itemsTxt = (sale.items || []).map(i => `${i.name} (x${i.qty})`).join('; ');
+                    lines.push([sale.date || formatDateStr(sale.isoDate), sale.id, sale.userId, sale.fullName, itemsTxt, sale.method, sale.soldBy, sale.totalAmount].map(esc).join(','));
+                });
+                lines.push([]);
+
+                lines.push(['5. SUPPLEMENT PURCHASES REGISTER (DEBIT)'].map(esc).join(','));
+                lines.push(['Date', 'Purchase ID', 'Product Name', 'Qty', 'Unit Cost (INR)', 'Payment Mode', 'Total Cost (INR)'].map(esc).join(','));
+                s.suppPurchRows.forEach(pur => {
+                    lines.push([formatDateStr(pur.date), pur.id, pur.productName, pur.qty, pur.unitCost, pur.mode, pur.totalCost].map(esc).join(','));
+                });
+                lines.push([]);
+
+                lines.push(['6. GENERAL EXPENSE REGISTER (DEBIT)'].map(esc).join(','));
+                lines.push(['Date', 'Category', 'Description', 'Mode', 'Amount (INR)'].map(esc).join(','));
+                s.expRows.forEach(ex => {
+                    lines.push([formatDateStr(ex.date), ex.category, ex.desc || '-', ex.mode, ex.amount].map(esc).join(','));
+                });
+
+                const csvContent = lines.join('\r\n');
+                const base64Csv = window.btoa(unescape(encodeURIComponent(csvContent)));
+                const fileName = `Revive_Report_${rep.fy}_${rep.month}.csv`;
+                window.moduleContext.triggerDirectStorageDownload(base64Csv, fileName);
             },
 
             // Fix #7: Re-admission is eligible ONLY for users who had admission 6 months and above ago.
@@ -3507,7 +3669,7 @@
                             <img src="${photoUrl}" alt="${user.fullName}" style="width:45px; height:45px; border-radius:50%; object-fit:cover; border:2px solid var(--accent-orange);">
                             <div style="flex:1;">
                                 <div style="color:var(--text-main); font-weight:800;">${user.fullName}</div>
-                                <div style="font-size:0.8rem; color:var(--text-muted);">ID: ${user.id} | Ph: ${user.primaryContact} | ${user.address || ''}</div>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">ID: ${user.id} | Ph: ${maskPhoneLast4(user.primaryContact)} | ${user.address || ''}</div>
                             </div>
                         </div>`;
                     });
