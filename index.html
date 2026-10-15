@@ -945,8 +945,8 @@
                                 <button type="button" id="btn-start-sig-camera" class="btn secondary" style="flex:1; font-size:0.82rem; padding:0.75rem;">📷 Use Live Camera</button>
                                 <button type="button" id="btn-switch-sig-camera" class="btn secondary" style="display:none; flex:1; font-size:0.82rem; padding:0.75rem;">Switch Lens</button>
                                 <button type="button" id="btn-capture-sig" class="btn primary" style="display:none; flex:1; font-size:0.82rem; padding:0.75rem;">Capture Signature</button>
-                                <label for="sig-file-input" class="btn secondary" style="flex:1; font-size:0.82rem; padding:0.75rem; margin:0; cursor:pointer;">📁 Select from Gallery</label>
-                                <input type="file" id="sig-file-input" accept="image/*" style="display:none;">
+                                <button type="button" id="btn-upload-sig-gallery" class="btn secondary" style="flex:1; font-size:0.82rem; padding:0.75rem;">📁 Choose from Gallery / Storage</button>
+                                <input type="file" id="sig-file-input" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,application/octet-stream" style="display:none;">
                                 <button type="button" id="btn-retake-sig" class="btn danger" style="display:none; flex:1; font-size:0.82rem; padding:0.75rem;">Clear / Retake</button>
                             </div>
                             <input type="hidden" id="sig-data" required>
@@ -1589,6 +1589,8 @@
         // Fix #6: Auto cache & transient state clearance to prevent data capture mismatch
         function clearRuntimeCache(preserveActiveUser = false) {
             currentMemberDetails = {};
+            window._cachedPdfMemberId = null;
+            window._cachedPdfDataUri = null;
             calculatedTotalFee = 0;
             calculatedAdmFeePart = 0;
             calculatedMonthlyFeePart = 0;
@@ -2913,12 +2915,39 @@
                 document.getElementById('official-timestamp').innerText = timestampStr;
             },
 
+            triggerDirectStorageDownload: function(base64DataUri, fileName) {
+                // Convert data:application/pdf;... to data:application/octet-stream;base64,... so mobile browsers/WebViews never open in-tab PDF viewer
+                const base64Clean = String(base64DataUri).includes('base64,')
+                    ? String(base64DataUri).split('base64,')[1]
+                    : String(base64DataUri);
+                const octetDataUri = 'data:application/octet-stream;base64,' + base64Clean;
+
+                const link = document.createElement('a');
+                link.style.display = 'none';
+                link.href = octetDataUri;
+                link.setAttribute('download', fileName);
+                document.body.appendChild(link);
+                link.click();
+                setTimeout(() => {
+                    if (link.parentNode) link.parentNode.removeChild(link);
+                }, 1000);
+                showNotice(`Saved ${fileName} to device storage!`, 'success');
+            },
+
             regeneratePdf: function() {
                 if (!currentMemberDetails || !currentMemberDetails.id) currentMemberDetails = currentActiveUser;
                 if (!currentMemberDetails) return;
+                const fileName = `${currentMemberDetails.id}_Admission_Record.pdf`;
+
+                // If pre-generated PDF is already cached for this member, trigger download synchronously inside the tap gesture!
+                if (window._cachedPdfMemberId === currentMemberDetails.id && window._cachedPdfDataUri) {
+                    window.moduleContext.triggerDirectStorageDownload(window._cachedPdfDataUri, fileName);
+                    return;
+                }
+
                 const dlBtn = document.getElementById('btn-download-pdf');
                 const origTxt = dlBtn ? dlBtn.innerText : '';
-                if (dlBtn) dlBtn.innerText = 'Downloading PDF...';
+                if (dlBtn) dlBtn.innerText = 'Preparing Download...';
 
                 window.moduleContext.preparePdfDom();
 
@@ -2928,36 +2957,24 @@
                 window.scrollTo(0, 0); appWrapper.style.display = 'none'; pdfWrapper.style.display = 'flex';
 
                 setTimeout(() => {
-                    const fileName = `${currentMemberDetails.id}_Admission_Record.pdf`;
                     html2pdf().set({
-                        margin: 0, filename: fileName, image: { type: 'jpeg', quality: 1.0 },
+                        margin: 0, filename: fileName, image: { type: 'jpeg', quality: 0.98 },
                         html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                    }).from(element).output('blob').then((pdfBlob) => {
+                    }).from(element).outputPdf('datauristring').then((pdfDataUri) => {
                         pdfWrapper.style.display = 'none';
                         appWrapper.style.display = 'flex';
                         if (dlBtn && origTxt) dlBtn.innerText = origTxt;
 
-                        // Force direct file download into internal storage using application/octet-stream
-                        const forceDownloadBlob = new Blob([pdfBlob], { type: 'application/octet-stream' });
-                        const blobUrl = window.URL.createObjectURL(forceDownloadBlob);
-                        const link = document.createElement('a');
-                        link.style.display = 'none';
-                        link.href = blobUrl;
-                        link.setAttribute('download', fileName);
-                        document.body.appendChild(link);
-                        link.click();
-                        setTimeout(() => {
-                            document.body.removeChild(link);
-                            window.URL.revokeObjectURL(blobUrl);
-                        }, 1500);
-                        showNotice(`Downloaded ${fileName} to storage!`, 'success');
+                        window._cachedPdfMemberId = currentMemberDetails.id;
+                        window._cachedPdfDataUri = pdfDataUri;
+                        window.moduleContext.triggerDirectStorageDownload(pdfDataUri, fileName);
                     }).catch((err) => {
                         console.error(err);
                         pdfWrapper.style.display = 'none';
                         appWrapper.style.display = 'flex';
                         if (dlBtn && origTxt) dlBtn.innerText = origTxt;
                     });
-                }, 350);
+                }, 300);
             },
             
             sendWelcomeMessage: function() {
@@ -4141,6 +4158,18 @@
                 if(activeSigStream) { activeSigStream.getTracks().forEach(t => t.stop()); activeSigStream = null; }
             });
 
+            const btnUploadSigGallery = document.getElementById('btn-upload-sig-gallery');
+            if (btnUploadSigGallery && sigFileInput) {
+                btnUploadSigGallery.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (activeSigStream) { activeSigStream.getTracks().forEach(t => t.stop()); activeSigStream = null; }
+                    sigVideo.style.display = 'none';
+                    sigFileInput.removeAttribute('capture');
+                    sigFileInput.value = '';
+                    sigFileInput.click();
+                });
+            }
+
             if(sigFileInput) sigFileInput.addEventListener('change', (e) => {
                 const file = e.target.files && e.target.files[0];
                 if(!file) return;
@@ -4464,7 +4493,37 @@
                 document.getElementById('sm-title').innerText = "Registration Complete!";
                 document.getElementById('generated-id').innerText = currentMemberDetails.id;
                 document.getElementById('sm-collected-by').innerText = currentMemberDetails.collectedBy || 'Admin';
-                document.getElementById('successModal').style.display = 'flex';
+
+                // Pre-generate PDF data URI so clicking "1. Download PDF Record" fires synchronously inside the user tap gesture
+                window.moduleContext.preparePdfDom();
+                const appWrapper = document.getElementById('app-wrapper');
+                const pdfWrapper = document.getElementById('pdf-template-wrapper');
+                const element = document.getElementById('pdf-template');
+                const dlBtn = document.getElementById('btn-download-pdf');
+                if (dlBtn) dlBtn.innerText = '1. Preparing PDF...';
+                window.scrollTo(0, 0);
+                appWrapper.style.display = 'none';
+                pdfWrapper.style.display = 'flex';
+
+                setTimeout(() => {
+                    const fileName = `${currentMemberDetails.id}_Admission_Record.pdf`;
+                    html2pdf().set({
+                        margin: 0, filename: fileName, image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2, useCORS: true, scrollY: 0 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    }).from(element).outputPdf('datauristring').then((pdfDataUri) => {
+                        window._cachedPdfMemberId = currentMemberDetails.id;
+                        window._cachedPdfDataUri = pdfDataUri;
+                        pdfWrapper.style.display = 'none';
+                        appWrapper.style.display = 'flex';
+                        if (dlBtn) dlBtn.innerText = '1. Download PDF Record';
+                        document.getElementById('successModal').style.display = 'flex';
+                    }).catch(() => {
+                        pdfWrapper.style.display = 'none';
+                        appWrapper.style.display = 'flex';
+                        if (dlBtn) dlBtn.innerText = '1. Download PDF Record';
+                        document.getElementById('successModal').style.display = 'flex';
+                    });
+                }, 250);
             }
             
             const admSelect = document.getElementById('admissionTypeSelect');
