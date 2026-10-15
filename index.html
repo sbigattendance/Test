@@ -618,6 +618,16 @@
                 </div>
                 <p id="hub-instruction" style="color:var(--text-muted); font-size:0.85rem; margin-bottom:1rem;"></p>
                 <div class="calendar-grid" id="fee-calendar"></div>
+
+                <div id="hub-supp-section" style="display:none; margin-top:2rem; padding-top:1.2rem; border-top:1px solid var(--border-color);">
+                    <h3 style="color:var(--accent-orange); margin-bottom:0.8rem; font-size:1rem; text-transform:uppercase;">Supplement Invoices & Pending Dues</h3>
+                    <div class="table-responsive">
+                        <table class="data-table" id="table-hub-supp-sales">
+                            <thead><tr><th>Date</th><th>Invoice</th><th>Items</th><th>Total Bill</th><th>Paid</th><th>Balance Due</th><th>Action</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </main>
         <main id="view-reports" class="view-section">
@@ -1196,14 +1206,24 @@
                             <div class="fee-row"><span>Admission Fee:</span> <strong>₹<span id="calc-admin-fee">0</span></strong></div>
                             <div class="fee-row"><span>Training Fee:</span> <strong>₹<span id="calc-monthly-fee">0</span></strong></div>
                             <div class="fee-row fee-total"><span>Total Payable <span id="calc-promo-badge"></span>:</span> <strong>₹<span id="calc-total-fee">0</span></strong></div>
+                            <div class="fee-row" style="margin-top:0.8rem; padding-top:0.8rem; border-top:1px dashed var(--border-color);">
+                                <span>Pending Balance (Due):</span>
+                                <strong style="color:var(--error-red); font-size:1.2rem;">₹<span id="adm-pending-balance">0</span></strong>
+                            </div>
                         </div>
 
-                        <div class="form-group" style="margin-bottom: 1.2rem;">
-                            <label>Select Payment Method <span class="required">*</span></label>
-                            <select id="paymentMethod">
-                                <option value="UPI">UPI Payment (QR Code)</option>
-                                <option value="CASH">Cash Payment</option>
-                            </select>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="adm-pay-amount-now">Amount Paying Now (₹) <span class="required">*</span></label>
+                                <input type="number" id="adm-pay-amount-now" min="0" oninput="window.moduleContext.updateAdmissionPaymentUI()" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Select Payment Method <span class="required">*</span></label>
+                                <select id="paymentMethod" onchange="window.moduleContext.updateAdmissionPaymentUI()">
+                                    <option value="UPI">UPI Payment (QR Code)</option>
+                                    <option value="CASH">Cash Payment</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div id="upi-section" style="text-align:center; margin: 1.5rem 0; padding: 1.2rem; background: var(--bg-main); border: 1px dashed var(--border-color); border-radius: 12px;">
@@ -1320,14 +1340,24 @@
                         <div class="fee-row"><span>Total MRP Value:</span> <strong>₹<span id="supp-pay-mrp">0</span></strong></div>
                         <div class="fee-row"><span>Total Offer Discount:</span> <strong style="color:var(--success-green);">- ₹<span id="supp-pay-disc">0</span></strong></div>
                         <div class="fee-row fee-total"><span>Net Payable Amount:</span> <strong>₹<span id="supp-pay-net">0</span></strong></div>
+                        <div class="fee-row" style="margin-top:0.8rem; padding-top:0.8rem; border-top:1px dashed var(--border-color);">
+                            <span>Pending Balance (Due):</span>
+                            <strong style="color:var(--error-red); font-size:1.2rem;">₹<span id="supp-pay-pending">0</span></strong>
+                        </div>
                     </div>
 
-                    <div class="form-group" style="margin-bottom: 1.2rem;">
-                        <label>Select Payment Method <span class="required">*</span></label>
-                        <select id="suppPaymentMethod" onchange="window.moduleContext.updateSuppPaymentUI()">
-                            <option value="UPI">UPI Payment (QR Code)</option>
-                            <option value="CASH">Cash Payment</option>
-                        </select>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="supp-pay-amount-now">Amount Paying Now (₹) <span class="required">*</span></label>
+                            <input type="number" id="supp-pay-amount-now" min="0" oninput="window.moduleContext.updateSuppPaymentUI()" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Select Payment Method <span class="required">*</span></label>
+                            <select id="suppPaymentMethod" onchange="window.moduleContext.updateSuppPaymentUI()">
+                                <option value="UPI">UPI Payment (QR Code)</option>
+                                <option value="CASH">Cash Payment</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div id="supp-upi-section" style="text-align:center; margin: 1.5rem 0; padding: 1.2rem; background: var(--bg-main); border: 1px dashed var(--border-color); border-radius: 12px;">
@@ -1441,11 +1471,14 @@
         <div id="paymentProcessModal" class="modal">
             <div class="modal-content" style="text-align: left;">
                 <h2 class="orange-text" style="text-align:center; font-size:1.35rem;">Process Fee Payment</h2>
-                <div style="background: var(--bg-main); padding: 1rem; border-radius: 8px; margin-bottom: 1.2rem; border: 1px solid var(--border-color);">
-                    <p style="margin-bottom: 5px;"><strong>Month:</strong> <span id="pay-month"></span> (<span id="pay-fy-display"></span>) <span id="pay-promo-badge"></span></p>
-                    <p style="margin-bottom: 5px;"><strong>Total Due:</strong> ₹<span id="pay-total-due"></span></p>
-                    <p style="margin-bottom: 5px;"><strong>Already Paid:</strong> ₹<span id="pay-already-paid"></span></p>
-                    <p style="color:var(--error-red); font-size:1.05rem; margin-top:8px;"><strong>Balance Left: ₹<span id="pay-balance"></span></strong></p>
+                <div style="background: var(--bg-main); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid var(--border-color);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                        <span><strong>Billing:</strong> <span id="pay-month"></span> (<span id="pay-fy-display"></span>) <span id="pay-promo-badge"></span></span>
+                        <button type="button" id="btn-paymodal-view-rcpt" class="btn secondary" style="display:none; width:auto; padding:0.25rem 0.6rem; font-size:0.72rem;" onclick="window.moduleContext.viewPartialReceiptFromModal()">🧾 View Receipt</button>
+                    </div>
+                    <p style="margin-bottom: 4px;"><strong>Total Fee:</strong> ₹<span id="pay-total-due"></span> &nbsp;|&nbsp; <strong>Already Paid:</strong> ₹<span id="pay-already-paid"></span></p>
+                    <p style="color:var(--accent-orange); font-size:1rem; margin-top:6px;"><strong>Current Balance Due: ₹<span id="pay-balance"></span></strong></p>
+                    <p style="color:var(--error-red); font-size:0.95rem; margin-top:4px;"><strong>Pending After This Payment: ₹<span id="pay-pending-after">0</span></strong></p>
                 </div>
                 <div class="form-group" style="margin-bottom:0.9rem;">
                     <label>Amount Paying Now (₹) <span class="required">*</span></label>
@@ -1674,9 +1707,11 @@
                 <tr><td><strong>Month Paid For:</strong></td><td id="rcpt-month" style="text-align:right; font-weight:bold; color:var(--accent-orange);"></td></tr>
             </table>
             <div class="rcpt-amount-box">
-                <table style="width: 100%; font-size: 13.5px; line-height:1.9;">
-                    <tr><td><strong>Amount Paid:</strong></td><td style="text-align: right; color: green; font-weight: 900; font-size:16px;">₹<span id="rcpt-paid"></span></td></tr>
-                    <tr><td><strong>Balance Due:</strong></td><td style="text-align: right; color: red; font-weight: bold;">₹<span id="rcpt-balance"></span></td></tr>
+                <table style="width: 100%; font-size: 13.5px; line-height:1.85;">
+                    <tr><td><strong>Total Fee:</strong></td><td style="text-align: right; font-weight: 800;">₹<span id="rcpt-total-due">0</span></td></tr>
+                    <tr><td><strong>Total Paid:</strong></td><td style="text-align: right; color: green; font-weight: 900; font-size:15.5px;">₹<span id="rcpt-paid">0</span></td></tr>
+                    <tr><td><strong>Pending Balance:</strong></td><td id="rcpt-balance-cell" style="text-align: right; color: red; font-weight: 900;">₹<span id="rcpt-balance">0</span></td></tr>
+                    <tr><td><strong>Status:</strong></td><td id="rcpt-status-label" style="text-align: right; font-weight: 800; color: green;">PAID IN FULL</td></tr>
                     <tr><td><strong>Payment Mode:</strong></td><td style="text-align: right; font-weight:bold;" id="rcpt-mode"></td></tr>
                     <tr><td><strong>Collected By:</strong></td><td style="text-align: right; font-weight:bold; color:#333;" id="rcpt-collector"></td></tr>
                 </table>
@@ -1713,8 +1748,10 @@
             <div class="rcpt-amount-box" style="margin-top:12px; padding:12px;">
                 <table style="width: 100%; font-size: 12.5px; line-height:1.8;">
                     <tr><td>Total MRP:</td><td style="text-align: right; text-decoration:line-through; color:#777;">₹<span id="sinv-mrp"></span></td></tr>
-                    <tr><td>Total Savings:</td><td style="text-align: right; color: green; font-weight:bold;">- ₹<span id="sinv-disc"></span></td></tr>
-                    <tr><td><strong>Net Paid:</strong></td><td style="text-align: right; color: var(--accent-orange); font-weight: 900; font-size:15px;">₹<span id="sinv-net"></span></td></tr>
+                    <tr><td>Offer Savings:</td><td style="text-align: right; color: green; font-weight:bold;">- ₹<span id="sinv-disc"></span></td></tr>
+                    <tr><td><strong>Net Bill Amount:</strong></td><td style="text-align: right; font-weight: 800;">₹<span id="sinv-net"></span></td></tr>
+                    <tr><td><strong>Amount Paid:</strong></td><td style="text-align: right; color: green; font-weight: 900; font-size:15px;">₹<span id="sinv-paid"></span></td></tr>
+                    <tr><td><strong>Pending Balance:</strong></td><td id="sinv-bal-cell" style="text-align: right; color: red; font-weight: 900;">₹<span id="sinv-bal">0</span></td></tr>
                     <tr><td><strong>Payment Mode:</strong></td><td style="text-align: right; font-weight:bold;" id="sinv-mode"></td></tr>
                     <tr><td><strong>Sold By:</strong></td><td style="text-align: right; font-weight:bold;" id="sinv-seller"></td></tr>
                 </table>
@@ -3888,14 +3925,16 @@
                         statusClass = 'status-paid'; 
                         let payDateStr = record.lastDate ? `<br><span style="font-size:0.65rem; font-weight:normal;">Paid: ${formatDateStr(record.lastDate)}</span>` : '';
                         let byStr = record.collectedBy ? `<br><span style="font-size:0.62rem; opacity:0.9;">By: ${record.collectedBy}</span>` : '';
-                        displayAmt = `Paid: ₹${record.amountPaid}${payDateStr}${byStr}${attBadge}`; 
+                        displayAmt = `Paid: ₹${record.amountPaid}<br><span style="font-size:0.68rem;">Due: ₹0 (Cleared)</span>${payDateStr}${byStr}${attBadge}`; 
                         action = `onclick="window.moduleContext.viewReceipt('${month}', '${fy}')"`;
                     } else if (record && record.status === 'Partial') {
                         statusClass = 'status-partial'; 
-                        let bal = parseInt(record.totalDue, 10) - parseInt(record.amountPaid, 10); 
-                        displayAmt = `Paid: ₹${record.amountPaid}<br>Bal: ₹${bal}${attBadge}`; 
-                        if (currentHubMode === 'fee' && (!currentActiveUser || !currentActiveUser.isDeleted)) {
+                        let bal = Math.max(0, parseInt(record.totalDue, 10) - parseInt(record.amountPaid, 10)); 
+                        displayAmt = `Paid: ₹${record.amountPaid}<br>Pending: ₹${bal}${attBadge}`; 
+                        if (!currentActiveUser || !currentActiveUser.isDeleted) {
                             action = `onclick="window.moduleContext.initPayment('${month}', '${fy}')"`;
+                        } else {
+                            action = `onclick="window.moduleContext.viewReceipt('${month}', '${fy}')"`;
                         }
                     } else {
                         const refDate = (mScore === adScore) ? new Date(adYear, adMonthIdx, adDay) : new Date(mYear, monthIdx, 1);
@@ -3922,6 +3961,40 @@
                 if (!renderedAny) {
                     grid.innerHTML = `<div style="grid-column: 1 / -1; padding: 1.2rem; background: var(--bg-main); border-radius: 8px; text-align: center; color: var(--text-muted); font-size: 0.9rem;">No billable months in FY ${fy} (Member admission date is ${adDateStr}). Switch Financial Year above if needed.</div>`;
                 }
+                window.moduleContext.renderHubSupplementSales(userId);
+            },
+
+            renderHubSupplementSales: function(userId) {
+                const sec = document.getElementById('hub-supp-section');
+                const tbody = document.querySelector('#table-hub-supp-sales tbody');
+                if (!sec || !tbody) return;
+                const sales = storage.get('revive_supplement_sales_db', []).filter(s => String(s.userId) === String(userId));
+                if (sales.length === 0) {
+                    sec.style.display = 'none';
+                    return;
+                }
+                sec.style.display = 'block';
+                tbody.innerHTML = '';
+                [...sales].reverse().forEach(s => {
+                    const total = parseInt(s.totalAmount || 0, 10);
+                    const paid = s.amountPaid != null ? parseInt(s.amountPaid, 10) : total;
+                    const bal = Math.max(0, total - paid);
+                    const itemsTxt = (s.items || []).map(i => `${i.name} (x${i.qty})`).join(', ');
+                    tbody.innerHTML += `<tr>
+                        <td>${s.date || formatDateStr(s.isoDate)}</td>
+                        <td><strong>${s.id}</strong></td>
+                        <td>${itemsTxt}</td>
+                        <td>₹${total}</td>
+                        <td style="color:var(--success-green); font-weight:800;">₹${paid}</td>
+                        <td style="color:${bal > 0 ? 'var(--error-red)' : 'var(--success-green)'}; font-weight:800;">${bal > 0 ? '₹' + bal + ' (Pending)' : '₹0 (Cleared)'}</td>
+                        <td>
+                            <div style="display:flex; gap:6px;">
+                                ${bal > 0 ? `<button type="button" class="btn primary" style="padding:0.35rem 0.7rem; font-size:0.74rem; width:auto;" onclick="window.moduleContext.initSupplementBalancePay('${s.id}')">Pay Due</button>` : ''}
+                                <button type="button" class="btn secondary" style="padding:0.35rem 0.7rem; font-size:0.74rem; width:auto;" onclick="window.moduleContext.viewSupplementInvoiceById('${s.id}')">Invoice</button>
+                            </div>
+                        </td>
+                    </tr>`;
+                });
             },
 
             initPayment: function(month, fy) {
@@ -3964,12 +4037,14 @@
                     balance = totalDue;
                 }
 
-                activePaymentConfig = { month, fy, totalDue, alreadyPaid, balance, isAdmissionMonth: (mScore === adScore) };
+                activePaymentConfig = { month, fy, totalDue, alreadyPaid, balance, isAdmissionMonth: (mScore === adScore), paymentType: 'gym_fee' };
                 document.getElementById('pay-month').innerText = month;
                 document.getElementById('pay-fy-display').innerText = fy;
                 document.getElementById('pay-total-due').innerText = totalDue;
                 document.getElementById('pay-already-paid').innerText = alreadyPaid;
                 document.getElementById('pay-balance').innerText = balance;
+                const viewRcptBtn = document.getElementById('btn-paymodal-view-rcpt');
+                if (viewRcptBtn) viewRcptBtn.style.display = alreadyPaid > 0 ? 'inline-flex' : 'none';
                 
                 const inputAmt = document.getElementById('pay-amount-now');
                 inputAmt.value = balance;
@@ -3981,9 +4056,65 @@
                 window.moduleContext.updatePaymentModalUI();
                 document.getElementById('paymentProcessModal').style.display = 'flex';
             },
+            viewPartialReceiptFromModal: function() {
+                if (!activePaymentConfig) return;
+                document.getElementById('paymentProcessModal').style.display = 'none';
+                window.moduleContext.viewReceipt(activePaymentConfig.month, activePaymentConfig.fy);
+            },
+            initSupplementBalancePay: function(invoiceId) {
+                const sales = storage.get('revive_supplement_sales_db', []);
+                const sale = sales.find(s => String(s.id) === String(invoiceId));
+                if (!sale) return;
+                const totalDue = parseInt(sale.totalAmount || 0, 10);
+                const alreadyPaid = sale.amountPaid != null ? parseInt(sale.amountPaid, 10) : totalDue;
+                const balance = Math.max(0, totalDue - alreadyPaid);
+                if (balance <= 0) {
+                    window.moduleContext.viewSupplementInvoiceById(invoiceId);
+                    return;
+                }
+                activePaymentConfig = {
+                    paymentType: 'supplement_due',
+                    invoiceId: sale.id,
+                    month: `Supplement ${sale.id}`,
+                    fy: sale.fy,
+                    totalDue,
+                    alreadyPaid,
+                    balance
+                };
+                document.getElementById('pay-promo-badge').innerHTML = '';
+                document.getElementById('pay-month').innerText = `Supplement Invoice ${sale.id}`;
+                document.getElementById('pay-fy-display').innerText = sale.date || '';
+                document.getElementById('pay-total-due').innerText = totalDue;
+                document.getElementById('pay-already-paid').innerText = alreadyPaid;
+                document.getElementById('pay-balance').innerText = balance;
+                const viewRcptBtn = document.getElementById('btn-paymodal-view-rcpt');
+                if (viewRcptBtn) viewRcptBtn.style.display = 'none';
+
+                const inputAmt = document.getElementById('pay-amount-now');
+                inputAmt.value = balance;
+                inputAmt.max = balance;
+                document.getElementById('pay-method').value = 'UPI';
+                document.getElementById('pay-staff-pin').value = '';
+                document.getElementById('pay-pin-identity').innerText = '';
+                window.moduleContext.updatePaymentModalUI();
+                document.getElementById('paymentProcessModal').style.display = 'flex';
+            },
+            viewSupplementInvoiceById: function(invoiceId) {
+                const sales = storage.get('revive_supplement_sales_db', []);
+                const sale = sales.find(s => String(s.id) === String(invoiceId));
+                if (!sale) return;
+                currentSuppSaleRecord = sale;
+                window.moduleContext.shareSupplementInvoice();
+            },
             updatePaymentModalUI: function() {
                 const method = document.getElementById('pay-method').value;
-                const amt = parseInt(document.getElementById('pay-amount-now').value, 10) || 0;
+                const rawAmt = parseInt(document.getElementById('pay-amount-now').value, 10);
+                const amt = isNaN(rawAmt) ? 0 : Math.max(0, rawAmt);
+                const maxBal = activePaymentConfig ? activePaymentConfig.balance : amt;
+                const pendingAfter = Math.max(0, maxBal - amt);
+                const pendEl = document.getElementById('pay-pending-after');
+                if (pendEl) pendEl.innerText = pendingAfter;
+
                 const upiSec = document.getElementById('pay-upi-section');
                 if(method === 'UPI' && amt > 0) {
                     upiSec.style.display = 'block';
@@ -4008,7 +4139,32 @@
                 
                 const method = document.getElementById('pay-method').value;
                 const newPaid = activePaymentConfig.alreadyPaid + payAmt;
-                const newStatus = newPaid >= activePaymentConfig.totalDue ? 'Paid' : 'Partial';
+                const newBal = Math.max(0, activePaymentConfig.totalDue - newPaid);
+                const newStatus = newBal === 0 ? 'Paid' : 'Partial';
+
+                // Check if this is clearing a Supplement Invoice balance
+                if (activePaymentConfig.paymentType === 'supplement_due') {
+                    let salesDb = storage.get('revive_supplement_sales_db', []);
+                    const idx = salesDb.findIndex(s => String(s.id) === String(activePaymentConfig.invoiceId));
+                    if (idx !== -1) {
+                        salesDb[idx].amountPaid = newPaid;
+                        salesDb[idx].balanceDue = newBal;
+                        salesDb[idx].status = newStatus;
+                        salesDb[idx].method = method;
+                        salesDb[idx].soldBy = collectorIdentity;
+                        salesDb[idx].lastClearedDate = new Date().toISOString();
+                        storage.set('revive_supplement_sales_db', salesDb);
+                        cloudSync.push('pushSupplementSale', salesDb[idx]);
+                        currentSuppSaleRecord = salesDb[idx];
+                    }
+                    document.getElementById('paymentProcessModal').style.display = 'none';
+                    if (currentActiveUser) {
+                        window.moduleContext.renderHubSupplementSales(currentActiveUser.id);
+                    }
+                    showNotice(newBal === 0 ? `Supplement Invoice ${activePaymentConfig.invoiceId} fully cleared!` : `Partial payment of ₹${payAmt} recorded (Pending: ₹${newBal}).`, "success");
+                    window.moduleContext.shareSupplementInvoice();
+                    return;
+                }
 
                 let paymentsDb = storage.get('revive_payments_db', {});
                 if(!paymentsDb[currentActiveUser.id]) paymentsDb[currentActiveUser.id] = {};
@@ -4022,6 +4178,7 @@
                     month: activePaymentConfig.month,
                     totalDue: activePaymentConfig.totalDue,
                     amountPaid: newPaid,
+                    balanceDue: newBal,
                     lastPaidAmount: payAmt,
                     status: newStatus,
                     method: method,
@@ -4032,8 +4189,19 @@
                 storage.set('revive_payments_db', paymentsDb);
                 cloudSync.push('pushPayment', pData);
 
+                // If admission month was partially paid at admission, update user's admFeePaid as well
+                if (activePaymentConfig.isAdmissionMonth) {
+                    let usersDb = storage.get('revive_users_db', []);
+                    const uIdx = usersDb.findIndex(u => String(u.id) === String(currentActiveUser.id));
+                    if (uIdx !== -1) {
+                        const baseAdm = parseInt(usersDb[uIdx].admFeeExpected || APP_CONFIG.baseAdmissionFee, 10);
+                        usersDb[uIdx].admFeePaid = Math.min(baseAdm, newPaid);
+                        storage.set('revive_users_db', usersDb);
+                    }
+                }
+
                 document.getElementById('paymentProcessModal').style.display = 'none';
-                window.moduleContext.generateReceiptImage(payAmt, activePaymentConfig.balance - payAmt, method, collectorIdentity, 'success');
+                window.moduleContext.generateReceiptImage(newPaid, newBal, method, collectorIdentity, 'success', pData.lastDate, activePaymentConfig.totalDue);
                 window.moduleContext.renderFeeCalendar(currentActiveUser.id, activePaymentConfig.fy, currentActiveUser.trainingCategory, currentActiveUser.date);
             },
             viewReceipt: function(month, fy) {
@@ -4041,22 +4209,36 @@
                 const record = (paymentsDb[currentActiveUser.id] && paymentsDb[currentActiveUser.id][fy] && paymentsDb[currentActiveUser.id][fy][month]) ? paymentsDb[currentActiveUser.id][fy][month] : null;
                 if(!record) return;
 
-                activePaymentConfig = { month, fy };
+                const totalDue = parseInt(record.totalDue || record.amountPaid || 0, 10);
+                const paidAmt = parseInt(record.amountPaid || 0, 10);
+                const balDue = Math.max(0, totalDue - paidAmt);
+                activePaymentConfig = { month, fy, totalDue, alreadyPaid: paidAmt, balance: balDue };
                 document.getElementById('vr-month-label').innerText = `${month} (${fy})`;
-                window.moduleContext.generateReceiptImage(record.amountPaid, 0, record.method || "N/A", record.collectedBy || "System Admin", 'view', record.lastDate);
+                window.moduleContext.generateReceiptImage(paidAmt, balDue, record.method || "N/A", record.collectedBy || "System Admin", 'view', record.lastDate, totalDue);
             },
             
-            generateReceiptImage: function(paidAmt, newBal, mode, collector, triggerFlow, overrideDate) {
+            generateReceiptImage: function(paidAmt, newBal, mode, collector, triggerFlow, overrideDate, totalDueAmt) {
                 applyLogoToExportTemplates();
                 const dIso = overrideDate || new Date().toISOString();
                 const dStr = new Date(dIso).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+                const cleanPaid = parseInt(paidAmt || 0, 10);
+                const cleanBal = Math.max(0, parseInt(newBal || 0, 10));
+                const cleanTotal = totalDueAmt != null ? parseInt(totalDueAmt, 10) : (cleanPaid + cleanBal);
                 
                 document.getElementById('rcpt-name').innerText = currentActiveUser.fullName;
                 document.getElementById('rcpt-id').innerText = currentActiveUser.id;
                 document.getElementById('rcpt-phone').innerText = currentActiveUser.primaryContact;
                 document.getElementById('rcpt-month').innerText = `${activePaymentConfig.month} (${activePaymentConfig.fy})`;
-                document.getElementById('rcpt-paid').innerText = paidAmt;
-                document.getElementById('rcpt-balance').innerText = newBal;
+                document.getElementById('rcpt-total-due').innerText = cleanTotal;
+                document.getElementById('rcpt-paid').innerText = cleanPaid;
+                document.getElementById('rcpt-balance').innerText = cleanBal === 0 ? '0 (Cleared)' : cleanBal;
+                const balCell = document.getElementById('rcpt-balance-cell');
+                if (balCell) balCell.style.color = cleanBal === 0 ? 'green' : 'red';
+                const statusEl = document.getElementById('rcpt-status-label');
+                if (statusEl) {
+                    statusEl.innerText = cleanBal === 0 ? 'PAID IN FULL (CLEARED)' : 'PARTIAL (BALANCE PENDING)';
+                    statusEl.style.color = cleanBal === 0 ? 'green' : '#d97706';
+                }
                 document.getElementById('rcpt-mode').innerText = mode;
                 document.getElementById('rcpt-collector').innerText = collector || 'System Admin';
                 document.getElementById('rcpt-date').innerText = dStr;
@@ -4084,7 +4266,9 @@
                 
                 try {
                     const file = new File([currentGeneratedReceiptBlob], `Receipt_${currentActiveUser.id}.jpg`, { type: 'image/jpeg' });
-                    const msg = `Dear ${currentActiveUser.fullName},\n\nWe have successfully received your payment of *₹${document.getElementById('rcpt-paid').innerText}* for *${activePaymentConfig.month}* (Collected by: ${document.getElementById('rcpt-collector').innerText}).\n\nYour official payment receipt is attached.\n\nThank you for choosing us!\n\nBest Regards,\n*Revive Fitness Studio*\n📞 8921698044`;
+                    const paidTxt = document.getElementById('rcpt-paid').innerText;
+                    const balTxt = document.getElementById('rcpt-balance').innerText;
+                    const msg = `Dear ${currentActiveUser.fullName},\n\nPayment Receipt for *${activePaymentConfig.month}*:\n• *Total Paid:* ₹${paidTxt}\n• *Pending Balance:* ₹${balTxt}\n• *Collected By:* ${document.getElementById('rcpt-collector').innerText}\n\nThank you for choosing *Revive Fitness Studio*!\n📞 8921698044`;
                     
                     if (navigator.canShare && navigator.canShare({ files: [file] })) { 
                         await navigator.share({ title: 'Payment Receipt', text: msg, files: [file] }); 
@@ -4109,12 +4293,24 @@
                 const targetMember = (currentMemberDetails && currentMemberDetails.id) ? currentMemberDetails : currentActiveUser;
                 if (!targetMember) return;
 
+                const totalFee = parseInt(targetMember.initialTotalDue != null ? targetMember.initialTotalDue : (calculatedTotalFee || document.getElementById('calc-total-fee').innerText || 0), 10);
+                const paidNow = parseInt(targetMember.initialAmountPaid != null ? targetMember.initialAmountPaid : totalFee, 10);
+                const pendingBal = Math.max(0, totalFee - paidNow);
+
                 document.getElementById('rcpt-name').innerText = targetMember.fullName; 
                 document.getElementById('rcpt-id').innerText = targetMember.id;
                 document.getElementById('rcpt-phone').innerText = targetMember.primaryContact; 
                 document.getElementById('rcpt-month').innerText = `Admission + ${targetMember._month} (${targetMember._fy})`;
-                document.getElementById('rcpt-paid').innerText = calculatedTotalFee || document.getElementById('calc-total-fee').innerText; 
-                document.getElementById('rcpt-balance').innerText = "0";
+                document.getElementById('rcpt-total-due').innerText = totalFee;
+                document.getElementById('rcpt-paid').innerText = paidNow; 
+                document.getElementById('rcpt-balance').innerText = pendingBal === 0 ? "0 (Cleared)" : pendingBal;
+                const balCell = document.getElementById('rcpt-balance-cell');
+                if (balCell) balCell.style.color = pendingBal === 0 ? 'green' : 'red';
+                const statusEl = document.getElementById('rcpt-status-label');
+                if (statusEl) {
+                    statusEl.innerText = pendingBal === 0 ? 'PAID IN FULL (CLEARED)' : 'PARTIAL (BALANCE PENDING)';
+                    statusEl.style.color = pendingBal === 0 ? 'green' : '#d97706';
+                }
                 document.getElementById('rcpt-mode').innerText = document.getElementById('paymentMethod') ? document.getElementById('paymentMethod').value : 'CASH'; 
                 document.getElementById('rcpt-collector').innerText = targetMember.collectedBy || 'System Admin';
                 document.getElementById('rcpt-date').innerText = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
@@ -4131,7 +4327,7 @@
                             
                             try {
                                 const file = new File([blob], `Admission_Receipt_${targetMember.id}.jpg`, { type: 'image/jpeg' });
-                                const msg = `Dear ${targetMember.fullName},\n\nWe have successfully received your payment of *₹${document.getElementById('rcpt-paid').innerText}* towards your Admission & Initial Fee (${targetMember._month}).\n\nCollected by: ${targetMember.collectedBy || 'Admin'}\n\nThank you for joining us!\n\nBest Regards,\n*Revive Fitness Studio*\n📞 8921698044`;
+                                const msg = `Dear ${targetMember.fullName},\n\nAdmission & Initial Fee Receipt (${targetMember._month}):\n• *Total Fee:* ₹${totalFee}\n• *Amount Paid:* ₹${paidNow}\n• *Pending Balance:* ₹${pendingBal === 0 ? '0 (Cleared)' : pendingBal}\n• *Collected By:* ${targetMember.collectedBy || 'Admin'}\n\nThank you for joining *Revive Fitness Studio*!\n📞 8921698044`;
                                 
                                 if (navigator.canShare && navigator.canShare({ files: [file] })) { 
                                     await navigator.share({ title: 'Admission Receipt', text: msg, files: [file] }); 
@@ -4552,14 +4748,29 @@
                     const gymFeeRev = s.rev;
                     s.feeAmt = Math.max(0, gymFeeRev - s.admAmt);
 
-                    // 4. Supplement Sales Revenue (Credit)
+                    // 4. Supplement Sales Revenue (Credit - counts actual amountPaid and tracks pending supplement balances in Shortfall)
                     suppSales.forEach(sale => {
                         if (sale.fy === targetFy && (targetMonth === 'All' || sale.month === targetMonth)) {
-                            const amt = parseInt(sale.totalAmount || 0, 10);
+                            const totalBill = parseInt(sale.totalAmount || 0, 10);
+                            const paidAmt = sale.amountPaid != null ? parseInt(sale.amountPaid, 10) : totalBill;
+                            const pendBal = Math.max(0, totalBill - paidAmt);
                             s.suppSalesCount++;
-                            s.suppSalesAmt += amt;
-                            s.rev += amt;
+                            s.suppSalesAmt += paidAmt;
+                            s.rev += paidAmt;
                             s.suppSalesRows.push(sale);
+                            if (pendBal > 0) {
+                                s.shortCount++;
+                                s.shortAmt += pendBal;
+                                s.shortRows.push({
+                                    userId: sale.userId,
+                                    fullName: sale.fullName,
+                                    primaryContact: sale.phone || '',
+                                    month: `${sale.month} (Supplement ${sale.id})`,
+                                    pendingAmt: pendBal,
+                                    statusLabel: `Supplement Partial (Paid Rs.${paidAmt} / Rs.${totalBill})`,
+                                    lastDate: sale.isoDate
+                                });
+                            }
                         }
                     });
 
@@ -4604,20 +4815,30 @@
                 admTbody.innerHTML = currStats.admRows.length ? currStats.admRows.map(u => `<tr onclick="window.moduleContext.loadProfileByPhoneOrId('${u.id}')" title="Click to view member profile"><td>${u.date}</td><td><strong>${u.id}</strong></td><td>${u.fullName}${u.isDeleted ? ' <span class="deleted-badge">Archived</span>' : ''}</td><td>${appContext.currentRole === 'staff' ? '******' + String(u.primaryContact).slice(-4) : u.primaryContact}</td><td>${u.admissionCategory} (${u.trainingCategory})</td><td>${u.collectedBy || 'Admin'}</td></tr>`).join('') : '<tr><td colspan="6" style="text-align:center;">No admissions found for this period.</td></tr>';
 
                 const feeTbody = document.querySelector('#table-fees tbody');
-                feeTbody.innerHTML = currStats.feeRows.length ? currStats.feeRows.map(p => `<tr onclick="window.moduleContext.loadProfileByPhoneOrId('${p.userId}')" title="Click to view member profile"><td>${p.lastDate ? new Date(p.lastDate).toLocaleDateString('en-IN') : '-'}</td><td><strong>${p.userId}</strong> - ${p.fullName}${p.isDeleted ? ' <span class="deleted-badge">Archived</span>' : ''}</td><td>${p.month}</td><td style="color:green; font-weight:bold;">₹${p.amountPaid}</td><td>${p.method || 'CASH'}</td><td>${p.collectedBy || 'Admin'}</td></tr>`).join('') : '<tr><td colspan="6" style="text-align:center;">No fee collections found for this period.</td></tr>';
+                feeTbody.innerHTML = currStats.feeRows.length ? currStats.feeRows.map(p => {
+                    const totDue = parseInt(p.totalDue || p.amountPaid || 0, 10);
+                    const paidVal = parseInt(p.amountPaid || 0, 10);
+                    const balVal = Math.max(0, totDue - paidVal);
+                    const balBadge = balVal > 0 ? ` <span style="color:var(--error-red); font-size:0.78rem;">(Due: ₹${balVal})</span>` : ` <span style="color:var(--text-muted); font-size:0.75rem;">(Cleared)</span>`;
+                    return `<tr onclick="window.moduleContext.loadProfileByPhoneOrId('${p.userId}')" title="Click to view member profile"><td>${p.lastDate ? new Date(p.lastDate).toLocaleDateString('en-IN') : '-'}</td><td><strong>${p.userId}</strong> - ${p.fullName}${p.isDeleted ? ' <span class="deleted-badge">Archived</span>' : ''}</td><td>${p.month}</td><td style="color:green; font-weight:bold;">₹${paidVal}${balBadge}</td><td>${p.method || 'CASH'}</td><td>${p.collectedBy || 'Admin'}</td></tr>`;
+                }).join('') : '<tr><td colspan="6" style="text-align:center;">No fee collections found for this period.</td></tr>';
 
                 const suppSalesTbody = document.querySelector('#table-supp-sales-report tbody');
                 if (suppSalesTbody) {
                     suppSalesTbody.innerHTML = currStats.suppSalesRows.length ? currStats.suppSalesRows.map(sale => {
                         const itemsSummary = (sale.items || []).map(i => `${i.name} (x${i.qty})`).join(', ');
-                        return `<tr onclick="window.moduleContext.loadProfileByPhoneOrId('${sale.userId}')" title="Click to view member profile">
+                        const totBill = parseInt(sale.totalAmount || 0, 10);
+                        const paidBill = sale.amountPaid != null ? parseInt(sale.amountPaid, 10) : totBill;
+                        const balBill = Math.max(0, totBill - paidBill);
+                        const balBadge = balBill > 0 ? ` <span style="color:var(--error-red); font-size:0.78rem;">(Due: ₹${balBill})</span>` : ` <span style="color:var(--text-muted); font-size:0.75rem;">(Cleared)</span>`;
+                        return `<tr onclick="window.moduleContext.loadProfileByPhoneOrId('${sale.userId}')" title="Click to open member profile & manage invoice">
                             <td>${sale.date || formatDateStr(sale.isoDate)}</td>
                             <td><strong>${sale.id}</strong></td>
                             <td><strong>${sale.userId}</strong> - ${sale.fullName}</td>
                             <td>${itemsSummary}</td>
                             <td>${sale.method || 'CASH'}</td>
                             <td>${sale.soldBy || 'Admin'}</td>
-                            <td style="color:var(--success-green); font-weight:bold;">₹${sale.totalAmount}</td>
+                            <td style="color:var(--success-green); font-weight:bold;">₹${paidBill}${balBadge}</td>
                         </tr>`;
                     }).join('') : '<tr><td colspan="7" style="text-align:center;">No supplement sales recorded for this period.</td></tr>';
                 }
@@ -5026,6 +5247,13 @@
                 document.getElementById('supp-pay-disc').innerText = Math.max(0, totalMrp - totalNet);
                 document.getElementById('supp-pay-net').innerText = totalNet;
 
+                const suppPayNowInput = document.getElementById('supp-pay-amount-now');
+                if (suppPayNowInput) {
+                    suppPayNowInput.value = totalNet;
+                    suppPayNowInput.max = totalNet;
+                }
+                document.getElementById('supp-pay-pending').innerText = '0';
+
                 document.getElementById('supp-staff-pin').value = '';
                 document.getElementById('supp-pin-identity').style.color = 'var(--text-muted)';
                 document.getElementById('supp-pin-identity').innerText = '';
@@ -5039,11 +5267,16 @@
             updateSuppPaymentUI: function() {
                 const method = document.getElementById('suppPaymentMethod').value;
                 const netAmt = parseInt(document.getElementById('supp-pay-net').innerText || '0', 10);
+                const rawPaying = parseInt(document.getElementById('supp-pay-amount-now').value, 10);
+                const payingNow = isNaN(rawPaying) ? 0 : Math.min(netAmt, Math.max(0, rawPaying));
+                const pendingBal = Math.max(0, netAmt - payingNow);
+                document.getElementById('supp-pay-pending').innerText = pendingBal;
+
                 const upiSec = document.getElementById('supp-upi-section');
-                if (method === 'UPI' && netAmt > 0) {
+                if (method === 'UPI' && payingNow > 0) {
                     upiSec.style.display = 'block';
-                    document.getElementById('supp-qr-amount-display').innerText = netAmt;
-                    renderUpiQrToElement('supp-upi-qr-code', netAmt, 190);
+                    document.getElementById('supp-qr-amount-display').innerText = payingNow;
+                    renderUpiQrToElement('supp-upi-qr-code', payingNow, 190);
                 } else {
                     upiSec.style.display = 'none';
                 }
@@ -5113,6 +5346,14 @@
                 const payMethod = document.getElementById('suppPaymentMethod').value;
                 const custAddress = document.getElementById('supp-cust-address').value.trim() || selectedSuppMember.address || 'Keralapuram';
 
+                const rawPayNow = parseInt(document.getElementById('supp-pay-amount-now').value, 10);
+                if (isNaN(rawPayNow) || rawPayNow < 0 || rawPayNow > totalAmount) {
+                    showNotice("Please enter a valid Amount Paying Now (between ₹0 and ₹" + totalAmount + ").", "error");
+                    return;
+                }
+                const amountPaidNow = rawPayNow;
+                const balanceDueNow = Math.max(0, totalAmount - amountPaidNow);
+
                 const saleRecord = {
                     id: invId,
                     date: dateStr,
@@ -5126,6 +5367,9 @@
                     items: itemsSold,
                     totalMrp: totalMrp,
                     totalAmount: totalAmount,
+                    amountPaid: amountPaidNow,
+                    balanceDue: balanceDueNow,
+                    status: balanceDueNow === 0 ? 'Paid' : (amountPaidNow > 0 ? 'Partial' : 'Unpaid'),
                     totalCost: totalCost,
                     method: payMethod,
                     soldBy: sellerIdentity
@@ -5169,9 +5413,16 @@
                     </tr>`;
                 });
 
+                const sTotal = parseInt(s.totalAmount || 0, 10);
+                const sPaid = s.amountPaid != null ? parseInt(s.amountPaid, 10) : sTotal;
+                const sBal = Math.max(0, sTotal - sPaid);
                 document.getElementById('sinv-mrp').innerText = s.totalMrp;
-                document.getElementById('sinv-disc').innerText = Math.max(0, s.totalMrp - s.totalAmount);
-                document.getElementById('sinv-net').innerText = s.totalAmount;
+                document.getElementById('sinv-disc').innerText = Math.max(0, s.totalMrp - sTotal);
+                document.getElementById('sinv-net').innerText = sTotal;
+                document.getElementById('sinv-paid').innerText = sPaid;
+                document.getElementById('sinv-bal').innerText = sBal === 0 ? '0 (Cleared)' : sBal;
+                const sinvBalCell = document.getElementById('sinv-bal-cell');
+                if (sinvBalCell) sinvBalCell.style.color = sBal === 0 ? 'green' : 'red';
                 document.getElementById('sinv-mode').innerText = s.method;
                 document.getElementById('sinv-seller').innerText = s.soldBy;
 
@@ -5190,7 +5441,7 @@
                             try {
                                 const file = new File([blob], `Supplement_Invoice_${s.id}.jpg`, { type: 'image/jpeg' });
                                 const itemsTxt = (s.items || []).map(i => `• ${i.name} x${i.qty} = ₹${i.lineTotal}`).join('\n');
-                                const msg = `Dear ${s.fullName},\n\nThank you for shopping at *Revive Fitness Supplement Store*!\n\n*Invoice No:* ${s.id}\n*Items:*\n${itemsTxt}\n*Total Paid:* ₹${s.totalAmount} (${s.method})\n*Sold By:* ${s.soldBy}\n\nBest Regards,\n*Revive Fitness Studio*\n📞 8921698044`;
+                                const msg = `Dear ${s.fullName},\n\n*Revive Supplement Invoice (${s.id}):*\n${itemsTxt}\n• *Net Bill:* ₹${sTotal}\n• *Amount Paid:* ₹${sPaid} (${s.method})\n• *Pending Balance:* ₹${sBal === 0 ? '0 (Cleared)' : sBal}\n• *Sold By:* ${s.soldBy}\n\nBest Regards,\n*Revive Fitness Studio*\n📞 8921698044`;
 
                                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                                     await navigator.share({ title: `Supplement Invoice ${s.id}`, text: msg, files: [file] });
@@ -6029,6 +6280,13 @@
                 document.getElementById('calc-monthly-fee').innerText = monthlyFeeToPay;
                 document.getElementById('calc-total-fee').innerText = calculatedTotalFee;
 
+                const admPayInput = document.getElementById('adm-pay-amount-now');
+                if (admPayInput) {
+                    admPayInput.value = calculatedTotalFee;
+                    admPayInput.max = calculatedTotalFee;
+                }
+                document.getElementById('adm-pending-balance').innerText = '0';
+
                 currentMemberDetails = {
                     id: preAdmissionId,
                     date: adDateVal,
@@ -6047,7 +6305,10 @@
                     signature: finalSig,
                     _fy: fyString,
                     _month: monthName,
+                    admFeeExpected: baseAdmFee,
                     admFeePaid: baseAdmFee,
+                    initialTotalDue: calculatedTotalFee,
+                    initialAmountPaid: calculatedTotalFee,
                     isDeleted: false
                 };
 
@@ -6055,22 +6316,31 @@
                 document.getElementById('adm-pin-identity').style.color = 'var(--text-muted)';
                 document.getElementById('adm-pin-identity').innerText = '';
 
-                const method = document.getElementById('paymentMethod').value;
-                const upiSec = document.getElementById('upi-section');
-                if (method === 'UPI') {
-                    upiSec.style.display = 'block';
-                    document.getElementById('btn-validate-payment').innerText = 'Verify PIN & Validate UPI Payment';
-                    document.getElementById('qr-amount-display').innerText = calculatedTotalFee;
-                    renderUpiQrToElement('upi-qr-code', calculatedTotalFee, 200);
-                } else {
-                    upiSec.style.display = 'none';
-                    document.getElementById('btn-validate-payment').innerText = 'Verify PIN & Collect Cash';
-                }
+                window.moduleContext.updateAdmissionPaymentUI();
 
                 step2.classList.remove('active-step');
                 step3.classList.add('active-step');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
+
+            window.moduleContext.updateAdmissionPaymentUI = function() {
+                const method = document.getElementById('paymentMethod').value;
+                const rawPaying = parseInt(document.getElementById('adm-pay-amount-now').value, 10);
+                const payingNow = isNaN(rawPaying) ? 0 : Math.min(calculatedTotalFee, Math.max(0, rawPaying));
+                const pendingBal = Math.max(0, calculatedTotalFee - payingNow);
+                document.getElementById('adm-pending-balance').innerText = pendingBal;
+
+                const upiSec = document.getElementById('upi-section');
+                if (method === 'UPI' && payingNow > 0) {
+                    upiSec.style.display = 'block';
+                    document.getElementById('btn-validate-payment').innerText = 'Verify PIN & Validate UPI Payment';
+                    document.getElementById('qr-amount-display').innerText = payingNow;
+                    renderUpiQrToElement('upi-qr-code', payingNow, 200);
+                } else {
+                    upiSec.style.display = 'none';
+                    document.getElementById('btn-validate-payment').innerText = payingNow > 0 ? 'Verify PIN & Collect Cash' : 'Verify PIN & Register (Pending Fee)';
+                }
+            };
 
             const btnPrev2 = document.getElementById('btn-prev-step-2');
             if(btnPrev2) btnPrev2.addEventListener('click', () => {
@@ -6079,23 +6349,16 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
-            const pMethod = document.getElementById('paymentMethod');
-            if(pMethod) pMethod.addEventListener('change', function() {
-                const upiSec = document.getElementById('upi-section');
-                if (this.value === 'UPI') {
-                    upiSec.style.display = 'block';
-                    document.getElementById('btn-validate-payment').innerText = 'Verify PIN & Validate UPI Payment';
-                    document.getElementById('qr-amount-display').innerText = calculatedTotalFee;
-                    renderUpiQrToElement('upi-qr-code', calculatedTotalFee, 200);
-                } else {
-                    upiSec.style.display = 'none';
-                    document.getElementById('btn-validate-payment').innerText = 'Verify PIN & Collect Cash';
-                }
-            });
-
             // Fix #4: Require Staff/Admin PIN verification to finalize admission & initial fee
             const btnValPay = document.getElementById('btn-validate-payment');
             if(btnValPay) btnValPay.addEventListener('click', () => {
+                const rawPaying = parseInt(document.getElementById('adm-pay-amount-now').value, 10);
+                if (isNaN(rawPaying) || rawPaying < 0 || rawPaying > calculatedTotalFee) {
+                    showNotice(`Please enter a valid Amount Paying Now between ₹0 and ₹${calculatedTotalFee}.`, "error");
+                    document.getElementById('adm-pay-amount-now').focus();
+                    return;
+                }
+
                 const pinVal = document.getElementById('adm-staff-pin').value;
                 const collectorIdentity = verifyCollectorPin(pinVal);
                 if (!collectorIdentity) {
@@ -6105,6 +6368,9 @@
                 }
 
                 currentMemberDetails.collectedBy = collectorIdentity;
+                currentMemberDetails.initialTotalDue = calculatedTotalFee;
+                currentMemberDetails.initialAmountPaid = rawPaying;
+                currentMemberDetails.admFeePaid = Math.min(calculatedAdmFeePart, rawPaying);
 
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
@@ -6112,7 +6378,7 @@
                         () => { userLocationStr = "Kadayil Arcade, Keralapuram"; }
                     );
                 }
-                if (document.getElementById('paymentMethod').value === 'UPI') {
+                if (document.getElementById('paymentMethod').value === 'UPI' && rawPaying > 0) {
                     document.getElementById('success-paid-id').innerText = preAdmissionId;
                     document.getElementById('success-verified-by').innerText = collectorIdentity;
                     document.getElementById('paymentSuccessModal').style.display = 'flex';
@@ -6132,6 +6398,10 @@
                 preAdmissionId = getNextAdmissionId();
                 currentMemberDetails.id = preAdmissionId;
 
+                const payingNow = parseInt(currentMemberDetails.initialAmountPaid != null ? currentMemberDetails.initialAmountPaid : calculatedTotalFee, 10);
+                const pendingBal = Math.max(0, calculatedTotalFee - payingNow);
+                const payStatus = pendingBal === 0 ? 'Paid' : (payingNow > 0 ? 'Partial' : 'Unpaid');
+
                 let usersDb = storage.get('revive_users_db', []);
                 usersDb.push(currentMemberDetails);
                 storage.set('revive_users_db', usersDb);
@@ -6142,23 +6412,27 @@
                 if(!payDb[currentMemberDetails.id][currentMemberDetails._fy]) payDb[currentMemberDetails.id][currentMemberDetails._fy] = {};
                 
                 const method = document.getElementById('paymentMethod').value;
-                const pData = {
-                    userId: currentMemberDetails.id,
-                    fullName: currentMemberDetails.fullName,
-                    primaryContact: currentMemberDetails.primaryContact,
-                    fy: currentMemberDetails._fy,
-                    month: currentMemberDetails._month,
-                    totalDue: calculatedTotalFee,
-                    amountPaid: calculatedTotalFee,
-                    admFeeIncluded: calculatedAdmFeePart,
-                    status: 'Paid',
-                    method: method,
-                    collectedBy: currentMemberDetails.collectedBy || 'Admin',
-                    lastDate: new Date().toISOString()
-                };
-                payDb[currentMemberDetails.id][currentMemberDetails._fy][currentMemberDetails._month] = pData;
-                storage.set('revive_payments_db', payDb);
-                cloudSync.push('pushPayment', pData);
+                if (payingNow > 0) {
+                    const pData = {
+                        userId: currentMemberDetails.id,
+                        fullName: currentMemberDetails.fullName,
+                        primaryContact: currentMemberDetails.primaryContact,
+                        fy: currentMemberDetails._fy,
+                        month: currentMemberDetails._month,
+                        totalDue: calculatedTotalFee,
+                        amountPaid: payingNow,
+                        balanceDue: pendingBal,
+                        lastPaidAmount: payingNow,
+                        admFeeIncluded: calculatedAdmFeePart,
+                        status: payStatus,
+                        method: method,
+                        collectedBy: currentMemberDetails.collectedBy || 'Admin',
+                        lastDate: new Date().toISOString()
+                    };
+                    payDb[currentMemberDetails.id][currentMemberDetails._fy][currentMemberDetails._month] = pData;
+                    storage.set('revive_payments_db', payDb);
+                    cloudSync.push('pushPayment', pData);
+                }
 
                 const currentCount = parseInt(preAdmissionId.split('-')[1], 10);
                 try { localStorage.setItem('revive_admission_count', String(currentCount)); } catch (e) {}
