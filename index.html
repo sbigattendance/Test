@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
     <title>Revive Fitness Studio | Portal</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -29,15 +30,17 @@
         #app-wrapper { display: flex; flex-direction: column; min-height: 100vh; padding-top: 60px; padding-bottom: 60px; }
 
         .app-header {
-            background-color: var(--bg-panel); height: 60px; padding: 0 1.5rem; display: flex; justify-content: space-between; align-items: center;
+            background-color: var(--bg-panel); height: 60px; padding: 0 1.25rem; display: flex; justify-content: center; align-items: center;
             border-bottom: 3px solid var(--accent-orange); position: fixed; top: 0; left: 0; width: 100%; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
         
-        .logo-container { cursor: pointer; display: flex; align-items: center; gap: 0.6rem; transition: transform 0.2s; height: 100%; font-weight: 900; font-size: 1.2rem; letter-spacing: 1px; color: var(--text-main); }
+        .logo-container { cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.6rem; transition: transform 0.2s; height: 100%; font-weight: 900; font-size: 1.2rem; letter-spacing: 1px; color: var(--text-main); }
         .logo-container:active { transform: scale(0.95); }
-        .logo-container img { height: 35px; object-fit: contain; }
-        .header-sync-btn { background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-muted); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; transition: all 0.2s; }
-        .header-sync-btn:hover { border-color: var(--accent-orange); color: var(--accent-orange); }
+        .logo-container img { height: 36px; object-fit: contain; }
+        .header-sync-btn { position: absolute; right: 1.1rem; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border-radius: 50%; background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.25s ease; }
+        .header-sync-btn:hover { border-color: var(--accent-orange); color: var(--accent-orange); background: #fff5eb; transform: translateY(-50%) rotate(90deg); }
+        .header-sync-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+        .sr-only-text { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
         .app-footer {
             background-color: var(--bg-panel); height: 42px; padding: 0 1.5rem; display: flex; justify-content: center; align-items: center;
@@ -240,15 +243,27 @@
         .modal-actions { display: flex; flex-direction: column; width: 100%; gap: 10px; align-items: stretch; margin-top: 1rem; }
 
         #receipt-render-zone { position: absolute; left: -9999px; top: 0; opacity: 0; pointer-events: none; z-index: -100; }
-        #receipt-template { width: 400px; padding: 25px; background: #ffffff; border: 3px solid var(--accent-orange); font-family: 'Segoe UI', Arial, sans-serif; color: #111; box-sizing: border-box; }
-        .rcpt-header { text-align: center; border-bottom: 2px dashed #ccc; padding-bottom: 15px; margin-bottom: 15px; }
-        .rcpt-header img { height: 45px; margin-bottom: 5px; }
-        .rcpt-address { font-size: 11px; color: #666; line-height: 1.4; }
-        .rcpt-title { margin: 15px 0 0 0; color: var(--accent-orange); font-size: 18px; letter-spacing: 2px; font-weight: 900; text-transform: uppercase;}
-        .rcpt-table { width: 100%; font-size: 13px; line-height: 2; border-collapse: collapse; }
-        .rcpt-table td { padding: 4px 0; }
-        .rcpt-amount-box { margin-top: 20px; padding: 15px; background: #fdfdfd; border-radius: 8px; border: 1px solid #eee; }
-        .rcpt-footer { text-align: center; font-size: 11px; color: #888; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
+        #receipt-template { width: 460px; background: #ffffff; border: 2px solid #1e1e1e; border-radius: 14px; overflow: hidden; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #111; box-sizing: border-box; box-shadow: 0 12px 35px rgba(0,0,0,0.12); }
+        .rcpt-top-banner { background: linear-gradient(135deg, #161616 0%, #262626 100%); color: #ffffff; padding: 22px 24px 18px 24px; text-align: center; border-bottom: 4px solid var(--accent-orange); position: relative; }
+        .rcpt-logo-pill { background: transparent; display: inline-flex; align-items: center; justify-content: center; padding: 2px 8px; margin-bottom: 8px; }
+        .rcpt-logo-pill img { height: 44px; max-width: 260px; object-fit: contain; display: block; }
+        .rcpt-address { font-size: 11.5px; color: #f0f0f0; line-height: 1.55; font-weight: 600; }
+        .rcpt-address a, .rcpt-top-banner a, #receipt-template a, #supp-invoice-template a { color: #ffffff !important; text-decoration: none !important; pointer-events: none !important; }
+        .rcpt-badge-bar { display: flex; justify-content: space-between; align-items: center; background: #fff5eb; padding: 10px 24px; border-bottom: 1px dashed #ffcc99; font-size: 11.5px; font-weight: 800; color: #333; }
+        .rcpt-title { margin: 12px 0 0 0; color: var(--accent-orange); font-size: 15px; letter-spacing: 2.5px; font-weight: 900; text-transform: uppercase; }
+        .rcpt-body { padding: 20px 24px; }
+        .rcpt-hero-paid { background: linear-gradient(135deg, #f4fbf7 0%, #e8f8ef 100%); border: 1.5px solid #9fe3b8; border-radius: 12px; padding: 14px 18px; text-align: center; margin-bottom: 18px; }
+        .rcpt-hero-paid-lbl { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: #2d6a4f; margin-bottom: 2px; }
+        .rcpt-hero-paid-val { font-size: 28px; font-weight: 900; color: #138a36; letter-spacing: 0.5px; line-height: 1.15; }
+        .rcpt-status-pill { display: inline-block; margin-top: 6px; padding: 3px 12px; border-radius: 20px; font-size: 10.5px; font-weight: 900; letter-spacing: 0.8px; text-transform: uppercase; background: #138a36; color: #fff; }
+        .rcpt-table { width: 100%; font-size: 12.5px; border-collapse: collapse; margin-bottom: 16px; }
+        .rcpt-table td { padding: 7px 4px; border-bottom: 1px solid #f0f0f0; }
+        .rcpt-table tr:last-child td { border-bottom: none; }
+        .rcpt-amount-box { padding: 14px 16px; background: #fafafa; border-radius: 10px; border: 1px solid #e6e6e6; }
+        .rcpt-sign-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 18px; padding-top: 14px; border-top: 1px dashed #d9d9d9; }
+        .rcpt-footer { text-align: center; font-size: 11px; color: #ffffff; background: #181818; padding: 12px 20px; font-weight: 700; letter-spacing: 0.5px; }
+        .rcpt-modal-preview-box { background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px; margin-bottom: 1rem; max-height: 360px; overflow-y: auto; display: flex; justify-content: center; }
+        .rcpt-modal-preview-box img { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
 
         #pdf-template-wrapper { display: none; background: #e0e0e0; min-height: 100vh; width: 100vw; padding: 20px; justify-content: center; }
         #pdf-template { background: #ffffff; color: #111111; width: 210mm; height: 296mm; padding: 12mm 15mm; box-sizing: border-box; font-family: 'Helvetica', 'Arial', sans-serif; position: relative; overflow: hidden; display: flex; flex-direction: column; }
@@ -306,12 +321,12 @@
 
     <div id="app-wrapper">
         <header class="app-header">
-            <div style="width: 110px;"></div>
             <div class="logo-container" onclick="window.appContext.goHome()">
                 <img data-logo-src="logo.png" src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22220%22%20height%3D%2250%22%20viewBox%3D%220%200%20220%2050%22%3E%3Crect%20width%3D%22220%22%20height%3D%2250%22%20rx%3D%226%22%20fill%3D%22%23ffffff%22%2F%3E%3Ctext%20x%3D%2212%22%20y%3D%2232%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%20fill%3D%22%23222222%22%3EREVIVE%20%3C%2Ftext%3E%3Ctext%20x%3D%22102%22%20y%3D%2232%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%20fill%3D%22%23ff6600%22%3EFITNESS%3C%2Ftext%3E%3C%2Fsvg%3E" class="brand-logo-img" alt="REVIVE FITNESS STUDIO" onerror="this.onerror=null; this.src=window.FALLBACK_LOGO_SVG;">
             </div>
-            <button type="button" class="header-sync-btn" onclick="window.cloudSync.forceRefreshCache()" title="Clear stale cache & pull fresh cloud data">
-                ↻ Sync & Clear Cache
+            <button type="button" class="header-sync-btn" onclick="window.cloudSync.forceRefreshCache()" title="Sync & Refresh Cloud Data">
+                <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                <span class="sr-only-text">↻ Sync & Clear Cache</span>
             </button>
         </header>
 
@@ -423,6 +438,10 @@
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
                     <h3>Supplement Inventory</h3>
                 </div>
+                <div class="module-card admin-only" onclick="window.appContext.switchView('supplement-store-config')">
+                    <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                    <h3>Supplement Store Config</h3>
+                </div>
                 <div class="module-card admin-only" onclick="window.appContext.switchView('expense')">
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
                     <h3>Expense Entry</h3>
@@ -446,6 +465,10 @@
                 <div class="module-card admin-only" onclick="window.appContext.switchView('staff-editor')">
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     <h3>Staff Access</h3>
+                </div>
+                <div class="module-card admin-only" onclick="window.appContext.switchView('studio-details')">
+                    <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    <h3>Studio Details</h3>
                 </div>
             </div>
             <div style="text-align: center; margin-top: 3rem;">
@@ -811,6 +834,38 @@
                     </div>
                 </div>
                 <div class="action-row"><button type="button" onclick="window.moduleContext.savePins()" class="btn primary">Save Admin PIN</button></div>
+            </div>
+        </main>
+
+        <main id="view-studio-details" class="view-section">
+            <div class="form-layout" style="max-width: 680px;">
+                <div class="module-toolbar">
+                    <button class="back-btn" onclick="window.appContext.goHome()" type="button"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>Back</button>
+                    <h2 class="module-title">Studio Details</h2>
+                </div>
+                <form id="studioDetailsForm" onsubmit="window.moduleContext.saveStudioDetails(event); return false;">
+                    <div class="form-group" style="margin-bottom:1.2rem;">
+                        <label for="studio-cfg-address">Studio Address <span class="required">*</span></label>
+                        <textarea id="studio-cfg-address" rows="2" placeholder="e.g. Kadayil Arcade, Thanal Nagar, Keralapuram, Kollam 691504" required></textarea>
+                    </div>
+                    <div class="form-group" style="margin-bottom:1.2rem;">
+                        <label for="studio-cfg-email">Email ID <span class="required">*</span></label>
+                        <input type="email" id="studio-cfg-email" placeholder="e.g. revivefitness@gmail.com" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="studio-cfg-phone1">Contact Number 1 <span class="required">*</span></label>
+                            <input type="tel" id="studio-cfg-phone1" placeholder="10-digit primary contact" pattern="\d{10,13}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="studio-cfg-phone2">Contact Number 2 (Optional)</label>
+                            <input type="tel" id="studio-cfg-phone2" placeholder="Optional secondary contact">
+                        </div>
+                    </div>
+                    <div class="action-row">
+                        <button type="submit" class="btn primary">Save Studio Details</button>
+                    </div>
+                </form>
             </div>
         </main>
 
@@ -1269,6 +1324,11 @@
                 <!-- Step 1: Browse Products & Add Multiple Quantities to Cart -->
                 <div id="supp-step-1" class="step-container active-step">
                     <div class="step-indicator">Step 1 of 3: Select Supplements</div>
+                    <div style="display:flex; gap:10px; align-items:center; margin-bottom:1rem; background:var(--bg-main); padding:0.85rem 1rem; border-radius:10px; border:1px solid var(--border-color);">
+                        <span style="font-size:1.1rem;">🔍</span>
+                        <input type="text" id="supp-store-search" placeholder="Search supplements by name or category (Listed A → Z)..." oninput="window.moduleContext.renderSupplementCatalog()" autocomplete="off" style="background:#fff; padding:0.75rem 1rem;">
+                        <button type="button" id="btn-clear-supp-search" class="btn secondary" style="display:none; width:auto; padding:0.65rem 1rem; font-size:0.8rem;" onclick="document.getElementById('supp-store-search').value=''; window.moduleContext.renderSupplementCatalog();">Clear</button>
+                    </div>
                     <div id="supp-catalog-grid" class="supp-grid"></div>
 
                     <div class="cart-summary-bar" id="supp-cart-bar">
@@ -1341,8 +1401,23 @@
                         <div class="fee-row"><span>Invoice Number:</span> <strong id="supp-pay-inv-id" style="color:var(--accent-orange);">INV-0001</strong></div>
                         <div class="fee-row"><span>Billed To Member:</span> <strong id="supp-pay-member-label">-</strong></div>
                         <div class="fee-row"><span>Total MRP Value:</span> <strong>₹<span id="supp-pay-mrp">0</span></strong></div>
-                        <div class="fee-row"><span>Total Offer Discount:</span> <strong style="color:var(--success-green);">- ₹<span id="supp-pay-disc">0</span></strong></div>
+                        <div class="fee-row"><span>Store Offer Savings:</span> <strong style="color:var(--success-green);">- ₹<span id="supp-pay-disc">0</span></strong></div>
+                        <div class="fee-row" id="supp-coupon-discount-row" style="display:none;">
+                            <span>Coupon Applied:<strong id="supp-applied-coupon-tag" style="display:none;"></strong></span>
+                            <strong style="color:var(--success-green);">- ₹<span id="supp-pay-coupon-disc">0</span></strong>
+                        </div>
                         <div class="fee-row fee-total"><span>Net Payable Amount:</span> <strong>₹<span id="supp-pay-net">0</span></strong></div>
+
+                        <!-- Coupon Code Provision -->
+                        <div style="margin-top:1rem; padding:0.9rem; background:var(--bg-panel); border:1px dashed var(--accent-orange); border-radius:8px;">
+                            <label for="supp-coupon-input" style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:0.4rem;">Have a Coupon Code?</label>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <input type="text" id="supp-coupon-input" placeholder="Enter Coupon Code" style="text-transform:uppercase; font-weight:800; padding:0.65rem 0.9rem;">
+                                <button type="button" class="btn secondary" style="width:auto; padding:0.65rem 1.1rem; font-size:0.8rem; border-color:var(--accent-orange); color:var(--accent-orange); white-space:nowrap;" onclick="window.moduleContext.applySupplementCoupon()">Apply</button>
+                                <button type="button" id="btn-remove-supp-coupon" class="btn danger" style="display:none; width:auto; padding:0.65rem 0.9rem; font-size:0.8rem;" onclick="window.moduleContext.removeSupplementCoupon()">✕</button>
+                            </div>
+                            <div id="supp-coupon-msg" style="margin-top:6px; font-size:0.82rem; font-weight:700;"></div>
+                        </div>
 
                         <div style="margin-top:1rem; padding:1rem; background:#fff8f3; border:2px solid var(--accent-orange); border-radius:10px;">
                             <label for="supp-pay-amount-now" style="color:var(--accent-orange); font-size:0.85rem; display:block; margin-bottom:0.5rem;">Enter Paying Amount Now (₹) — Edit if Partial Payment <span class="required">*</span></label>
@@ -1388,7 +1463,7 @@
             </div>
         </main>
 
-        <!-- New Admin Module: Supplement Inventory & Purchase Manager -->
+        <!-- Admin Module 1: Pure Supplement Purchase & Stock Inventory (No Selling Price) -->
         <main id="view-supplement-admin" class="view-section">
             <div class="form-layout" style="max-width: 980px;">
                 <div class="module-toolbar">
@@ -1396,35 +1471,42 @@
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                         Back
                     </button>
-                    <h2 class="module-title">Supplement Inventory & Purchases</h2>
+                    <h2 class="module-title">Supplement Purchase & Stock</h2>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:1rem;">
+                    <h3 id="supp-inv-form-title" style="color:var(--accent-orange); font-size:1.05rem; text-transform:uppercase; margin:0;">Record Purchase & Stock Entry</h3>
+                    <button type="button" class="btn secondary" style="width:auto; padding:0.5rem 1rem; font-size:0.8rem; border-color:var(--accent-orange); color:var(--accent-orange);" onclick="window.appContext.switchView('supplement-store-config')">⚙ Open Supplement Store Config →</button>
                 </div>
 
                 <div style="background:var(--bg-main); padding:1.5rem; border-radius:10px; border:1px dashed var(--accent-orange); margin-bottom:2rem;">
-                    <h3 id="supp-inv-form-title" style="color:var(--accent-orange); margin-bottom:0.5rem; font-size:1.1rem; text-transform:uppercase;">Add New Product / Record Stock Purchase</h3>
-                    
-
                     <form id="suppInventoryForm" onsubmit="window.moduleContext.saveSupplementInventory(event); return false;">
-                        <input type="hidden" id="supp-inv-id" value="">
+                        <input type="hidden" id="supp-inv-id" value=""><input type="hidden" id="supp-inv-offer" value="">
                         <div class="form-row">
+                            <div class="form-group" style="flex:1;">
+                                <label>Date of Purchase <span class="required">*</span></label>
+                                <input type="date" id="supp-inv-date" required>
+                            </div>
                             <div class="form-group" style="flex:2;">
                                 <label>Product Name <span class="required">*</span></label>
-                                <input type="text" id="supp-inv-name" placeholder="e.g. Optimum Nutrition Gold Standard Whey 2lbs" required>
+                                <input type="text" id="supp-inv-name" placeholder="Type supplement name to search existing or enter new..." oninput="window.moduleContext.previewSupplementInventoryName(this.value)" onfocus="window.moduleContext.previewSupplementInventoryName(this.value)" autocomplete="off" required>
+                                <div id="supp-inv-name-live-preview" style="margin-top:6px;"></div>
                             </div>
                             <div class="form-group" style="flex:1;">
                                 <label>Category / Brand</label>
-                                <input type="text" id="supp-inv-cat" placeholder="e.g. Whey Protein / Creatine">
-                            </div>
-                            <div class="form-group" style="flex:1;">
-                                <label>Entry Mode <span class="required">*</span></label>
-                                <select id="supp-inv-entry-mode">
-                                    <option value="purchase">Stock Purchase (Logs P&L Debit)</option>
-                                    <option value="update">Update Details / Price Only</option>
-                                </select>
+                                <input type="text" id="supp-inv-cat" placeholder="e.g. Whey Protein">
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Unit Purchase Cost (₹) <span class="required">*</span></label>
+                                <label>Entry Mode <span class="required">*</span></label>
+                                <select id="supp-inv-entry-mode">
+                                    <option value="purchase">New Purchase (Add Stock)</option>
+                                    <option value="update">Correction / Update Stock</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Landing Price / Unit Cost (₹) <span class="required">*</span></label>
                                 <input type="number" id="supp-inv-cost" min="0" placeholder="e.g. 2400" required>
                             </div>
                             <div class="form-group">
@@ -1432,15 +1514,11 @@
                                 <input type="number" id="supp-inv-mrp" min="1" placeholder="e.g. 3899" required>
                             </div>
                             <div class="form-group">
-                                <label>Offer Selling Price (₹) <span class="required">*</span></label>
-                                <input type="number" id="supp-inv-offer" min="1" placeholder="e.g. 3200" required>
-                            </div>
-                            <div class="form-group">
-                                <label id="supp-inv-qty-label">Stock Qty (Units) <span class="required">*</span></label>
+                                <label id="supp-inv-qty-label">Purchase Qty <span class="required">*</span></label>
                                 <input type="number" id="supp-inv-qty" min="0" placeholder="e.g. 10" required>
                             </div>
                             <div class="form-group">
-                                <label>Purchase Mode</label>
+                                <label>Payment Mode</label>
                                 <select id="supp-inv-paymode">
                                     <option value="UPI">UPI / Bank</option>
                                     <option value="CASH">Cash</option>
@@ -1454,20 +1532,90 @@
                     </form>
                 </div>
 
-                <h3 style="color:var(--accent-orange); margin-bottom:0.8rem; font-size:1.05rem; text-transform:uppercase;">Stock Inventory</h3>
+                <h3 style="color:var(--accent-orange); margin-bottom:0.8rem; font-size:1.05rem; text-transform:uppercase;">Purchased Stock Inventory</h3>
                 <div class="table-responsive" style="margin-bottom:2.2rem;">
                     <table class="data-table" id="table-supp-inventory">
-                        <thead><tr><th>ID</th><th>Product Name</th><th>Unit Cost</th><th>MRP</th><th>Offer Price</th><th>Live Stock</th><th>Actions</th></tr></thead>
+                        <thead><tr><th>ID</th><th>Product Name</th><th>Last Purchase Date</th><th>Landing Price</th><th>MRP</th><th>Live Stock</th><th>Actions</th></tr></thead>
                         <tbody></tbody>
                     </table>
                 </div>
 
-                <h3 style="color:var(--error-red); margin-bottom:0.8rem; font-size:1.05rem; text-transform:uppercase;">Stock Purchase Log</h3>
+                <h3 style="color:var(--error-red); margin-bottom:0.8rem; font-size:1.05rem; text-transform:uppercase;">Purchase Log</h3>
                 <div class="table-responsive">
                     <table class="data-table" id="table-supp-purchases-admin">
-                        <thead><tr><th>Date</th><th>Purchase ID</th><th>Product</th><th>Qty Added</th><th>Unit Cost</th><th>Mode</th><th>Total Purchase Cost</th></tr></thead>
+                        <thead><tr><th>Purchase Date</th><th>Purchase ID</th><th>Product</th><th>Qty</th><th>Landing Price</th><th>Mode</th><th>Total Cost</th></tr></thead>
                         <tbody></tbody>
                     </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- Admin Module 2: Supplement Store Config (Store Visibility ON/OFF, Selling Price & Coupon Codes) -->
+        <main id="view-supplement-store-config" class="view-section">
+            <div class="form-layout" style="max-width: 980px;">
+                <div class="module-toolbar">
+                    <button class="back-btn" onclick="window.appContext.goHome()" type="button">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                        Back
+                    </button>
+                    <h2 class="module-title">Supplement Store Config</h2>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:0.8rem;">
+                    <h3 style="color:var(--accent-orange); font-size:1.05rem; text-transform:uppercase; margin:0;">Store Catalog Visibility & Selling Price</h3>
+                    <button type="button" class="btn primary" style="width:auto; padding:0.6rem 1.3rem; font-size:0.82rem;" onclick="window.moduleContext.saveAllStoreConfigPrices()">✔ Save All Selling Prices</button>
+                </div>
+
+                <div class="table-responsive" style="margin-bottom:2.5rem;">
+                    <table class="data-table" id="table-supp-store-config">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Stock Qty</th>
+                                <th>Landing Price</th>
+                                <th>MRP</th>
+                                <th>Selling Price (₹)</th>
+                                <th>Show on Store</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div style="background:var(--bg-main); padding:1.5rem; border-radius:10px; border:1px dashed var(--accent-orange);">
+                    <h3 style="color:var(--accent-orange); margin-bottom:1rem; font-size:1.05rem; text-transform:uppercase;">Coupon Codes Manager</h3>
+                    <form id="suppCouponForm" onsubmit="window.moduleContext.saveSupplementCoupon(event); return false;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Coupon Code <span class="required">*</span></label>
+                                <input type="text" id="coupon-code" placeholder="e.g. REVIVE10" style="text-transform:uppercase; font-weight:800;" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Discount Type <span class="required">*</span></label>
+                                <select id="coupon-type" required>
+                                    <option value="FLAT">Flat Discount (₹ OFF)</option>
+                                    <option value="PERCENT">Percentage (% OFF)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Discount Value <span class="required">*</span></label>
+                                <input type="number" id="coupon-val" min="1" placeholder="e.g. 200 or 10" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Min. Bill Amount (₹)</label>
+                                <input type="number" id="coupon-min" min="0" value="0" placeholder="0">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn secondary" style="width:auto; padding:0.75rem 1.5rem; border-color:var(--accent-orange); color:var(--accent-orange);">+ Create Coupon Code</button>
+                    </form>
+
+                    <div class="table-responsive" style="margin-top:1.2rem;">
+                        <table class="data-table" id="table-supp-coupons">
+                            <thead><tr><th>Coupon Code</th><th>Discount</th><th>Min. Bill</th><th>Action</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </main>
@@ -1551,23 +1699,29 @@
         </div>
         
         <div id="receiptSuccessModal" class="modal">
-            <div class="modal-content">
-                <div class="checkmark-circle"><div class="checkmark-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div></div>
-                <h2 class="orange-text">Payment Recorded!</h2>
-                <p style="margin-bottom: 1.5rem;">Receipt has been generated and stamped with collector details.</p>
+            <div class="modal-content" style="max-width: 480px;">
+                <h2 class="orange-text" style="margin-top:0;">Payment Recorded!</h2>
+                <div class="rcpt-modal-preview-box">
+                    <img id="sr-preview-img" src="" alt="Generated Payment Receipt Preview">
+                </div>
                 <div class="modal-actions">
                     <button type="button" id="btn-share-receipt" onclick="window.moduleContext.shareReceipt('success')" class="btn whatsapp">Share Receipt Image</button>
+                    <button type="button" class="btn primary" onclick="window.moduleContext.downloadReceiptImageDirect()">⬇ Download Receipt Image</button>
                     <button type="button" class="btn secondary" onclick="document.getElementById('receiptSuccessModal').style.display='none'; window.appContext.switchView('user-hub');">Return to Profile</button>
                 </div>
             </div>
         </div>
 
         <div id="viewReceiptModal" class="modal">
-            <div class="modal-content">
-                <h2 class="orange-text">Payment Receipt</h2>
-                <p style="margin-bottom: 1.5rem;">Receipt for <span id="vr-month-label" style="font-weight:bold;"></span></p>
+            <div class="modal-content" style="max-width: 480px;">
+                <h2 class="orange-text" style="margin-top:0;">Official Payment Receipt</h2>
+                <p style="margin-bottom: 0.8rem; font-size:0.88rem; color:var(--text-muted);">Billing Period: <span id="vr-month-label" style="font-weight:800; color:var(--text-main);"></span></p>
+                <div class="rcpt-modal-preview-box">
+                    <img id="vr-preview-img" src="" alt="Payment Receipt Preview">
+                </div>
                 <div class="modal-actions">
                     <button type="button" id="btn-vr-share" onclick="window.moduleContext.shareReceipt('vr')" class="btn whatsapp">Share Receipt via WhatsApp</button>
+                    <button type="button" class="btn primary" onclick="window.moduleContext.downloadReceiptImageDirect()">⬇ Download Receipt Image</button>
                     <button type="button" class="btn secondary" onclick="document.getElementById('viewReceiptModal').style.display='none'">Close</button>
                 </div>
             </div>
@@ -1702,74 +1856,127 @@
                     <li><strong>Ensure that all the above conditions are read, understood, and acceptable. Applicable to everyone.</strong><em>മേൽപ്പറഞ്ഞ നിബന്ധനകൾ എല്ലാം വായിച്ചു ബോധ്യപ്പെടുകയും അവയെല്ലാം സ്വീകാര്യവുമാണെന്ന് ഉറപ്പ് വരുത്തുക. മുകളിൽ പറഞ്ഞ വസ്തുതകൾ എല്ലാവർക്കും ബാധകം.</em></li>
                 </ol>
             </div>
-            <div class="pdf-footer">Address: Kadayil Arcade, Thanal Nagar, Keralapuram, Keralam 691504 | Contact no: 8921698044</div>
+            <div class="pdf-footer" id="pdf-studio-footer">Address: Kadayil Arcade, Thanal Nagar, Keralapuram, Kollam 691504 | Contact: 8921698044</div>
         </div>
     </div>
 
     <div id="receipt-render-zone">
         <div id="receipt-template">
-            <div class="rcpt-header">
-                <img data-logo-src="logo.png" src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22220%22%20height%3D%2250%22%20viewBox%3D%220%200%20220%2050%22%3E%3Crect%20width%3D%22220%22%20height%3D%2250%22%20rx%3D%226%22%20fill%3D%22%23ffffff%22%2F%3E%3Ctext%20x%3D%2212%22%20y%3D%2232%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%20fill%3D%22%23222222%22%3EREVIVE%20%3C%2Ftext%3E%3Ctext%20x%3D%22102%22%20y%3D%2232%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%20fill%3D%22%23ff6600%22%3EFITNESS%3C%2Ftext%3E%3C%2Fsvg%3E" class="brand-logo-img" alt="REVIVE FITNESS STUDIO" onerror="this.onerror=null; this.src=window.FALLBACK_LOGO_SVG;">
-                <div class="rcpt-address">Kadayil Arcade, Thanal Nagar, Keralapuram, Keralam 691504<br>Ph: 8921698044</div>
-                <h3 class="rcpt-title">PAYMENT RECEIPT</h3>
+            <div class="rcpt-top-banner">
+                <div class="rcpt-logo-pill">
+                    <img data-logo-src="logo.png" src="" class="brand-logo-img rcpt-white-logo-img" alt="REVIVE FITNESS STUDIO">
+                </div>
+                <div class="rcpt-address" id="rcpt-studio-address-box">Kadayil Arcade, Thanal Nagar, Keralapuram, Kollam 691504<br><span style="color:#ffffff !important; font-weight:800; text-decoration:none !important;">Contact: +91&#8203; 89216&#8203; 98044</span></div>
+                <h3 class="rcpt-title">OFFICIAL PAYMENT RECEIPT</h3>
             </div>
-            <table class="rcpt-table">
-                <tr><td><strong>Member Name:</strong></td><td id="rcpt-name" style="text-align:right;"></td></tr>
-                <tr><td><strong>Admission No:</strong></td><td id="rcpt-id" style="text-align:right;"></td></tr>
-                <tr><td><strong>Phone:</strong></td><td id="rcpt-phone" style="text-align:right;"></td></tr>
-                <tr><td><strong>Month Paid For:</strong></td><td id="rcpt-month" style="text-align:right; font-weight:bold; color:var(--accent-orange);"></td></tr>
-            </table>
-            <div class="rcpt-amount-box">
-                <table style="width: 100%; font-size: 13.5px; line-height:1.85;">
-                    <tr><td><strong>Total Fee:</strong></td><td style="text-align: right; font-weight: 800;">₹<span id="rcpt-total-due">0</span></td></tr>
-                    <tr><td><strong>Total Paid:</strong></td><td style="text-align: right; color: green; font-weight: 900; font-size:15.5px;">₹<span id="rcpt-paid">0</span></td></tr>
-                    <tr><td><strong>Pending Balance:</strong></td><td id="rcpt-balance-cell" style="text-align: right; color: red; font-weight: 900;">₹<span id="rcpt-balance">0</span></td></tr>
-                    <tr><td><strong>Status:</strong></td><td id="rcpt-status-label" style="text-align: right; font-weight: 800; color: green;">PAID IN FULL</td></tr>
-                    <tr><td><strong>Payment Mode:</strong></td><td style="text-align: right; font-weight:bold;" id="rcpt-mode"></td></tr>
-                    <tr><td><strong>Collected By:</strong></td><td style="text-align: right; font-weight:bold; color:#333;" id="rcpt-collector"></td></tr>
+            <div class="rcpt-badge-bar">
+                <span>RECEIPT NO: <strong id="rcpt-no" style="color:var(--accent-orange);">RCPT-0001</strong></span>
+                <span>DATE: <strong id="rcpt-date"></strong></span>
+            </div>
+            <div class="rcpt-body">
+                <div class="rcpt-hero-paid" id="rcpt-hero-box">
+                    <div class="rcpt-hero-paid-lbl">Total Amount Received</div>
+                    <div class="rcpt-hero-paid-val">₹<span id="rcpt-paid">0</span></div>
+                    <div class="rcpt-status-pill" id="rcpt-status-label">PAID IN FULL (CLEARED)</div>
+                </div>
+
+                <table class="rcpt-table">
+                    <tr><td style="color:#666; font-weight:700;">Member Name</td><td id="rcpt-name" style="text-align:right; font-weight:900; font-size:13.5px; color:#111;"></td></tr>
+                    <tr><td style="color:#666; font-weight:700;">Admission ID</td><td id="rcpt-id" style="text-align:right; font-weight:900; color:var(--accent-orange);"></td></tr>
+                    <tr><td style="color:#666; font-weight:700;">Mobile Number</td><td id="rcpt-phone" style="text-align:right; font-weight:700;"></td></tr>
+                    <tr><td style="color:#666; font-weight:700;">Billing Period</td><td id="rcpt-month" style="text-align:right; font-weight:900; color:var(--accent-orange);"></td></tr>
                 </table>
+
+                <div class="rcpt-amount-box">
+                    <table style="width: 100%; font-size: 13px; line-height:1.95; border-collapse:collapse;">
+                        <tr style="border-bottom:1px dashed #e0e0e0;">
+                            <td style="color:#555; font-weight:700;">Total Fee Payable:</td>
+                            <td style="text-align: right; font-weight: 900; color:#111;">₹<span id="rcpt-total-due">0</span></td>
+                        </tr>
+                        <tr style="border-bottom:1px dashed #e0e0e0;">
+                            <td style="color:#555; font-weight:700;">Amount Paid:</td>
+                            <td style="text-align: right; color: #138a36; font-weight: 900; font-size:14.5px;">₹<span id="rcpt-paid-row">0</span></td>
+                        </tr>
+                        <tr style="border-bottom:1px dashed #e0e0e0;">
+                            <td style="color:#555; font-weight:700;">Shortfall / Pending:</td>
+                            <td id="rcpt-balance-cell" style="text-align: right; color: #d32f2f; font-weight: 900;">₹<span id="rcpt-balance">0</span></td>
+                        </tr>
+                        <tr>
+                            <td style="color:#555; font-weight:700;">Payment Method:</td>
+                            <td style="text-align: right; font-weight:800; color:#222;" id="rcpt-mode"></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="rcpt-sign-row">
+                    <div style="font-size:11px; color:#555; line-height:1.5;">
+                        <div style="font-weight:800; color:#111; text-transform:uppercase; font-size:10px; letter-spacing:0.5px;">Verified & Collected By</div>
+                        <div id="rcpt-collector" style="font-weight:900; color:var(--accent-orange); font-size:12.5px;">System Admin</div>
+                        <div style="font-size:9.5px; color:#888; margin-top:2px;">*Fees once paid are non-refundable</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <img data-seal-src="signature.png" src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22140%22%20height%3D%2245%22%20viewBox%3D%220%200%20140%2045%22%3E%3Crect%20x%3D%222%22%20y%3D%222%22%20width%3D%22136%22%20height%3D%2241%22%20rx%3D%224%22%20fill%3D%22none%22%20stroke%3D%22%23ff6600%22%20stroke-width%3D%222%22%2F%3E%3Ctext%20x%3D%2270%22%20y%3D%2220%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2210%22%20fill%3D%22%23ff6600%22%20text-anchor%3D%22middle%22%3EREVIVE%20FITNESS%20STUDIO%3C%2Ftext%3E%3Ctext%20x%3D%2270%22%20y%3D%2234%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22700%22%20font-size%3D%228.5%22%20fill%3D%22%23222222%22%20text-anchor%3D%22middle%22%3EAUTHORIZED%20SEAL%3C%2Ftext%3E%3C%2Fsvg%3E" class="brand-seal-img" alt="Authorized Seal" style="height:44px; object-fit:contain; display:block; margin:0 auto 2px auto;" onerror="this.onerror=null; this.src=window.FALLBACK_SEAL_SVG;">
+                        <div style="font-size:9px; font-weight:800; color:#444; letter-spacing:0.8px; text-transform:uppercase; border-top:1px solid #ccc; padding-top:2px;">Authorized Signatory</div>
+                    </div>
+                </div>
             </div>
-            <div class="rcpt-footer">Generated on <span id="rcpt-date"></span><br>Thank you for choosing Revive!</div>
+            <div class="rcpt-footer">THANK YOU FOR CHOOSING REVIVE FITNESS STUDIO!</div>
         </div>
 
-        <div id="supp-invoice-template" style="width: 420px; padding: 25px; background: #ffffff; border: 3px solid var(--accent-orange); font-family: 'Segoe UI', Arial, sans-serif; color: #111; box-sizing: border-box;">
-            <div class="rcpt-header">
-                <img data-logo-src="logo.png" src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22220%22%20height%3D%2250%22%20viewBox%3D%220%200%20220%2050%22%3E%3Crect%20width%3D%22220%22%20height%3D%2250%22%20rx%3D%226%22%20fill%3D%22%23ffffff%22%2F%3E%3Ctext%20x%3D%2212%22%20y%3D%2232%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%20fill%3D%22%23222222%22%3EREVIVE%20%3C%2Ftext%3E%3Ctext%20x%3D%22102%22%20y%3D%2232%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%20fill%3D%22%23ff6600%22%3EFITNESS%3C%2Ftext%3E%3C%2Fsvg%3E" class="brand-logo-img" alt="REVIVE FITNESS STUDIO" onerror="this.onerror=null; this.src=window.FALLBACK_LOGO_SVG;">
-                <div class="rcpt-address">Kadayil Arcade, Thanal Nagar, Keralapuram, Keralam 691504<br>Ph: 8921698044</div>
+        <div id="supp-invoice-template" style="width: 460px; background: #ffffff; border: 2px solid #1e1e1e; border-radius: 14px; overflow: hidden; font-family: 'Segoe UI', Roboto, Arial, sans-serif; color: #111; box-sizing: border-box;">
+            <div class="rcpt-top-banner">
+                <div class="rcpt-logo-pill">
+                    <img data-logo-src="logo.png" src="" class="brand-logo-img rcpt-white-logo-img" alt="REVIVE FITNESS STUDIO">
+                </div>
+                <div class="rcpt-address" id="sinv-studio-address-box">Kadayil Arcade, Thanal Nagar, Keralapuram, Kollam 691504<br><span style="color:#ffffff !important; font-weight:800; text-decoration:none !important;">Contact: +91&#8203; 89216&#8203; 98044</span></div>
                 <h3 class="rcpt-title">SUPPLEMENT INVOICE</h3>
             </div>
-            <table class="rcpt-table" style="font-size:12px; line-height:1.7;">
-                <tr><td><strong>Invoice No:</strong></td><td id="sinv-id" style="text-align:right; font-weight:bold; color:var(--accent-orange);"></td></tr>
-                <tr><td><strong>Date:</strong></td><td id="sinv-date" style="text-align:right;"></td></tr>
-                <tr><td><strong>Member:</strong></td><td id="sinv-member" style="text-align:right; font-weight:bold;"></td></tr>
-                <tr><td><strong>Phone:</strong></td><td id="sinv-phone" style="text-align:right;"></td></tr>
-                <tr><td><strong>Address:</strong></td><td id="sinv-address" style="text-align:right; font-size:11px;"></td></tr>
-            </table>
-            <div style="margin-top:12px; border-top:1px solid #ddd; border-bottom:1px solid #ddd; padding:8px 0;">
-                <table style="width:100%; font-size:11.5px; border-collapse:collapse;" id="sinv-items-table">
-                    <thead>
-                        <tr style="border-bottom:1px dashed #ccc; color:#555; text-align:left;">
-                            <th style="padding:4px 0;">Item</th>
-                            <th style="padding:4px 0; text-align:center;">Qty</th>
-                            <th style="padding:4px 0; text-align:right;">Rate</th>
-                            <th style="padding:4px 0; text-align:right;">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+            <div class="rcpt-badge-bar">
+                <span>INVOICE NO: <strong id="sinv-id" style="color:var(--accent-orange);"></strong></span>
+                <span>DATE: <strong id="sinv-date"></strong></span>
             </div>
-            <div class="rcpt-amount-box" style="margin-top:12px; padding:12px;">
-                <table style="width: 100%; font-size: 12.5px; line-height:1.8;">
-                    <tr><td>Total MRP:</td><td style="text-align: right; text-decoration:line-through; color:#777;">₹<span id="sinv-mrp"></span></td></tr>
-                    <tr><td>Offer Savings:</td><td style="text-align: right; color: green; font-weight:bold;">- ₹<span id="sinv-disc"></span></td></tr>
-                    <tr><td><strong>Net Bill Amount:</strong></td><td style="text-align: right; font-weight: 800;">₹<span id="sinv-net"></span></td></tr>
-                    <tr><td><strong>Amount Paid:</strong></td><td style="text-align: right; color: green; font-weight: 900; font-size:15px;">₹<span id="sinv-paid"></span></td></tr>
-                    <tr><td><strong>Pending Balance:</strong></td><td id="sinv-bal-cell" style="text-align: right; color: red; font-weight: 900;">₹<span id="sinv-bal">0</span></td></tr>
-                    <tr><td><strong>Payment Mode:</strong></td><td style="text-align: right; font-weight:bold;" id="sinv-mode"></td></tr>
-                    <tr><td><strong>Sold By:</strong></td><td style="text-align: right; font-weight:bold;" id="sinv-seller"></td></tr>
+            <div class="rcpt-body">
+                <table class="rcpt-table" style="font-size:12px;">
+                    <tr><td style="color:#666; font-weight:700;">Billed To Member</td><td id="sinv-member" style="text-align:right; font-weight:900; color:#111;"></td></tr>
+                    <tr><td style="color:#666; font-weight:700;">Mobile Number</td><td id="sinv-phone" style="text-align:right; font-weight:700;"></td></tr>
+                    <tr><td style="color:#666; font-weight:700;">Billing Address</td><td id="sinv-address" style="text-align:right; font-size:11px;"></td></tr>
                 </table>
+                <div style="margin:12px 0; border:1px solid #e6e6e6; border-radius:8px; overflow:hidden;">
+                    <table style="width:100%; font-size:11.5px; border-collapse:collapse;" id="sinv-items-table">
+                        <thead>
+                            <tr style="background:#181818; color:#fff; text-align:left;">
+                                <th style="padding:7px 10px;">Supplement Item</th>
+                                <th style="padding:7px 6px; text-align:center;">Qty</th>
+                                <th style="padding:7px 8px; text-align:right;">Price</th>
+                                <th style="padding:7px 10px; text-align:right;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="rcpt-amount-box" style="padding:12px 16px;">
+                    <table style="width: 100%; font-size: 12.5px; line-height:1.85;">
+                        <tr><td style="color:#666;">Total MRP Value:</td><td style="text-align: right; text-decoration:line-through; color:#777;">₹<span id="sinv-mrp"></span></td></tr>
+                        <tr><td style="color:#666;">Store Offer Savings:</td><td style="text-align: right; color: #138a36; font-weight:bold;">- ₹<span id="sinv-disc"></span></td></tr>
+                        <tr id="sinv-coupon-row" style="display:none;"><td style="color:#666; font-weight:700;">Coupon Applied:<strong id="sinv-coupon-code" style="display:none;"></strong></td><td style="text-align: right; color: #138a36; font-weight:bold;">- ₹<span id="sinv-coupon-disc">0</span></td></tr>
+                        <tr style="border-top:1px dashed #ddd;"><td style="font-weight:800;">Net Bill Amount:</td><td style="text-align: right; font-weight: 900; font-size:14px;">₹<span id="sinv-net"></span></td></tr>
+                        <tr><td style="font-weight:800;">Amount Paid:</td><td style="text-align: right; color: #138a36; font-weight: 900; font-size:15.5px;">₹<span id="sinv-paid"></span></td></tr>
+                        <tr><td style="font-weight:800;">Shortfall / Pending:</td><td id="sinv-bal-cell" style="text-align: right; color: #d32f2f; font-weight: 900;">₹<span id="sinv-bal">0</span></td></tr>
+                        <tr><td style="color:#666; font-weight:700;">Payment Mode:</td><td style="text-align: right; font-weight:bold;" id="sinv-mode"></td></tr>
+                    </table>
+                </div>
+                <div class="rcpt-sign-row">
+                    <div style="font-size:11px; color:#555;">
+                        <div style="font-weight:800; color:#111; text-transform:uppercase; font-size:10px;">Verified & Sold By</div>
+                        <div id="sinv-seller" style="font-weight:900; color:var(--accent-orange); font-size:12.5px;"></div>
+                    </div>
+                    <div style="text-align:center;">
+                        <img data-seal-src="signature.png" src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22140%22%20height%3D%2245%22%20viewBox%3D%220%200%20140%2045%22%3E%3Crect%20x%3D%222%22%20y%3D%222%22%20width%3D%22136%22%20height%3D%2241%22%20rx%3D%224%22%20fill%3D%22none%22%20stroke%3D%22%23ff6600%22%20stroke-width%3D%222%22%2F%3E%3Ctext%20x%3D%2270%22%20y%3D%2220%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2210%22%20fill%3D%22%23ff6600%22%20text-anchor%3D%22middle%22%3EREVIVE%20FITNESS%20STUDIO%3C%2Ftext%3E%3Ctext%20x%3D%2270%22%20y%3D%2234%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-weight%3D%22700%22%20font-size%3D%228.5%22%20fill%3D%22%23222222%22%20text-anchor%3D%22middle%22%3EAUTHORIZED%20SEAL%3C%2Ftext%3E%3C%2Fsvg%3E" class="brand-seal-img" alt="Authorized Seal" style="height:42px; object-fit:contain; display:block; margin:0 auto 2px auto;" onerror="this.onerror=null; this.src=window.FALLBACK_SEAL_SVG;">
+                        <div style="font-size:9px; font-weight:800; color:#444; letter-spacing:0.8px; text-transform:uppercase; border-top:1px solid #ccc; padding-top:2px;">Authorized Signatory</div>
+                    </div>
+                </div>
             </div>
-            <div class="rcpt-footer">Thank you for shopping at Revive Supplement Store!</div>
+            <div class="rcpt-footer">THANK YOU FOR SHOPPING AT REVIVE SUPPLEMENT STORE!</div>
         </div>
     </div>
     <script>
@@ -1788,8 +1995,47 @@
             baseAdmissionFee: 850, 
             baseMonthlyFee: 800, 
             basePTFee: 1500,
-            upiId: "revivefitness@upi"
+            upiId: "revivefitness@upi",
+            studioAddress: "Kadayil Arcade, Thanal Nagar, Keralapuram, Kollam 691504",
+            studioEmail: "revivefitness@gmail.com",
+            studioContact1: "8921698044",
+            studioContact2: ""
         };
+
+        function formatSafeNonLinkedText(str) {
+            return String(str || '').replace(/([@.0-9])/g, '$1\u200B');
+        }
+
+        function getStudioDetails() {
+            const s = (typeof storage !== 'undefined' && storage.get) ? storage.get('revive_settings_db', {}) : {};
+            const sd = (s && s.studioDetails && typeof s.studioDetails === 'object') ? s.studioDetails : {};
+            return {
+                address: String(sd.address || s.studioAddress || APP_CONFIG.studioAddress).trim(),
+                email: String(sd.email || s.studioEmail || APP_CONFIG.studioEmail).trim(),
+                contact1: String(sd.contact1 || s.studioContact1 || APP_CONFIG.studioContact1).trim(),
+                contact2: String(sd.contact2 != null ? sd.contact2 : (s.studioContact2 || APP_CONFIG.studioContact2)).trim()
+            };
+        }
+
+        function applyStudioDetailsToAllTemplates() {
+            const d = getStudioDetails();
+            const c1Safe = formatSafeNonLinkedText(d.contact1);
+            const c2Safe = d.contact2 ? formatSafeNonLinkedText(d.contact2) : '';
+            const phoneCombined = c2Safe ? `${c1Safe} / ${c2Safe}` : c1Safe;
+            const emailSafe = d.email ? formatSafeNonLinkedText(d.email) : '';
+
+            const receiptHtml = `${d.address}<br><span style="color:#ffffff !important; font-weight:800; text-decoration:none !important;">Contact: ${phoneCombined}</span>${emailSafe ? `<br><span style="color:#e6e6e6 !important; font-weight:600; text-decoration:none !important;">Email: ${emailSafe}</span>` : ''}`;
+            const rcptBox = document.getElementById('rcpt-studio-address-box');
+            if (rcptBox) rcptBox.innerHTML = receiptHtml;
+            const sinvBox = document.getElementById('sinv-studio-address-box');
+            if (sinvBox) sinvBox.innerHTML = receiptHtml;
+
+            const pdfFooter = document.getElementById('pdf-studio-footer');
+            if (pdfFooter) {
+                const plainPhone = d.contact2 ? `${d.contact1} / ${d.contact2}` : d.contact1;
+                pdfFooter.innerText = `Address: ${d.address} | Contact: ${plainPhone}${d.email ? ' | Email: ' + d.email : ''}`;
+            }
+        }
         var tariffMonthsOrder = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
         var tariffMonthIndices = [3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1, 2]; 
 
@@ -1800,14 +2046,104 @@
         window.FALLBACK_SEAL_SVG = FALLBACK_SEAL_SVG;
         var BLANK_PIXEL = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
         var cachedLogoDataUri = null;
+        var cachedWhiteLogoDataUri = null;
         var cachedSealDataUri = null;
+
+        function buildDefaultWhiteLogoPngDataUri() {
+            const c = document.createElement('canvas');
+            c.width = 480;
+            c.height = 96;
+            const ctx = c.getContext('2d');
+            ctx.clearRect(0, 0, c.width, c.height);
+            // Draw emblem icon on left
+            ctx.strokeStyle = '#ff6600';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(46, 48, 32, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '900 22px Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('RF', 46, 49);
+
+            // Draw REVIVE (Pure White) + FITNESS (Vibrant Orange)
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'alphabetic';
+            ctx.font = '900 42px "Segoe UI", Arial, sans-serif';
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText('REVIVE', 94, 54);
+            const revW = ctx.measureText('REVIVE ').width;
+            ctx.fillStyle = '#ff6600';
+            ctx.fillText('FITNESS', 94 + revW, 54);
+
+            // Subtitle STUDIO
+            ctx.font = '800 14px "Segoe UI", Arial, sans-serif';
+            ctx.fillStyle = '#e0e0e0';
+            ctx.letterSpacing = '4px';
+            ctx.fillText('FITNESS STUDIO • KERALAPURAM', 96, 78);
+            return c.toDataURL('image/png');
+        }
+
+        function convertLogoImageToWhitePngDataUri(imgEl) {
+            try {
+                const natW = imgEl.naturalWidth || 260;
+                const natH = imgEl.naturalHeight || 60;
+                const scale = natW < 400 ? 2 : 1;
+                const c = document.createElement('canvas');
+                c.width = natW * scale;
+                c.height = natH * scale;
+                const ctx = c.getContext('2d');
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+                ctx.drawImage(imgEl, 0, 0, c.width, c.height);
+
+                const imgData = ctx.getImageData(0, 0, c.width, c.height);
+                const d = imgData.data;
+                // Check if corners are solid white background
+                const topLeftWhite = d[3] > 200 && d[0] > 235 && d[1] > 235 && d[2] > 235;
+                let visiblePixels = 0;
+
+                for (let i = 0; i < d.length; i += 4) {
+                    const r = d[i], g = d[i + 1], b = d[i + 2], a = d[i + 3];
+                    if (a < 25) continue;
+                    // If image had a solid white background, strip near-white background pixels to transparent
+                    if (topLeftWhite && r > 235 && g > 235 && b > 235) {
+                        d[i + 3] = 0;
+                        continue;
+                    }
+                    visiblePixels++;
+                    // Keep orange/warm brand accent pixels vibrant, convert dark/black text pixels to pure white
+                    const isOrangeOrRed = (r > 160 && r > g * 1.25 && g < 180 && b < 120);
+                    if (!isOrangeOrRed) {
+                        const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+                        if (lum < 185) {
+                            d[i] = 255;
+                            d[i + 1] = 255;
+                            d[i + 2] = 255;
+                        }
+                    }
+                }
+                if (visiblePixels < 50) {
+                    return buildDefaultWhiteLogoPngDataUri();
+                }
+                ctx.putImageData(imgData, 0, 0);
+                return c.toDataURL('image/png');
+            } catch (e) {
+                return buildDefaultWhiteLogoPngDataUri();
+            }
+        }
 
         // Preload logo.png and signature.png (company seal) from repository into Base64 Data URIs so html2pdf and html2canvas always capture them reliably
         function preloadLogoForCapture() {
-            document.querySelectorAll('.brand-logo-img').forEach(el => {
+            cachedWhiteLogoDataUri = buildDefaultWhiteLogoPngDataUri();
+            document.querySelectorAll('.brand-logo-img:not(.rcpt-white-logo-img)').forEach(el => {
                 const repoLogo = el.getAttribute('data-logo-src') || 'logo.png';
                 el.onerror = function() { this.onerror = null; this.src = FALLBACK_LOGO_SVG; };
                 el.src = repoLogo;
+            });
+            document.querySelectorAll('.rcpt-white-logo-img').forEach(el => {
+                el.src = cachedWhiteLogoDataUri;
             });
             document.querySelectorAll('.brand-seal-img').forEach(el => {
                 const repoSeal = el.getAttribute('data-seal-src') || 'signature.png';
@@ -1816,7 +2152,6 @@
             });
 
             const img = new Image();
-            img.crossOrigin = "anonymous";
             img.onload = function() {
                 try {
                     const c = document.createElement('canvas');
@@ -1824,14 +2159,18 @@
                     c.height = img.naturalHeight || 50;
                     c.getContext('2d').drawImage(img, 0, 0);
                     cachedLogoDataUri = c.toDataURL('image/png');
-                    document.querySelectorAll('.brand-logo-img').forEach(el => { el.src = cachedLogoDataUri; });
+                    cachedWhiteLogoDataUri = convertLogoImageToWhitePngDataUri(img);
+                    document.querySelectorAll('.brand-logo-img:not(.rcpt-white-logo-img)').forEach(el => { el.src = cachedLogoDataUri; });
+                    document.querySelectorAll('.rcpt-white-logo-img').forEach(el => { el.src = cachedWhiteLogoDataUri; });
                 } catch (e) {
                     cachedLogoDataUri = 'logo.png';
                 }
             };
             img.onerror = function() {
                 cachedLogoDataUri = FALLBACK_LOGO_SVG;
-                document.querySelectorAll('.brand-logo-img').forEach(el => { el.src = FALLBACK_LOGO_SVG; });
+                cachedWhiteLogoDataUri = buildDefaultWhiteLogoPngDataUri();
+                document.querySelectorAll('.brand-logo-img:not(.rcpt-white-logo-img)').forEach(el => { el.src = FALLBACK_LOGO_SVG; });
+                document.querySelectorAll('.rcpt-white-logo-img').forEach(el => { el.src = cachedWhiteLogoDataUri; });
             };
             img.src = 'logo.png';
 
@@ -1864,12 +2203,18 @@
         }
 
         function applyLogoToExportTemplates() {
+            applyStudioDetailsToAllTemplates();
             const srcToUse = cachedLogoDataUri || 'logo.png';
-            document.querySelectorAll('#pdf-template .brand-logo-img, #receipt-template .brand-logo-img, #supp-invoice-template .brand-logo-img').forEach(el => {
+            document.querySelectorAll('#pdf-template .brand-logo-img').forEach(el => {
                 el.src = srcToUse;
             });
+            const whiteLogoToUse = cachedWhiteLogoDataUri || buildDefaultWhiteLogoPngDataUri();
+            document.querySelectorAll('#receipt-template .rcpt-white-logo-img, #supp-invoice-template .rcpt-white-logo-img').forEach(el => {
+                el.src = whiteLogoToUse;
+                el.style.display = 'block';
+            });
             const sealToUse = cachedSealDataUri || 'signature.png';
-            document.querySelectorAll('#pdf-template .brand-seal-img').forEach(el => {
+            document.querySelectorAll('#pdf-template .brand-seal-img, #receipt-template .brand-seal-img, #supp-invoice-template .brand-seal-img').forEach(el => {
                 el.src = sealToUse;
                 el.style.display = 'inline-block';
             });
@@ -1963,6 +2308,7 @@
         var supplementCart = {};
         var selectedSuppMember = null;
         var currentSuppSaleRecord = null;
+        var activeAppliedCoupon = null;
 
         function ensureDefaultHolidays() {
             let hols = storage.get('revive_holidays_db', null);
@@ -2045,15 +2391,41 @@
             let supps = storage.get('revive_supplements_db', null);
             if (!supps || !Array.isArray(supps) || supps.length === 0) {
                 supps = [
-                    { id: 'SUPP-101', name: 'Gold Standard 100% Whey (2 lbs)', category: 'Whey Protein', costPrice: 2400, mrp: 3899, offerPrice: 3299, stock: 12 },
-                    { id: 'SUPP-102', name: 'Micronized Creatine Monohydrate (250g)', category: 'Creatine', costPrice: 650, mrp: 1299, offerPrice: 899, stock: 20 },
-                    { id: 'SUPP-103', name: 'BCAA Energy Intra-Workout (30 Servings)', category: 'Amino Acids', costPrice: 900, mrp: 1799, offerPrice: 1299, stock: 15 },
-                    { id: 'SUPP-104', name: 'Pre-Workout Explosive Surge (200g)', category: 'Pre-Workout', costPrice: 850, mrp: 1699, offerPrice: 1199, stock: 10 },
-                    { id: 'SUPP-105', name: 'High Protein Peanut Butter (1 kg)', category: 'Nutrition', costPrice: 320, mrp: 599, offerPrice: 449, stock: 25 }
+                    { id: 'SUPP-101', name: 'Gold Standard 100% Whey (2 lbs)', category: 'Whey Protein', costPrice: 2400, mrp: 3899, offerPrice: 3299, stock: 12, storeVisible: true, lastPurchaseDate: '2026-10-01' },
+                    { id: 'SUPP-102', name: 'Micronized Creatine Monohydrate (250g)', category: 'Creatine', costPrice: 650, mrp: 1299, offerPrice: 899, stock: 20, storeVisible: true, lastPurchaseDate: '2026-10-01' },
+                    { id: 'SUPP-103', name: 'BCAA Energy Intra-Workout (30 Servings)', category: 'Amino Acids', costPrice: 900, mrp: 1799, offerPrice: 1299, stock: 15, storeVisible: true, lastPurchaseDate: '2026-10-01' },
+                    { id: 'SUPP-104', name: 'Pre-Workout Explosive Surge (200g)', category: 'Pre-Workout', costPrice: 850, mrp: 1699, offerPrice: 1199, stock: 10, storeVisible: true, lastPurchaseDate: '2026-10-01' },
+                    { id: 'SUPP-105', name: 'High Protein Peanut Butter (1 kg)', category: 'Nutrition', costPrice: 320, mrp: 599, offerPrice: 449, stock: 25, storeVisible: true, lastPurchaseDate: '2026-10-01' }
                 ];
                 storage.set('revive_supplements_db', supps);
+            } else {
+                supps = supps.map(item => ({
+                    ...item,
+                    offerPrice: item.offerPrice != null ? item.offerPrice : item.mrp,
+                    storeVisible: item.storeVisible !== false,
+                    lastPurchaseDate: item.lastPurchaseDate || '2026-10-01'
+                }));
             }
             return supps;
+        }
+
+        function ensureDefaultSuppCoupons() {
+            let coupons = storage.get('revive_supp_coupons_db', null);
+            if (!coupons || !Array.isArray(coupons)) {
+                coupons = [
+                    { id: 'CPN-1', code: 'REVIVE10', type: 'PERCENT', value: 10, minOrder: 500 },
+                    { id: 'CPN-2', code: 'FIT200', type: 'FLAT', value: 200, minOrder: 1500 }
+                ];
+                storage.set('revive_supp_coupons_db', coupons);
+            }
+            return coupons;
+        }
+
+        function syncSuppConfigBackupToSettings() {
+            const s = storage.get('revive_settings_db', {});
+            s.suppCouponsBackup = storage.get('revive_supp_coupons_db', []);
+            storage.set('revive_settings_db', s);
+            cloudSync.push('pushSettings', s);
         }
 
         function getNextSupplementInvoiceId() {
@@ -2164,29 +2536,64 @@
             queue: [],
             isSyncing: false,
             
-            pullInitial: async function() {
+            pullInitial: async function(showBlockingOverlay = false) {
                 clearRuntimeCache(false);
                 if(!CLOUD_SYNC_URL || CLOUD_SYNC_URL === "YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE") {
                     syncAdmissionCounter();
                     return;
                 }
-                document.getElementById('cloud-sync-overlay').style.display = 'flex';
+                const overlayEl = document.getElementById('cloud-sync-overlay');
+                if (showBlockingOverlay && overlayEl) {
+                    overlayEl.style.display = 'flex';
+                }
                 try {
+                    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+                    const timeoutId = controller ? setTimeout(() => controller.abort(), 7000) : null;
                     const cacheBuster = `&t=${Date.now()}`;
-                    const res = await fetch(CLOUD_SYNC_URL + '?action=pull' + cacheBuster, { cache: 'no-store' });
+                    const res = await fetch(CLOUD_SYNC_URL + '?action=pull' + cacheBuster, {
+                        cache: 'no-store',
+                        signal: controller ? controller.signal : undefined
+                    });
+                    if (timeoutId) clearTimeout(timeoutId);
                     const data = await res.json();
                     
                     // Fix #6: Clear stale local caches and hydrate cleanly from server while preserving soft-deleted records
+                    const existingLocalSa = storage.get('revive_staff_attendance_db', {});
+                    const mergeSaMap = function(targetMap, sourceMap) {
+                        if (!sourceMap || typeof sourceMap !== 'object') return targetMap;
+                        Object.keys(sourceMap).forEach(staffKey => {
+                            const dayObj = sourceMap[staffKey];
+                            if (!dayObj || typeof dayObj !== 'object') return;
+                            if (!targetMap[staffKey]) targetMap[staffKey] = {};
+                            Object.keys(dayObj).forEach(dKey => {
+                                const incRec = dayObj[dKey];
+                                if (!incRec || !incRec.checkIn) return;
+                                const curRec = targetMap[staffKey][dKey];
+                                if (!curRec || (!curRec.checkOut && incRec.checkOut)) {
+                                    targetMap[staffKey][dKey] = incRec;
+                                }
+                            });
+                        });
+                        return targetMap;
+                    };
+                    let mergedSa = mergeSaMap({}, existingLocalSa);
+
                     if(data.settings) {
-                        storage.set('revive_settings_db', data.settings);
+                        const localSettings = storage.get('revive_settings_db', {});
+                        const combinedSettings = { ...localSettings, ...data.settings };
                         if (data.settings.holidaysBackup && !data.holidays) {
                             storage.set('revive_holidays_db', data.settings.holidaysBackup);
                         }
-                        if (data.settings.staffAttendanceBackup && !data.staffAttendance) {
-                            storage.set('revive_staff_attendance_db', data.settings.staffAttendanceBackup);
+                        if (data.settings.staffAttendanceBackup) {
+                            mergedSa = mergeSaMap(mergedSa, data.settings.staffAttendanceBackup);
                         }
+                        if (data.settings.suppCouponsBackup) {
+                            storage.set('revive_supp_coupons_db', data.settings.suppCouponsBackup);
+                        }
+                        combinedSettings.staffAttendanceBackup = mergedSa;
+                        storage.set('revive_settings_db', combinedSettings);
                     }
-                    if(data.holidays && Array.isArray(data.holidays)) {
+                    if(data.holidays && Array.isArray(data.holidays) && data.holidays.length > 0) {
                         storage.set('revive_holidays_db', data.holidays);
                     }
                     if(data.staffAttendance) {
@@ -2197,11 +2604,12 @@
                                 if (!saObj[r.staffId]) saObj[r.staffId] = {};
                                 saObj[r.staffId][r.dateKey] = r;
                             });
-                            storage.set('revive_staff_attendance_db', saObj);
-                        } else {
-                            storage.set('revive_staff_attendance_db', data.staffAttendance);
+                            mergedSa = mergeSaMap(mergedSa, saObj);
+                        } else if (typeof data.staffAttendance === 'object') {
+                            mergedSa = mergeSaMap(mergedSa, data.staffAttendance);
                         }
                     }
+                    storage.set('revive_staff_attendance_db', mergedSa);
                     if(data.staff && Array.isArray(data.staff)) {
                         const localStaff = storage.get('revive_staff_db', []);
                         const backupStaff = (data.settings && Array.isArray(data.settings.staffBackup)) ? data.settings.staffBackup : [];
@@ -2249,15 +2657,49 @@
                     
                     if(data.attendance) {
                         const aObj = {};
+                        let saCurrent = storage.get('revive_staff_attendance_db', {});
                         data.attendance.forEach(a => {
+                            if (!a || !a.dateKey) return;
+                            if (String(a.userId || '').startsWith('__STAFF_ATT__')) {
+                                try {
+                                    const parts = String(a.userId).split(':');
+                                    const sPin = parts[1] || '';
+                                    const sId = parts[2] || (`STF-${sPin}`);
+                                    const payload = JSON.parse(a.timestamp || '{}');
+                                    const dKey = String(a.dateKey).split('T')[0];
+                                    if (!saCurrent[sId]) saCurrent[sId] = {};
+                                    const existing = saCurrent[sId][dKey];
+                                    const reconstructed = {
+                                        id: `SATT-${sId}-${dKey}`,
+                                        staffId: sId,
+                                        staffName: a.fullName || payload.staffName || 'Staff',
+                                        staffPin: sPin,
+                                        dateKey: dKey,
+                                        checkIn: payload.checkIn || '',
+                                        checkInIso: payload.checkInIso || '',
+                                        checkOut: payload.checkOut || '',
+                                        checkOutIso: payload.checkOutIso || '',
+                                        duration: payload.duration || '',
+                                        status: 'Present'
+                                    };
+                                    if (!existing || (!existing.checkOut && reconstructed.checkOut)) {
+                                        saCurrent[sId][dKey] = reconstructed;
+                                    }
+                                } catch (err) {}
+                                return;
+                            }
                             if(!aObj[a.dateKey]) aObj[a.dateKey] = [];
                             aObj[a.dateKey].push(a);
                         });
                         storage.set('revive_attendance_db', aObj);
+                        storage.set('revive_staff_attendance_db', saCurrent);
                     }
 
                     // Fix #2: Always sync admission number series after pulling Google Sheet data
                     syncAdmissionCounter();
+                    if (window.appContext && window.appContext.currentRole === 'staff' && window.moduleContext && typeof window.moduleContext.refreshDashboardHrState === 'function') {
+                        window.moduleContext.refreshDashboardHrState();
+                    }
                 } catch(e) {
                     console.error("Cloud Pull Error:", e);
                     syncAdmissionCounter();
@@ -2267,7 +2709,7 @@
 
             forceRefreshCache: async function() {
                 clearRuntimeCache(false);
-                await this.pullInitial();
+                await this.pullInitial(true);
                 showNotice("Cache cleared & synced with Google Sheet records!", "success");
                 window.appContext.goHome();
             },
@@ -2426,12 +2868,14 @@
                 if(viewName === 'tariff-editor') window.moduleContext.initTariffEditor();
                 if(viewName === 'upi-editor') window.moduleContext.initUpiEditor();
                 if(viewName === 'pin-editor') window.moduleContext.initPinEditor();
+                if(viewName === 'studio-details') window.moduleContext.initStudioDetails();
                 if(viewName === 'staff-editor') window.moduleContext.initStaffEditor();
                 if(viewName === 'reports') window.moduleContext.initReports();
                 if(viewName === 'attendance') window.moduleContext.initAttendanceView();
                 if(viewName === 'expense') window.moduleContext.initExpenseView();
                 if(viewName === 'supplement-store') window.moduleContext.initSupplementStore();
                 if(viewName === 'supplement-admin') window.moduleContext.initSupplementAdmin();
+                if(viewName === 'supplement-store-config') window.moduleContext.initSupplementStoreConfig();
                 if(viewName === 'staff-my-attendance') window.moduleContext.initStaffMyAttendance();
                 if(viewName === 'staff-holiday-calendar') window.moduleContext.initStaffHolidayCalendar();
                 if(viewName === 'admin-staff-attendance') window.moduleContext.initAdminStaffAttendance();
@@ -2816,6 +3260,37 @@
                 window.appContext.goHome();
             },
 
+            initStudioDetails: function() {
+                const d = getStudioDetails();
+                document.getElementById('studio-cfg-address').value = d.address;
+                document.getElementById('studio-cfg-email').value = d.email;
+                document.getElementById('studio-cfg-phone1').value = d.contact1;
+                document.getElementById('studio-cfg-phone2').value = d.contact2;
+            },
+            saveStudioDetails: function(e) {
+                if (e) e.preventDefault();
+                const address = document.getElementById('studio-cfg-address').value.trim();
+                const email = document.getElementById('studio-cfg-email').value.trim();
+                const contact1 = document.getElementById('studio-cfg-phone1').value.trim();
+                const contact2 = document.getElementById('studio-cfg-phone2').value.trim();
+
+                if (!address || !email || !contact1) {
+                    showNotice("Please fill Address, Email ID, and Contact Number 1.", "error");
+                    return;
+                }
+                const s = storage.get('revive_settings_db', {});
+                s.studioDetails = { address, email, contact1, contact2 };
+                s.studioAddress = address;
+                s.studioEmail = email;
+                s.studioContact1 = contact1;
+                s.studioContact2 = contact2;
+                storage.set('revive_settings_db', s);
+                cloudSync.push('pushSettings', s);
+                applyStudioDetailsToAllTemplates();
+                showNotice("Studio Details updated & applied to all invoices and forms!", "success");
+                window.appContext.goHome();
+            },
+
             initStaffEditor: function() {
                 ensureDefaultHolidays();
                 window.moduleContext.resetStaffForm();
@@ -3003,25 +3478,50 @@
                 return null;
             },
 
-            getTodayStaffPunchRecord: function(st, todayKey) {
+            getStaffPunchRecordForDate: function(st, targetDateKey) {
                 if (!st) return null;
                 let saDb = storage.get('revive_staff_attendance_db', {});
                 if (!saDb || typeof saDb !== 'object' || Array.isArray(saDb)) saDb = {};
-                if (saDb[st.id] && saDb[st.id][todayKey]) return saDb[st.id][todayKey];
-                // Fallback lookup by staff PIN or name in case ID changed after cloud sync
+                const pinKey = `PIN_${String(st.pin || '').trim()}`;
+                let bestRec = null;
+
+                const candidates = [];
+                if (saDb[st.id] && saDb[st.id][targetDateKey]) candidates.push(saDb[st.id][targetDateKey]);
+                if (saDb[pinKey] && saDb[pinKey][targetDateKey]) candidates.push(saDb[pinKey][targetDateKey]);
+
                 for (const k of Object.keys(saDb)) {
                     const dayMap = saDb[k];
-                    if (dayMap && dayMap[todayKey]) {
-                        const r = dayMap[todayKey];
-                        if (String(r.staffName || '').toLowerCase() === String(st.name || '').toLowerCase() || String(r.staffPin || '') === String(st.pin || '')) {
-                            if (!saDb[st.id]) saDb[st.id] = {};
-                            saDb[st.id][todayKey] = r;
-                            storage.set('revive_staff_attendance_db', saDb);
-                            return r;
+                    if (dayMap && dayMap[targetDateKey]) {
+                        const r = dayMap[targetDateKey];
+                        if (
+                            String(r.staffId || '') === String(st.id || '') ||
+                            (st.pin && String(r.staffPin || '').trim() === String(st.pin).trim()) ||
+                            (st.name && String(r.staffName || '').trim().toLowerCase() === String(st.name).trim().toLowerCase())
+                        ) {
+                            candidates.push(r);
                         }
                     }
                 }
-                return null;
+                candidates.forEach(c => {
+                    if (!c || !c.checkIn) return;
+                    if (!bestRec || (!bestRec.checkOut && c.checkOut)) {
+                        bestRec = c;
+                    }
+                });
+                if (bestRec) {
+                    if (!saDb[st.id]) saDb[st.id] = {};
+                    saDb[st.id][targetDateKey] = bestRec;
+                    if (st.pin) {
+                        if (!saDb[pinKey]) saDb[pinKey] = {};
+                        saDb[pinKey][targetDateKey] = bestRec;
+                    }
+                    storage.set('revive_staff_attendance_db', saDb);
+                }
+                return bestRec;
+            },
+
+            getTodayStaffPunchRecord: function(st, todayKey) {
+                return window.moduleContext.getStaffPunchRecordForDate(st, todayKey);
             },
 
             refreshDashboardHrState: function() {
@@ -3156,9 +3656,21 @@
                     duration: '',
                     status: 'Present'
                 };
+                const pinKey = `PIN_${String(st.pin || '').trim()}`;
                 saDb[st.id][todayKey] = rec;
+                if (st.pin) {
+                    if (!saDb[pinKey]) saDb[pinKey] = {};
+                    saDb[pinKey][todayKey] = rec;
+                }
                 storage.set('revive_staff_attendance_db', saDb);
                 cloudSync.push('pushStaffAttendance', rec);
+                cloudSync.push('pushAttendance', {
+                    dateKey: todayKey,
+                    userId: `__STAFF_ATT__:${st.pin}:${st.id}`,
+                    fullName: st.name,
+                    timestamp: JSON.stringify({ checkIn: rec.checkIn, checkInIso: rec.checkInIso, checkOut: '', duration: '' }),
+                    month: now.toLocaleString('default', { month: 'long' })
+                });
                 syncHrBackupToSettings();
 
                 showNotice(`Checked in at ${timeStr}! Studio Operations unlocked.`, "success");
@@ -3192,10 +3704,22 @@
                     rec.duration = 'Completed';
                 }
 
+                const pinKey = `PIN_${String(st.pin || '').trim()}`;
                 if (!saDb[st.id]) saDb[st.id] = {};
                 saDb[st.id][todayKey] = rec;
+                if (st.pin) {
+                    if (!saDb[pinKey]) saDb[pinKey] = {};
+                    saDb[pinKey][todayKey] = rec;
+                }
                 storage.set('revive_staff_attendance_db', saDb);
                 cloudSync.push('pushStaffAttendance', rec);
+                cloudSync.push('pushAttendance', {
+                    dateKey: todayKey,
+                    userId: `__STAFF_ATT__:${st.pin}:${st.id}`,
+                    fullName: st.name,
+                    timestamp: JSON.stringify({ checkIn: rec.checkIn, checkInIso: rec.checkInIso, checkOut: rec.checkOut, checkOutIso: rec.checkOutIso, duration: rec.duration }),
+                    month: now.toLocaleString('default', { month: 'long' })
+                });
                 syncHrBackupToSettings();
 
                 showNotice(`Checked out at ${timeStr} (${rec.duration}). Operations locked.`, "success");
@@ -3234,7 +3758,7 @@
                     const dObj = new Date(year, monthIdx, d);
                     const dayName = dObj.toLocaleDateString('en-IN', { weekday: 'short' });
                     const holInfo = getDayHolidayInfo(dateIso);
-                    const punch = staffRecs[dateIso];
+                    const punch = window.moduleContext.getStaffPunchRecordForDate(staffObj, dateIso) || staffRecs[dateIso];
 
                     if (holInfo.isHoliday) {
                         holidays++;
@@ -4259,46 +4783,101 @@
                 window.moduleContext.generateReceiptImage(paidAmt, balDue, record.method || "N/A", record.collectedBy || "System Admin", 'view', record.lastDate, totalDue);
             },
             
-            generateReceiptImage: function(paidAmt, newBal, mode, collector, triggerFlow, overrideDate, totalDueAmt) {
+            populateStyledReceiptDom: function(memberObj, monthLabel, totalDueAmt, paidAmt, pendingBalAmt, mode, collector, dateIsoStr) {
                 applyLogoToExportTemplates();
-                const dIso = overrideDate || new Date().toISOString();
-                const dStr = new Date(dIso).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+                const dObj = dateIsoStr ? new Date(dateIsoStr) : new Date();
+                const dStr = (isNaN(dObj.getTime()) ? new Date() : dObj).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+                const cleanPaid = parseInt(paidAmt || 0, 10);
+                const cleanBal = Math.max(0, parseInt(pendingBalAmt || 0, 10));
+                const cleanTotal = totalDueAmt != null ? parseInt(totalDueAmt, 10) : (cleanPaid + cleanBal);
+
+                const shortId = String(memberObj.id || 'REV').replace(/\D/g, '') || '001';
+                const shortM = String(monthLabel || 'FEE').replace(/[^A-Za-z]/g, '').slice(0, 3).toUpperCase();
+                const rcptNoEl = document.getElementById('rcpt-no');
+                if (rcptNoEl) rcptNoEl.innerText = `RCPT-${shortId}-${shortM}`;
+
+                document.getElementById('rcpt-name').innerText = memberObj.fullName;
+                document.getElementById('rcpt-id').innerText = memberObj.id;
+                document.getElementById('rcpt-phone').innerText = memberObj.primaryContact;
+                document.getElementById('rcpt-month').innerText = monthLabel;
+                document.getElementById('rcpt-total-due').innerText = cleanTotal.toLocaleString('en-IN');
+                document.getElementById('rcpt-paid').innerText = cleanPaid.toLocaleString('en-IN');
+                const paidRowEl = document.getElementById('rcpt-paid-row');
+                if (paidRowEl) paidRowEl.innerText = cleanPaid.toLocaleString('en-IN');
+                document.getElementById('rcpt-balance').innerText = cleanBal === 0 ? '0 (Cleared)' : `${cleanBal.toLocaleString('en-IN')} (Shortfall)`;
+
+                const balCell = document.getElementById('rcpt-balance-cell');
+                if (balCell) balCell.style.color = cleanBal === 0 ? '#138a36' : '#d32f2f';
+
+                const heroBox = document.getElementById('rcpt-hero-box');
+                const statusEl = document.getElementById('rcpt-status-label');
+                if (cleanBal === 0) {
+                    if (heroBox) {
+                        heroBox.style.background = 'linear-gradient(135deg, #f4fbf7 0%, #e8f8ef 100%)';
+                        heroBox.style.borderColor = '#9fe3b8';
+                    }
+                    if (statusEl) {
+                        statusEl.innerText = '✔ PAID IN FULL (CLEARED)';
+                        statusEl.style.background = '#138a36';
+                        statusEl.style.color = '#ffffff';
+                    }
+                } else {
+                    if (heroBox) {
+                        heroBox.style.background = 'linear-gradient(135deg, #fffdf5 0%, #fff4e0 100%)';
+                        heroBox.style.borderColor = '#f6c36d';
+                    }
+                    if (statusEl) {
+                        statusEl.innerText = `⏳ PARTIAL (SHORTFALL: ₹${cleanBal})`;
+                        statusEl.style.background = '#d97706';
+                        statusEl.style.color = '#ffffff';
+                    }
+                }
+
+                document.getElementById('rcpt-mode').innerText = mode || 'UPI';
+                document.getElementById('rcpt-collector').innerText = collector || 'System Admin';
+                document.getElementById('rcpt-date').innerText = dStr;
+            },
+
+            downloadReceiptImageDirect: function() {
+                if (!window._lastGeneratedReceiptDataUrl) {
+                    showNotice("Receipt image is still rendering. Please try again in a moment.", "warning");
+                    return;
+                }
+                const uid = (currentActiveUser && currentActiveUser.id) ? currentActiveUser.id : ((currentMemberDetails && currentMemberDetails.id) ? currentMemberDetails.id : 'Member');
+                const mName = (activePaymentConfig && activePaymentConfig.month) ? String(activePaymentConfig.month).replace(/\s+/g, '_') : 'Fee';
+                const fileName = `Revive_Receipt_${uid}_${mName}.jpg`;
+                window.moduleContext.triggerDirectStorageDownload(window._lastGeneratedReceiptDataUrl, fileName);
+            },
+
+            generateReceiptImage: function(paidAmt, newBal, mode, collector, triggerFlow, overrideDate, totalDueAmt) {
                 const cleanPaid = parseInt(paidAmt || 0, 10);
                 const cleanBal = Math.max(0, parseInt(newBal || 0, 10));
                 const cleanTotal = totalDueAmt != null ? parseInt(totalDueAmt, 10) : (cleanPaid + cleanBal);
-                
-                document.getElementById('rcpt-name').innerText = currentActiveUser.fullName;
-                document.getElementById('rcpt-id').innerText = currentActiveUser.id;
-                document.getElementById('rcpt-phone').innerText = currentActiveUser.primaryContact;
-                document.getElementById('rcpt-month').innerText = `${activePaymentConfig.month} (${activePaymentConfig.fy})`;
-                document.getElementById('rcpt-total-due').innerText = cleanTotal;
-                document.getElementById('rcpt-paid').innerText = cleanPaid;
-                document.getElementById('rcpt-balance').innerText = cleanBal === 0 ? '0 (Cleared)' : cleanBal;
-                const balCell = document.getElementById('rcpt-balance-cell');
-                if (balCell) balCell.style.color = cleanBal === 0 ? 'green' : 'red';
-                const statusEl = document.getElementById('rcpt-status-label');
-                if (statusEl) {
-                    statusEl.innerText = cleanBal === 0 ? 'PAID IN FULL (CLEARED)' : 'PARTIAL (BALANCE PENDING)';
-                    statusEl.style.color = cleanBal === 0 ? 'green' : '#d97706';
-                }
-                document.getElementById('rcpt-mode').innerText = mode;
-                document.getElementById('rcpt-collector').innerText = collector || 'System Admin';
-                document.getElementById('rcpt-date').innerText = dStr;
+                const monthLbl = `${activePaymentConfig.month} (${activePaymentConfig.fy})`;
+
+                window.moduleContext.populateStyledReceiptDom(currentActiveUser, monthLbl, cleanTotal, cleanPaid, cleanBal, mode, collector, overrideDate);
 
                 const wrapper = document.getElementById('receipt-render-zone');
                 const target = document.getElementById('receipt-template');
                 wrapper.style.left = '0'; wrapper.style.opacity = '1';
 
                 setTimeout(() => {
-                    html2canvas(target, { scale: 2 }).then(canvas => {
+                    html2canvas(target, { scale: 2.5, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.96);
+                        window._lastGeneratedReceiptDataUrl = dataUrl;
+                        const srPrev = document.getElementById('sr-preview-img');
+                        if (srPrev) srPrev.src = dataUrl;
+                        const vrPrev = document.getElementById('vr-preview-img');
+                        if (vrPrev) vrPrev.src = dataUrl;
+
                         canvas.toBlob(blob => {
                             currentGeneratedReceiptBlob = blob;
                             wrapper.style.left = '-9999px'; wrapper.style.opacity = '0';
                             if (triggerFlow === 'success') { document.getElementById('receiptSuccessModal').style.display = 'flex'; } 
                             else if (triggerFlow === 'view') { document.getElementById('viewReceiptModal').style.display = 'flex'; }
-                        }, 'image/jpeg', 0.95);
+                        }, 'image/jpeg', 0.96);
                     });
-                }, 300);
+                }, 250);
             },
             
             shareReceipt: async function(source = 'success') {
@@ -4310,7 +4889,7 @@
                     const file = new File([currentGeneratedReceiptBlob], `Receipt_${currentActiveUser.id}.jpg`, { type: 'image/jpeg' });
                     const paidTxt = document.getElementById('rcpt-paid').innerText;
                     const balTxt = document.getElementById('rcpt-balance').innerText;
-                    const msg = `Dear ${currentActiveUser.fullName},\n\nPayment Receipt for *${activePaymentConfig.month}*:\n• *Total Paid:* ₹${paidTxt}\n• *Pending Balance:* ₹${balTxt}\n• *Collected By:* ${document.getElementById('rcpt-collector').innerText}\n\nThank you for choosing *Revive Fitness Studio*!\n📞 8921698044`;
+                    const msg = `Dear ${currentActiveUser.fullName},\n\nPayment Receipt for *${activePaymentConfig.month}*:\n• *Total Paid:* ₹${paidTxt}\n• *Pending Balance:* ₹${balTxt}\n• *Collected By:* ${document.getElementById('rcpt-collector').innerText}\n\nThank you for choosing *Revive Fitness Studio*!\n📞 ${getStudioDetails().contact1}${getStudioDetails().contact2 ? ' / ' + getStudioDetails().contact2 : ''}`;
                     
                     if (navigator.canShare && navigator.canShare({ files: [file] })) { 
                         await navigator.share({ title: 'Payment Receipt', text: msg, files: [file] }); 
@@ -4339,23 +4918,17 @@
                 const paidNow = parseInt(targetMember.initialAmountPaid != null ? targetMember.initialAmountPaid : totalFee, 10);
                 const pendingBal = Math.max(0, totalFee - paidNow);
 
-                document.getElementById('rcpt-name').innerText = targetMember.fullName; 
-                document.getElementById('rcpt-id').innerText = targetMember.id;
-                document.getElementById('rcpt-phone').innerText = targetMember.primaryContact; 
-                document.getElementById('rcpt-month').innerText = `Admission + ${targetMember._month} (${targetMember._fy})`;
-                document.getElementById('rcpt-total-due').innerText = totalFee;
-                document.getElementById('rcpt-paid').innerText = paidNow; 
-                document.getElementById('rcpt-balance').innerText = pendingBal === 0 ? "0 (Cleared)" : pendingBal;
-                const balCell = document.getElementById('rcpt-balance-cell');
-                if (balCell) balCell.style.color = pendingBal === 0 ? 'green' : 'red';
-                const statusEl = document.getElementById('rcpt-status-label');
-                if (statusEl) {
-                    statusEl.innerText = pendingBal === 0 ? 'PAID IN FULL (CLEARED)' : 'PARTIAL (BALANCE PENDING)';
-                    statusEl.style.color = pendingBal === 0 ? 'green' : '#d97706';
-                }
-                document.getElementById('rcpt-mode').innerText = document.getElementById('paymentMethod') ? document.getElementById('paymentMethod').value : 'CASH'; 
-                document.getElementById('rcpt-collector').innerText = targetMember.collectedBy || 'System Admin';
-                document.getElementById('rcpt-date').innerText = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+                const modeVal = document.getElementById('paymentMethod') ? document.getElementById('paymentMethod').value : 'UPI';
+                window.moduleContext.populateStyledReceiptDom(
+                    targetMember,
+                    `Admission + ${targetMember._month} (${targetMember._fy})`,
+                    totalFee,
+                    paidNow,
+                    pendingBal,
+                    modeVal,
+                    targetMember.collectedBy || 'System Admin',
+                    new Date().toISOString()
+                );
 
                 const wrapper = document.getElementById('receipt-render-zone'); 
                 const target = document.getElementById('receipt-template');
@@ -4369,7 +4942,7 @@
                             
                             try {
                                 const file = new File([blob], `Admission_Receipt_${targetMember.id}.jpg`, { type: 'image/jpeg' });
-                                const msg = `Dear ${targetMember.fullName},\n\nAdmission & Initial Fee Receipt (${targetMember._month}):\n• *Total Fee:* ₹${totalFee}\n• *Amount Paid:* ₹${paidNow}\n• *Pending Balance:* ₹${pendingBal === 0 ? '0 (Cleared)' : pendingBal}\n• *Collected By:* ${targetMember.collectedBy || 'Admin'}\n\nThank you for joining *Revive Fitness Studio*!\n📞 8921698044`;
+                                const msg = `Dear ${targetMember.fullName},\n\nAdmission & Initial Fee Receipt (${targetMember._month}):\n• *Total Fee:* ₹${totalFee}\n• *Amount Paid:* ₹${paidNow}\n• *Pending Balance:* ₹${pendingBal === 0 ? '0 (Cleared)' : pendingBal}\n• *Collected By:* ${targetMember.collectedBy || 'Admin'}\n\nThank you for joining *Revive Fitness Studio*!\n📞 ${getStudioDetails().contact1}${getStudioDetails().contact2 ? ' / ' + getStudioDetails().contact2 : ''}`;
                                 
                                 if (navigator.canShare && navigator.canShare({ files: [file] })) { 
                                     await navigator.share({ title: 'Admission Receipt', text: msg, files: [file] }); 
@@ -4613,7 +5186,7 @@
                         pdfWrapper.style.display = 'none'; appWrapper.style.display = 'flex';
                         btn.innerText = origText;
                         
-                        const msg = `Dear ${currentMemberDetails.fullName},\n\nWelcome to Revive Fitness Studio!\n\nYour admission process has been successfully completed. Please find your Official Admission Record attached/downloaded with this message.\n\n*Admission Details:*\n• ID: ${currentMemberDetails.id}\n• Category: ${currentMemberDetails.admissionCategory} - ${currentMemberDetails.trainingCategory}\n• Date: ${currentMemberDetails.date}\n• Verified By: ${currentMemberDetails.collectedBy || 'Admin'}\n\nBest Regards,\n*Revive Fitness Studio*\n📞 8921698044\n📍 Kadayil Arcade, Thanal Nagar`;
+                        const msg = `Dear ${currentMemberDetails.fullName},\n\nWelcome to Revive Fitness Studio!\n\nYour admission process has been successfully completed. Please find your Official Admission Record attached/downloaded with this message.\n\n*Admission Details:*\n• ID: ${currentMemberDetails.id}\n• Category: ${currentMemberDetails.admissionCategory} - ${currentMemberDetails.trainingCategory}\n• Date: ${currentMemberDetails.date}\n• Verified By: ${currentMemberDetails.collectedBy || 'Admin'}\n\nBest Regards,\n*Revive Fitness Studio*\n📞 ${getStudioDetails().contact1}${getStudioDetails().contact2 ? ' / ' + getStudioDetails().contact2 : ''}${getStudioDetails().email ? '\n✉ ' + getStudioDetails().email : ''}\n📍 ${getStudioDetails().address}`;
 
                         const file = new File([pdfBlob], `${currentMemberDetails.id}_Record.pdf`, { type: 'application/pdf' });
                         if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -4868,7 +5441,8 @@
                 const suppSalesTbody = document.querySelector('#table-supp-sales-report tbody');
                 if (suppSalesTbody) {
                     suppSalesTbody.innerHTML = currStats.suppSalesRows.length ? currStats.suppSalesRows.map(sale => {
-                        const itemsSummary = (sale.items || []).map(i => `${i.name} (x${i.qty})`).join(', ');
+                        const cpnNote = sale.couponCode ? ` [Coupon: ${sale.couponDetails || (sale.couponCode + ' -₹' + (sale.couponDiscount || 0))}]` : '';
+                        const itemsSummary = (sale.items || []).map(i => `${i.name} (x${i.qty})`).join(', ') + cpnNote;
                         const totBill = parseInt(sale.totalAmount || 0, 10);
                         const paidBill = sale.amountPaid != null ? parseInt(sale.amountPaid, 10) : totBill;
                         const balBill = Math.max(0, totBill - paidBill);
@@ -4987,10 +5561,11 @@
                 lines.push([]);
 
                 lines.push(['4. SUPPLEMENT SALES REGISTER (CREDIT)'].map(esc).join(','));
-                lines.push(['Date', 'Invoice ID', 'Member ID', 'Member Name', 'Items Sold', 'Payment Method', 'Sold By', 'Total Sale (INR)'].map(esc).join(','));
+                lines.push(['Date', 'Invoice ID', 'Member ID', 'Member Name', 'Items Sold', 'Applied Coupon Details', 'Payment Method', 'Sold By', 'Total Sale (INR)'].map(esc).join(','));
                 s.suppSalesRows.forEach(sale => {
                     const itemsTxt = (sale.items || []).map(i => `${i.name} (x${i.qty})`).join('; ');
-                    lines.push([sale.date || formatDateStr(sale.isoDate), sale.id, sale.userId, sale.fullName, itemsTxt, sale.method, sale.soldBy, sale.totalAmount].map(esc).join(','));
+                    const cpnTxt = sale.couponDetails || (sale.couponCode ? `${sale.couponCode} (-Rs.${sale.couponDiscount || 0})` : 'None');
+                    lines.push([sale.date || formatDateStr(sale.isoDate), sale.id, sale.userId, sale.fullName, itemsTxt, cpnTxt, sale.method, sale.soldBy, sale.totalAmount].map(esc).join(','));
                 });
                 lines.push([]);
 
@@ -5073,13 +5648,17 @@
             },
 
             // ==========================================
-            // SUPPLEMENT STORE MODULE (BROWSE, CART, MEMBER VALIDATION, PAYMENT & INVOICE)
+            // SUPPLEMENT STORE MODULE (BROWSE, CART, COUPON CODE, MEMBER VALIDATION, PAYMENT & INVOICE)
             // ==========================================
             initSupplementStore: function() {
                 ensureDefaultSupplements();
+                ensureDefaultSuppCoupons();
                 supplementCart = {};
                 selectedSuppMember = null;
                 currentSuppSaleRecord = null;
+                activeAppliedCoupon = null;
+                const searchInp = document.getElementById('supp-store-search');
+                if (searchInp) searchInp.value = '';
                 document.getElementById('supp-step-1').classList.add('active-step');
                 document.getElementById('supp-step-2').classList.remove('active-step');
                 document.getElementById('supp-step-3').classList.remove('active-step');
@@ -5088,25 +5667,52 @@
 
             renderSupplementCatalog: function() {
                 const supps = ensureDefaultSupplements();
-                const grid = document.getElementById('supp-catalog-grid');
-                if (!grid) return;
-                grid.innerHTML = '';
+                // Sort all visible supplements alphabetically (A -> Z)
+                const allVisibleSupps = supps
+                    .filter(item => item.storeVisible !== false)
+                    .sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), undefined, { sensitivity: 'base' }));
 
+                const searchEl = document.getElementById('supp-store-search');
+                const clearBtn = document.getElementById('btn-clear-supp-search');
+                const query = searchEl ? String(searchEl.value || '').trim().toLowerCase() : '';
+                if (clearBtn) clearBtn.style.display = query ? 'inline-flex' : 'none';
+
+                // Calculate cart totals across all items in cart (even if search filter is active)
                 let totalItems = 0;
                 let totalPayable = 0;
                 let totalMrp = 0;
-
                 supps.forEach(item => {
-                    const stock = parseInt(item.stock || 0, 10);
-                    const mrp = parseInt(item.mrp || 0, 10);
-                    const offer = parseInt(item.offerPrice || mrp, 10);
                     const inCartQty = supplementCart[item.id] || 0;
-
                     if (inCartQty > 0) {
+                        const mrp = parseInt(item.mrp || 0, 10);
+                        const offer = parseInt(item.offerPrice != null ? item.offerPrice : mrp, 10);
                         totalItems += inCartQty;
                         totalPayable += inCartQty * offer;
                         totalMrp += inCartQty * mrp;
                     }
+                });
+
+                const visibleSupps = query
+                    ? allVisibleSupps.filter(item =>
+                        String(item.name || '').toLowerCase().includes(query) ||
+                        String(item.category || '').toLowerCase().includes(query) ||
+                        String(item.id || '').toLowerCase().includes(query)
+                    )
+                    : allVisibleSupps;
+
+                const grid = document.getElementById('supp-catalog-grid');
+                if (!grid) return;
+                grid.innerHTML = '';
+
+                if (visibleSupps.length === 0) {
+                    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:2rem; color:var(--text-muted);">${query ? 'No supplements match "' + query + '".' : 'No supplements are currently enabled for display in the store.'}</div>`;
+                }
+
+                visibleSupps.forEach(item => {
+                    const stock = parseInt(item.stock || 0, 10);
+                    const mrp = parseInt(item.mrp || 0, 10);
+                    const offer = parseInt(item.offerPrice != null ? item.offerPrice : mrp, 10);
+                    const inCartQty = supplementCart[item.id] || 0;
 
                     const savingsPct = mrp > offer ? Math.round(((mrp - offer) / mrp) * 100) : 0;
                     let stockBadgeClass = 'stock-in';
@@ -5170,6 +5776,7 @@
 
             clearSupplementCart: function() {
                 supplementCart = {};
+                activeAppliedCoupon = null;
                 window.moduleContext.renderSupplementCatalog();
                 showNotice("Supplement cart cleared.", "info");
             },
@@ -5189,12 +5796,13 @@
                     const item = supps.find(s => String(s.id) === String(pid));
                     const qty = supplementCart[pid] || 0;
                     if (!item || qty <= 0) return;
-                    const sub = qty * parseInt(item.offerPrice, 10);
+                    const sellPrice = parseInt(item.offerPrice != null ? item.offerPrice : item.mrp, 10);
+                    const sub = qty * sellPrice;
                     grandTotal += sub;
                     tbody.innerHTML += `<tr>
                         <td><strong>${item.name}</strong></td>
                         <td style="text-decoration:line-through; color:var(--text-muted);">₹${item.mrp}</td>
-                        <td style="color:var(--accent-orange); font-weight:700;">₹${item.offerPrice}</td>
+                        <td style="color:var(--accent-orange); font-weight:700;">₹${sellPrice}</td>
                         <td><strong>${qty}</strong></td>
                         <td style="font-weight:900;">₹${sub}</td>
                     </tr>`;
@@ -5256,6 +5864,36 @@
                 document.getElementById('supp-member-live-preview').innerHTML = `<span style="color:var(--success-green); font-weight:700; font-size:0.85rem;">✔ Member verified and details loaded for invoice generation.</span>`;
             },
 
+            getSupplementCartSubtotalInfo: function() {
+                const supps = ensureDefaultSupplements();
+                let totalMrp = 0;
+                let baseSellingTotal = 0;
+                Object.keys(supplementCart).forEach(pid => {
+                    const item = supps.find(s => String(s.id) === String(pid));
+                    const qty = supplementCart[pid] || 0;
+                    if (item && qty > 0) {
+                        const sellPrice = parseInt(item.offerPrice != null ? item.offerPrice : item.mrp, 10);
+                        totalMrp += qty * parseInt(item.mrp, 10);
+                        baseSellingTotal += qty * sellPrice;
+                    }
+                });
+                let couponDisc = 0;
+                if (activeAppliedCoupon) {
+                    if (baseSellingTotal >= parseInt(activeAppliedCoupon.minOrder || 0, 10)) {
+                        if (activeAppliedCoupon.type === 'PERCENT') {
+                            couponDisc = Math.round((baseSellingTotal * parseFloat(activeAppliedCoupon.value || 0)) / 100);
+                        } else {
+                            couponDisc = parseInt(activeAppliedCoupon.value || 0, 10);
+                        }
+                        couponDisc = Math.min(baseSellingTotal, Math.max(0, couponDisc));
+                    } else {
+                        activeAppliedCoupon = null;
+                    }
+                }
+                const finalNet = Math.max(0, baseSellingTotal - couponDisc);
+                return { totalMrp, baseSellingTotal, couponDisc, finalNet };
+            },
+
             proceedToSuppPayment: function() {
                 if (!selectedSuppMember || !document.getElementById('supp-cust-id').value) {
                     const typed = document.getElementById('supp-member-search').value.trim();
@@ -5270,31 +5908,13 @@
                     return;
                 }
 
-                const supps = ensureDefaultSupplements();
-                let totalMrp = 0;
-                let totalNet = 0;
-                Object.keys(supplementCart).forEach(pid => {
-                    const item = supps.find(s => String(s.id) === String(pid));
-                    const qty = supplementCart[pid] || 0;
-                    if (item && qty > 0) {
-                        totalMrp += qty * parseInt(item.mrp, 10);
-                        totalNet += qty * parseInt(item.offerPrice, 10);
-                    }
-                });
+                activeAppliedCoupon = null;
+                document.getElementById('supp-coupon-input').value = '';
+                document.getElementById('supp-coupon-msg').innerText = '';
+                document.getElementById('btn-remove-supp-coupon').style.display = 'none';
+                document.getElementById('supp-coupon-discount-row').style.display = 'none';
 
-                const nextInvId = getNextSupplementInvoiceId();
-                document.getElementById('supp-pay-inv-id').innerText = nextInvId;
-                document.getElementById('supp-pay-member-label').innerText = `${selectedSuppMember.fullName} (${selectedSuppMember.id})`;
-                document.getElementById('supp-pay-mrp').innerText = totalMrp;
-                document.getElementById('supp-pay-disc').innerText = Math.max(0, totalMrp - totalNet);
-                document.getElementById('supp-pay-net').innerText = totalNet;
-
-                const suppPayNowInput = document.getElementById('supp-pay-amount-now');
-                if (suppPayNowInput) {
-                    suppPayNowInput.value = totalNet;
-                    suppPayNowInput.max = totalNet;
-                }
-                document.getElementById('supp-pay-pending').innerText = '0';
+                window.moduleContext.recalcSupplementSummaryTotals(true);
 
                 document.getElementById('supp-staff-pin').value = '';
                 document.getElementById('supp-pin-identity').style.color = 'var(--text-muted)';
@@ -5304,6 +5924,79 @@
                 document.getElementById('supp-step-2').classList.remove('active-step');
                 document.getElementById('supp-step-3').classList.add('active-step');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+
+            recalcSupplementSummaryTotals: function(resetPayingAmountToFull = true) {
+                const { totalMrp, baseSellingTotal, couponDisc, finalNet } = window.moduleContext.getSupplementCartSubtotalInfo();
+                const nextInvId = getNextSupplementInvoiceId();
+                document.getElementById('supp-pay-inv-id').innerText = nextInvId;
+                if (selectedSuppMember) {
+                    document.getElementById('supp-pay-member-label').innerText = `${selectedSuppMember.fullName} (${selectedSuppMember.id})`;
+                }
+                document.getElementById('supp-pay-mrp').innerText = totalMrp;
+                document.getElementById('supp-pay-disc').innerText = Math.max(0, totalMrp - baseSellingTotal);
+
+                const cpnRow = document.getElementById('supp-coupon-discount-row');
+                if (activeAppliedCoupon && couponDisc > 0) {
+                    cpnRow.style.display = 'flex';
+                    document.getElementById('supp-applied-coupon-tag').innerText = activeAppliedCoupon.code;
+                    document.getElementById('supp-pay-coupon-disc').innerText = couponDisc;
+                } else {
+                    cpnRow.style.display = 'none';
+                    document.getElementById('supp-pay-coupon-disc').innerText = '0';
+                }
+
+                document.getElementById('supp-pay-net').innerText = finalNet;
+
+                const suppPayNowInput = document.getElementById('supp-pay-amount-now');
+                if (suppPayNowInput) {
+                    suppPayNowInput.max = finalNet;
+                    if (resetPayingAmountToFull || parseInt(suppPayNowInput.value || '0', 10) > finalNet) {
+                        suppPayNowInput.value = finalNet;
+                    }
+                }
+                window.moduleContext.updateSuppPaymentUI();
+            },
+
+            applySupplementCoupon: function() {
+                const codeInput = document.getElementById('supp-coupon-input');
+                const msgEl = document.getElementById('supp-coupon-msg');
+                const removeBtn = document.getElementById('btn-remove-supp-coupon');
+                const code = String(codeInput.value || '').trim().toUpperCase();
+                if (!code) {
+                    showNotice("Please enter a coupon code.", "error");
+                    return;
+                }
+                const coupons = ensureDefaultSuppCoupons();
+                const matched = coupons.find(c => String(c.code).toUpperCase() === code);
+                if (!matched) {
+                    msgEl.style.color = 'var(--error-red)';
+                    msgEl.innerText = `✖ Invalid coupon code "${code}".`;
+                    return;
+                }
+                const { baseSellingTotal } = window.moduleContext.getSupplementCartSubtotalInfo();
+                const minOrd = parseInt(matched.minOrder || 0, 10);
+                if (baseSellingTotal < minOrd) {
+                    msgEl.style.color = 'var(--error-red)';
+                    msgEl.innerText = `✖ Coupon "${code}" requires a minimum order of ₹${minOrd}.`;
+                    return;
+                }
+                activeAppliedCoupon = matched;
+                window.moduleContext.recalcSupplementSummaryTotals(true);
+                const { couponDisc } = window.moduleContext.getSupplementCartSubtotalInfo();
+                msgEl.style.color = 'var(--success-green)';
+                msgEl.innerText = `✔ Coupon Applied! You saved an extra ₹${couponDisc}.`;
+                removeBtn.style.display = 'inline-flex';
+                showNotice(`Coupon ${matched.code} applied (-₹${couponDisc})!`, "success");
+            },
+
+            removeSupplementCoupon: function() {
+                activeAppliedCoupon = null;
+                document.getElementById('supp-coupon-input').value = '';
+                document.getElementById('supp-coupon-msg').innerText = '';
+                document.getElementById('btn-remove-supp-coupon').style.display = 'none';
+                window.moduleContext.recalcSupplementSummaryTotals(true);
+                showNotice("Coupon removed.", "info");
             },
 
             updateSuppPaymentUI: function() {
@@ -5344,7 +6037,7 @@
                 let supps = ensureDefaultSupplements();
                 const itemsSold = [];
                 let totalMrp = 0;
-                let totalAmount = 0;
+                let baseSellingAmount = 0;
                 let totalCost = 0;
 
                 // Validate stock and deduct
@@ -5358,7 +6051,7 @@
                     }
                     supps[idx].stock = parseInt(supps[idx].stock, 10) - qty;
                     const mrp = parseInt(supps[idx].mrp, 10);
-                    const offer = parseInt(supps[idx].offerPrice, 10);
+                    const offer = parseInt(supps[idx].offerPrice != null ? supps[idx].offerPrice : mrp, 10);
                     const cost = parseInt(supps[idx].costPrice || 0, 10);
                     itemsSold.push({
                         id: supps[idx].id,
@@ -5370,9 +6063,25 @@
                         lineTotal: qty * offer
                     });
                     totalMrp += qty * mrp;
-                    totalAmount += qty * offer;
+                    baseSellingAmount += qty * offer;
                     totalCost += qty * cost;
                 }
+
+                let couponDiscount = 0;
+                let couponCodeStr = '';
+                let couponDetailsStr = '';
+                if (activeAppliedCoupon) {
+                    couponCodeStr = activeAppliedCoupon.code;
+                    if (activeAppliedCoupon.type === 'PERCENT') {
+                        couponDiscount = Math.round((baseSellingAmount * parseFloat(activeAppliedCoupon.value || 0)) / 100);
+                        couponDetailsStr = `${activeAppliedCoupon.code} (${activeAppliedCoupon.value}% OFF = -Rs.${couponDiscount})`;
+                    } else {
+                        couponDiscount = parseInt(activeAppliedCoupon.value || 0, 10);
+                        couponDetailsStr = `${activeAppliedCoupon.code} (Flat Rs.${activeAppliedCoupon.value} OFF = -Rs.${couponDiscount})`;
+                    }
+                    couponDiscount = Math.min(baseSellingAmount, Math.max(0, couponDiscount));
+                }
+                const totalAmount = Math.max(0, baseSellingAmount - couponDiscount);
 
                 storage.set('revive_supplements_db', supps);
                 cloudSync.push('pushSupplements', supps);
@@ -5408,6 +6117,10 @@
                     address: custAddress,
                     items: itemsSold,
                     totalMrp: totalMrp,
+                    baseSellingAmount: baseSellingAmount,
+                    couponCode: couponCodeStr,
+                    couponDiscount: couponDiscount,
+                    couponDetails: couponDetailsStr,
                     totalAmount: totalAmount,
                     amountPaid: amountPaidNow,
                     balanceDue: balanceDueNow,
@@ -5424,6 +6137,7 @@
 
                 currentSuppSaleRecord = saleRecord;
                 supplementCart = {};
+                activeAppliedCoupon = null;
 
                 document.getElementById('supp-generated-inv-id').innerText = invId;
                 document.getElementById('supp-sm-sold-by').innerText = sellerIdentity;
@@ -5448,18 +6162,32 @@
                 tbody.innerHTML = '';
                 (s.items || []).forEach(it => {
                     tbody.innerHTML += `<tr style="border-bottom:1px solid #f0f0f0;">
-                        <td style="padding:4px 0;">${it.name}</td>
-                        <td style="padding:4px 0; text-align:center;">${it.qty}</td>
-                        <td style="padding:4px 0; text-align:right;">₹${it.offerPrice}</td>
-                        <td style="padding:4px 0; text-align:right; font-weight:bold;">₹${it.lineTotal}</td>
+                        <td style="padding:6px 10px; font-weight:600;">${it.name}</td>
+                        <td style="padding:6px 6px; text-align:center; font-weight:700;">${it.qty}</td>
+                        <td style="padding:6px 8px; text-align:right;">₹${it.offerPrice}</td>
+                        <td style="padding:6px 10px; text-align:right; font-weight:800;">₹${it.lineTotal}</td>
                     </tr>`;
                 });
 
                 const sTotal = parseInt(s.totalAmount || 0, 10);
+                const sCpnDisc = parseInt(s.couponDiscount || 0, 10);
+                const sBaseSell = s.baseSellingAmount != null ? parseInt(s.baseSellingAmount, 10) : (sTotal + sCpnDisc);
                 const sPaid = s.amountPaid != null ? parseInt(s.amountPaid, 10) : sTotal;
                 const sBal = Math.max(0, sTotal - sPaid);
                 document.getElementById('sinv-mrp').innerText = s.totalMrp;
-                document.getElementById('sinv-disc').innerText = Math.max(0, s.totalMrp - sTotal);
+                document.getElementById('sinv-disc').innerText = Math.max(0, s.totalMrp - sBaseSell);
+
+                const sinvCpnRow = document.getElementById('sinv-coupon-row');
+                if (sinvCpnRow) {
+                    if (s.couponCode && sCpnDisc > 0) {
+                        sinvCpnRow.style.display = 'table-row';
+                        document.getElementById('sinv-coupon-code').innerText = s.couponCode;
+                        document.getElementById('sinv-coupon-disc').innerText = sCpnDisc;
+                    } else {
+                        sinvCpnRow.style.display = 'none';
+                    }
+                }
+
                 document.getElementById('sinv-net').innerText = sTotal;
                 document.getElementById('sinv-paid').innerText = sPaid;
                 document.getElementById('sinv-bal').innerText = sBal === 0 ? '0 (Cleared)' : sBal;
@@ -5483,7 +6211,21 @@
                             try {
                                 const file = new File([blob], `Supplement_Invoice_${s.id}.jpg`, { type: 'image/jpeg' });
                                 const itemsTxt = (s.items || []).map(i => `• ${i.name} x${i.qty} = ₹${i.lineTotal}`).join('\n');
-                                const msg = `Dear ${s.fullName},\n\n*Revive Supplement Invoice (${s.id}):*\n${itemsTxt}\n• *Net Bill:* ₹${sTotal}\n• *Amount Paid:* ₹${sPaid} (${s.method})\n• *Pending Balance:* ₹${sBal === 0 ? '0 (Cleared)' : sBal}\n• *Sold By:* ${s.soldBy}\n\nBest Regards,\n*Revive Fitness Studio*\n📞 8921698044`;
+                                const cpnLine = (sCpnDisc > 0) ? `• *Coupon Applied:* -₹${sCpnDisc}
+` : '';
+                                const stInfo = getStudioDetails();
+                                const msg = `Dear ${s.fullName},
+
+*Revive Supplement Invoice (${s.id}):*
+${itemsTxt}
+${cpnLine}• *Net Bill:* ₹${sTotal}
+• *Amount Paid:* ₹${sPaid} (${s.method})
+• *Pending Balance:* ₹${sBal === 0 ? '0 (Cleared)' : sBal}
+• *Sold By:* ${s.soldBy}
+
+Best Regards,
+*Revive Fitness Studio*
+📞 ${stInfo.contact1}${stInfo.contact2 ? ' / ' + stInfo.contact2 : ''}${stInfo.email ? '\n✉ ' + stInfo.email : ''}`;
 
                                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                                     await navigator.share({ title: `Supplement Invoice ${s.id}`, text: msg, files: [file] });
@@ -5507,7 +6249,7 @@
             },
 
             // ==========================================
-            // ADMIN SUPPLEMENT INVENTORY & PURCHASE MANAGER
+            // ADMIN MODULE 1: PURE SUPPLEMENT PURCHASE & STOCK MANAGER (NO SELLING PRICE)
             // ==========================================
             initSupplementAdmin: function() {
                 ensureDefaultSupplements();
@@ -5520,42 +6262,114 @@
                 const form = document.getElementById('suppInventoryForm');
                 if (form) form.reset();
                 document.getElementById('supp-inv-id').value = '';
-                document.getElementById('supp-inv-form-title').innerText = 'Add New Product / Record Stock Purchase';
+                document.getElementById('supp-inv-date').value = toIsoDateKey(new Date());
+                document.getElementById('supp-inv-form-title').innerText = 'Record Purchase & Stock Entry';
                 document.getElementById('supp-inv-entry-mode').value = 'purchase';
-                document.getElementById('supp-inv-qty-label').innerHTML = 'Stock Qty to Add <span class="required">*</span>';
+                document.getElementById('supp-inv-qty-label').innerHTML = 'Purchase Qty <span class="required">*</span>';
                 document.getElementById('btn-save-supp-inv').innerText = 'Save Product & Record Stock';
                 document.getElementById('btn-cancel-supp-edit').style.display = 'none';
+                const prevEl = document.getElementById('supp-inv-name-live-preview');
+                if (prevEl) prevEl.innerHTML = '';
+            },
+
+            previewSupplementInventoryName: function(val) {
+                const previewEl = document.getElementById('supp-inv-name-live-preview');
+                if (!previewEl) return;
+                const cleanVal = String(val || '').trim().toLowerCase();
+                if (!cleanVal) {
+                    previewEl.innerHTML = '';
+                    return;
+                }
+                const supps = ensureDefaultSupplements()
+                    .slice()
+                    .sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), undefined, { sensitivity: 'base' }));
+                const matches = supps.filter(s =>
+                    String(s.name || '').toLowerCase().includes(cleanVal) ||
+                    String(s.category || '').toLowerCase().includes(cleanVal) ||
+                    String(s.id || '').toLowerCase().includes(cleanVal)
+                );
+                if (matches.length === 0) {
+                    previewEl.innerHTML = `<div style="font-size:0.78rem; color:var(--text-muted);">✨ New product "${val.trim()}" — fill details below to add to inventory.</div>`;
+                    return;
+                }
+                let listHtml = `<div style="font-size:0.75rem; font-weight:800; color:var(--accent-orange); margin-bottom:4px;">Matching Supplements in Inventory (Click to select & restock/update):</div>`;
+                listHtml += `<div style="display:grid; gap:6px; max-height:200px; overflow-y:auto; padding:4px; background:var(--bg-panel); border:1px solid var(--border-color); border-radius:8px;">`;
+                matches.forEach(item => {
+                    const safeId = String(item.id).replace(/'/g, "\\'");
+                    listHtml += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border-bottom:1px solid var(--border-color); cursor:pointer; background:var(--bg-main); border-radius:6px;"
+                             onclick="window.moduleContext.selectExistingSuppForPurchase('${safeId}')">
+                            <div>
+                                <div style="font-weight:800; color:var(--text-main); font-size:0.9rem;">${item.name}</div>
+                                <div style="font-size:0.75rem; color:var(--text-muted);">${item.id} • ${item.category || 'Supplement'} | Landing: ₹${item.costPrice || 0} | MRP: ₹${item.mrp}</div>
+                            </div>
+                            <span style="font-size:0.78rem; font-weight:800; color:var(--success-green); white-space:nowrap; margin-left:8px;">Stock: ${item.stock}</span>
+                        </div>
+                    `;
+                });
+                listHtml += `</div>`;
+                previewEl.innerHTML = listHtml;
+            },
+
+            selectExistingSuppForPurchase: function(id) {
+                const supps = ensureDefaultSupplements();
+                const item = supps.find(s => String(s.id) === String(id));
+                if (!item) return;
+                document.getElementById('supp-inv-id').value = item.id;
+                document.getElementById('supp-inv-name').value = item.name;
+                document.getElementById('supp-inv-cat').value = item.category || '';
+                document.getElementById('supp-inv-cost').value = item.costPrice || 0;
+                document.getElementById('supp-inv-mrp').value = item.mrp;
+                document.getElementById('supp-inv-entry-mode').value = 'purchase';
+                document.getElementById('supp-inv-form-title').innerText = `Restock / Update Selected: ${item.name} (Current Stock: ${item.stock})`;
+                document.getElementById('supp-inv-qty-label').innerHTML = 'Purchase Qty <span class="required">*</span>';
+                if (!document.getElementById('supp-inv-qty').value) {
+                    document.getElementById('supp-inv-qty').value = 5;
+                }
+                document.getElementById('btn-cancel-supp-edit').style.display = 'inline-flex';
+                const prevEl = document.getElementById('supp-inv-name-live-preview');
+                if (prevEl) {
+                    prevEl.innerHTML = `<span style="color:var(--success-green); font-size:0.8rem; font-weight:700;">✔ Selected existing product (${item.id} — Stock: ${item.stock} units). Enter Purchase Qty to add stock.</span>`;
+                }
             },
 
             saveSupplementInventory: function(e) {
                 if (e) e.preventDefault();
                 const editId = document.getElementById('supp-inv-id').value.trim();
+                const purchaseDateIso = document.getElementById('supp-inv-date').value || toIsoDateKey(new Date());
                 const name = document.getElementById('supp-inv-name').value.trim();
                 const cat = document.getElementById('supp-inv-cat').value.trim() || 'Supplement';
                 const entryMode = document.getElementById('supp-inv-entry-mode').value;
                 const costPrice = parseInt(document.getElementById('supp-inv-cost').value || '0', 10);
                 const mrp = parseInt(document.getElementById('supp-inv-mrp').value || '0', 10);
-                const offerPrice = parseInt(document.getElementById('supp-inv-offer').value || '0', 10);
                 const qtyVal = parseInt(document.getElementById('supp-inv-qty').value || '0', 10);
                 const payMode = document.getElementById('supp-inv-paymode').value;
 
-                if (offerPrice > mrp) {
-                    showNotice("Offer Price cannot exceed MRP!", "error");
+                if (costPrice > mrp) {
+                    showNotice("Landing Price cannot exceed MRP!", "error");
                     return;
                 }
 
                 let supps = ensureDefaultSupplements();
                 let targetProduct = null;
                 let qtyPurchasedForReport = 0;
+                let resolvedEditId = editId;
+                if (!resolvedEditId) {
+                    const exactByName = supps.find(s => String(s.name || '').trim().toLowerCase() === name.toLowerCase());
+                    if (exactByName) resolvedEditId = exactByName.id;
+                }
 
-                if (editId) {
-                    const idx = supps.findIndex(s => String(s.id) === String(editId));
+                if (resolvedEditId) {
+                    const idx = supps.findIndex(s => String(s.id) === String(resolvedEditId));
                     if (idx !== -1) {
                         supps[idx].name = name;
                         supps[idx].category = cat;
                         supps[idx].costPrice = costPrice;
                         supps[idx].mrp = mrp;
-                        supps[idx].offerPrice = offerPrice;
+                        supps[idx].lastPurchaseDate = purchaseDateIso;
+                        if (!supps[idx].offerPrice || supps[idx].offerPrice > mrp) {
+                            supps[idx].offerPrice = mrp;
+                        }
                         if (entryMode === 'purchase') {
                             supps[idx].stock = parseInt(supps[idx].stock || 0, 10) + qtyVal;
                             qtyPurchasedForReport = qtyVal;
@@ -5572,8 +6386,10 @@
                         category: cat,
                         costPrice: costPrice,
                         mrp: mrp,
-                        offerPrice: offerPrice,
-                        stock: qtyVal
+                        offerPrice: mrp,
+                        stock: qtyVal,
+                        storeVisible: true,
+                        lastPurchaseDate: purchaseDateIso
                     };
                     supps.push(targetProduct);
                     if (entryMode === 'purchase' && qtyVal > 0) {
@@ -5584,19 +6400,19 @@
                 storage.set('revive_supplements_db', supps);
                 cloudSync.push('pushSupplements', supps);
 
-                // Record purchase transaction in P&L Purchase Report if stock was purchased
+                // Record purchase transaction in P&L Purchase Report using the selected Date of Purchase
                 if (entryMode === 'purchase' && qtyPurchasedForReport > 0 && costPrice > 0 && targetProduct) {
-                    const now = new Date();
-                    const dateIso = now.toISOString().split('T')[0];
-                    const monthName = now.toLocaleString('default', { month: 'long' });
-                    const y = now.getFullYear();
-                    const m = now.getMonth();
+                    const dParts = purchaseDateIso.split('-');
+                    const dObj = new Date(parseInt(dParts[0], 10), parseInt(dParts[1], 10) - 1, parseInt(dParts[2], 10));
+                    const monthName = dObj.toLocaleString('default', { month: 'long' });
+                    const y = dObj.getFullYear();
+                    const m = dObj.getMonth();
                     const fyStart = m >= 3 ? y : y - 1;
                     const fyString = `${fyStart}-${fyStart + 1}`;
 
                     const purRecord = {
                         id: 'PUR-' + Date.now().toString().slice(-5),
-                        date: dateIso,
+                        date: purchaseDateIso,
                         fy: fyString,
                         month: monthName,
                         productId: targetProduct.id,
@@ -5605,7 +6421,7 @@
                         unitCost: costPrice,
                         totalCost: qtyPurchasedForReport * costPrice,
                         mode: payMode,
-                        timestamp: now.toISOString()
+                        timestamp: new Date().toISOString()
                     };
                     let purDb = storage.get('revive_supplement_purchases_db', []);
                     purDb.push(purRecord);
@@ -5613,7 +6429,7 @@
                     cloudSync.push('pushSupplementPurchase', purRecord);
                 }
 
-                showNotice(editId ? "Supplement inventory updated!" : "New supplement added to inventory!", "success");
+                showNotice(editId ? "Purchase & stock record updated!" : "New purchase & stock recorded!", "success");
                 window.moduleContext.initSupplementAdmin();
             },
 
@@ -5623,23 +6439,23 @@
                 if (!item) return;
 
                 document.getElementById('supp-inv-id').value = item.id;
+                document.getElementById('supp-inv-date').value = item.lastPurchaseDate || toIsoDateKey(new Date());
                 document.getElementById('supp-inv-name').value = item.name;
                 document.getElementById('supp-inv-cat').value = item.category || '';
                 document.getElementById('supp-inv-cost').value = item.costPrice || 0;
                 document.getElementById('supp-inv-mrp').value = item.mrp;
-                document.getElementById('supp-inv-offer').value = item.offerPrice;
                 document.getElementById('supp-inv-entry-mode').value = mode;
 
                 if (mode === 'purchase') {
                     document.getElementById('supp-inv-form-title').innerText = `Restock Purchase: ${item.name} (Current Stock: ${item.stock})`;
-                    document.getElementById('supp-inv-qty-label').innerHTML = 'Qty to Add (Purchase) <span class="required">*</span>';
+                    document.getElementById('supp-inv-qty-label').innerHTML = 'Purchase Qty <span class="required">*</span>';
                     document.getElementById('supp-inv-qty').value = 5;
-                    document.getElementById('btn-save-supp-inv').innerText = '+ Record Stock Purchase';
+                    document.getElementById('btn-save-supp-inv').innerText = '+ Record Purchase';
                 } else {
-                    document.getElementById('supp-inv-form-title').innerText = `Edit Product Details: ${item.name}`;
-                    document.getElementById('supp-inv-qty-label').innerHTML = 'Set Exact Live Stock <span class="required">*</span>';
+                    document.getElementById('supp-inv-form-title').innerText = `Edit Purchase / Stock: ${item.name}`;
+                    document.getElementById('supp-inv-qty-label').innerHTML = 'Exact Stock Qty <span class="required">*</span>';
                     document.getElementById('supp-inv-qty').value = item.stock;
-                    document.getElementById('btn-save-supp-inv').innerText = 'Update Product Details';
+                    document.getElementById('btn-save-supp-inv').innerText = 'Update Stock Record';
                 }
                 document.getElementById('btn-cancel-supp-edit').style.display = 'inline-flex';
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -5647,21 +6463,21 @@
 
             deleteSupplementItem: function(id) {
                 window.appContext.askConfirm(
-                    "Remove Supplement Product",
-                    "Are you sure you want to remove this product from the active store catalog? Past sales and purchase records in P&L reports will remain preserved.",
+                    "Remove Supplement Item",
+                    "Remove this item from inventory? Historical purchase and sales records in P&L reports will remain preserved.",
                     function() {
                         let supps = ensureDefaultSupplements();
                         supps = supps.filter(s => String(s.id) !== String(id));
                         storage.set('revive_supplements_db', supps);
                         cloudSync.push('pushSupplements', supps);
                         window.moduleContext.renderSupplementInventoryTable();
-                        showNotice("Product removed from catalog.", "info");
+                        showNotice("Item removed from inventory.", "info");
                     }
                 );
             },
 
             renderSupplementInventoryTable: function() {
-                const supps = ensureDefaultSupplements();
+                const supps = ensureDefaultSupplements().slice().sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), undefined, { sensitivity: 'base' }));
                 const tbody = document.querySelector('#table-supp-inventory tbody');
                 if (!tbody) return;
                 tbody.innerHTML = '';
@@ -5675,9 +6491,9 @@
                     tbody.innerHTML += `<tr>
                         <td><strong>${item.id}</strong></td>
                         <td><strong>${item.name}</strong><br><span style="font-size:0.75rem; color:var(--text-muted);">${item.category || ''}</span></td>
-                        <td>₹${item.costPrice || 0}</td>
+                        <td>${formatDateStr(item.lastPurchaseDate || '2026-10-01')}</td>
+                        <td><strong>₹${item.costPrice || 0}</strong></td>
                         <td>₹${item.mrp}</td>
-                        <td style="color:var(--accent-orange); font-weight:800;">₹${item.offerPrice}</td>
                         <td style="color:${stColor}; font-weight:900;">${st} units</td>
                         <td>
                             <div style="display:flex; gap:6px;">
@@ -5692,7 +6508,7 @@
 
             renderSupplementPurchasesAdminTable: function() {
                 let purDb = storage.get('revive_supplement_purchases_db', []);
-                purDb = [...purDb].sort((a, b) => new Date(b.timestamp || b.date) - new Date(a.timestamp || a.date));
+                purDb = [...purDb].sort((a, b) => new Date(b.date || b.timestamp) - new Date(a.date || a.timestamp));
                 const tbody = document.querySelector('#table-supp-purchases-admin tbody');
                 if (!tbody) return;
                 tbody.innerHTML = '';
@@ -5703,13 +6519,179 @@
                 }
                 recent.forEach(p => {
                     tbody.innerHTML += `<tr>
-                        <td>${formatDateStr(p.date)}</td>
+                        <td><strong>${formatDateStr(p.date)}</strong></td>
                         <td><strong>${p.id}</strong></td>
                         <td>${p.productName}</td>
                         <td><strong>+${p.qty}</strong></td>
                         <td>₹${p.unitCost}</td>
                         <td>${p.mode || 'UPI'}</td>
                         <td style="color:var(--error-red); font-weight:bold;">₹${p.totalCost}</td>
+                    </tr>`;
+                });
+            },
+
+            // ==========================================
+            // ADMIN MODULE 2: SUPPLEMENT STORE CONFIG (ON/OFF VISIBILITY, SELLING PRICE & COUPONS)
+            // ==========================================
+            initSupplementStoreConfig: function() {
+                ensureDefaultSupplements();
+                ensureDefaultSuppCoupons();
+                window.moduleContext.renderSupplementStoreConfigTable();
+                window.moduleContext.renderSupplementCouponsTable();
+            },
+
+            renderSupplementStoreConfigTable: function() {
+                const supps = ensureDefaultSupplements().slice().sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), undefined, { sensitivity: 'base' }));
+                const tbody = document.querySelector('#table-supp-store-config tbody');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                if (supps.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No purchased items found. Add items in Supplement Inventory first.</td></tr>';
+                    return;
+                }
+                supps.forEach(item => {
+                    const isOn = item.storeVisible !== false;
+                    const sellVal = item.offerPrice != null ? item.offerPrice : item.mrp;
+                    const st = parseInt(item.stock || 0, 10);
+                    tbody.innerHTML += `<tr>
+                        <td><strong>${item.name}</strong><br><span style="font-size:0.75rem; color:var(--text-muted);">${item.id} • ${item.category || ''}</span></td>
+                        <td style="font-weight:800; color:${st > 0 ? 'var(--success-green)' : 'var(--error-red)'};">${st} units</td>
+                        <td>₹${item.costPrice || 0}</td>
+                        <td>₹${item.mrp}</td>
+                        <td style="max-width:140px;">
+                            <input type="number" id="store-cfg-price-${item.id}" class="store-cfg-price-input" data-id="${item.id}" value="${sellVal}" min="1" max="${item.mrp}" style="padding:0.45rem 0.6rem; font-weight:800; color:var(--accent-orange); background:#fff;">
+                        </td>
+                        <td>
+                            <button type="button" class="btn ${isOn ? 'primary' : 'secondary'}" style="width:auto; padding:0.4rem 0.85rem; font-size:0.75rem; background:${isOn ? 'var(--success-green)' : 'transparent'};" onclick="window.moduleContext.toggleSupplementStoreVisibility('${item.id}')">
+                                ${isOn ? '● ON (Shown)' : '○ OFF (Hidden)'}
+                            </button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn secondary" style="width:auto; padding:0.4rem 0.85rem; font-size:0.75rem; border-color:var(--accent-orange); color:var(--accent-orange);" onclick="window.moduleContext.saveSingleStoreConfigItem('${item.id}')">Save</button>
+                        </td>
+                    </tr>`;
+                });
+            },
+
+            toggleSupplementStoreVisibility: function(id) {
+                let supps = ensureDefaultSupplements();
+                const idx = supps.findIndex(s => String(s.id) === String(id));
+                if (idx === -1) return;
+                const priceInp = document.getElementById(`store-cfg-price-${id}`);
+                if (priceInp) {
+                    const pVal = parseInt(priceInp.value, 10);
+                    if (!isNaN(pVal) && pVal > 0 && pVal <= parseInt(supps[idx].mrp, 10)) {
+                        supps[idx].offerPrice = pVal;
+                    }
+                }
+                supps[idx].storeVisible = supps[idx].storeVisible === false ? true : false;
+                storage.set('revive_supplements_db', supps);
+                cloudSync.push('pushSupplements', supps);
+                window.moduleContext.renderSupplementStoreConfigTable();
+                showNotice(`${supps[idx].name} is now ${supps[idx].storeVisible ? 'ON (Visible in Supplement Store)' : 'OFF (Hidden from Store)'}.`, "success");
+            },
+
+            saveSingleStoreConfigItem: function(id) {
+                let supps = ensureDefaultSupplements();
+                const idx = supps.findIndex(s => String(s.id) === String(id));
+                if (idx === -1) return;
+                const priceInp = document.getElementById(`store-cfg-price-${id}`);
+                if (!priceInp) return;
+                const newPrice = parseInt(priceInp.value, 10);
+                const mrp = parseInt(supps[idx].mrp, 10);
+                if (isNaN(newPrice) || newPrice <= 0 || newPrice > mrp) {
+                    showNotice(`Selling Price must be between ₹1 and MRP (₹${mrp}).`, "error");
+                    return;
+                }
+                supps[idx].offerPrice = newPrice;
+                storage.set('revive_supplements_db', supps);
+                cloudSync.push('pushSupplements', supps);
+                showNotice(`Selling price for ${supps[idx].name} fixed at ₹${newPrice}!`, "success");
+            },
+
+            saveAllStoreConfigPrices: function() {
+                let supps = ensureDefaultSupplements();
+                let hasError = false;
+                document.querySelectorAll('.store-cfg-price-input').forEach(inp => {
+                    const id = inp.getAttribute('data-id');
+                    const idx = supps.findIndex(s => String(s.id) === String(id));
+                    if (idx !== -1) {
+                        const val = parseInt(inp.value, 10);
+                        const mrp = parseInt(supps[idx].mrp, 10);
+                        if (isNaN(val) || val <= 0 || val > mrp) {
+                            hasError = true;
+                        } else {
+                            supps[idx].offerPrice = val;
+                        }
+                    }
+                });
+                if (hasError) {
+                    showNotice("One or more Selling Prices exceed MRP. Please check and try again.", "error");
+                    return;
+                }
+                storage.set('revive_supplements_db', supps);
+                cloudSync.push('pushSupplements', supps);
+                window.moduleContext.renderSupplementStoreConfigTable();
+                showNotice("All Supplement Store selling prices saved!", "success");
+            },
+
+            saveSupplementCoupon: function(e) {
+                if (e) e.preventDefault();
+                const code = String(document.getElementById('coupon-code').value || '').trim().toUpperCase();
+                const type = document.getElementById('coupon-type').value;
+                const val = parseInt(document.getElementById('coupon-val').value || '0', 10);
+                const minOrder = parseInt(document.getElementById('coupon-min').value || '0', 10);
+
+                if (!code || val <= 0) {
+                    showNotice("Please enter a valid coupon code and discount value.", "error");
+                    return;
+                }
+                if (type === 'PERCENT' && val > 95) {
+                    showNotice("Percentage discount cannot exceed 95%.", "error");
+                    return;
+                }
+
+                let coupons = ensureDefaultSuppCoupons();
+                const existingIdx = coupons.findIndex(c => String(c.code).toUpperCase() === code);
+                const cObj = { id: 'CPN-' + Date.now(), code, type, value: val, minOrder: Math.max(0, minOrder) };
+                if (existingIdx !== -1) {
+                    coupons[existingIdx] = cObj;
+                } else {
+                    coupons.push(cObj);
+                }
+                storage.set('revive_supp_coupons_db', coupons);
+                syncSuppConfigBackupToSettings();
+                document.getElementById('suppCouponForm').reset();
+                document.getElementById('coupon-min').value = '0';
+                window.moduleContext.renderSupplementCouponsTable();
+                showNotice(`Coupon code "${code}" saved!`, "success");
+            },
+
+            deleteSupplementCoupon: function(id) {
+                let coupons = ensureDefaultSuppCoupons();
+                coupons = coupons.filter(c => String(c.id) !== String(id));
+                storage.set('revive_supp_coupons_db', coupons);
+                syncSuppConfigBackupToSettings();
+                window.moduleContext.renderSupplementCouponsTable();
+                showNotice("Coupon code deleted.", "info");
+            },
+
+            renderSupplementCouponsTable: function() {
+                const coupons = ensureDefaultSuppCoupons();
+                const tbody = document.querySelector('#table-supp-coupons tbody');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                if (coupons.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No active coupon codes. Create one above.</td></tr>';
+                    return;
+                }
+                coupons.forEach(c => {
+                    const discLabel = c.type === 'PERCENT' ? `${c.value}% OFF` : `₹${c.value} FLAT OFF`;
+                    tbody.innerHTML += `<tr>
+                        <td><strong style="color:var(--accent-orange); letter-spacing:1px;">${c.code}</strong></td>
+                        <td><span class="supp-save-badge" style="font-size:0.8rem; padding:4px 8px;">${discLabel}</span></td>
+                        <td>₹${c.minOrder || 0}</td>
+                        <td><button type="button" class="btn danger" style="width:auto; padding:0.35rem 0.8rem; font-size:0.75rem; border:none;" onclick="window.moduleContext.deleteSupplementCoupon('${c.id}')">Delete</button></td>
                     </tr>`;
                 });
             }
@@ -5724,10 +6706,11 @@
         document.addEventListener('DOMContentLoaded', () => {
             preloadLogoForCapture();
             ensureDefaultSupplements();
+            ensureDefaultSuppCoupons();
             ensureDefaultHolidays();
             const fyEl = document.getElementById('footer-year');
             if (fyEl) fyEl.innerText = new Date().getFullYear();
-            cloudSync.pullInitial();
+            cloudSync.pullInitial(false);
 
             const dobInp = document.getElementById('dob'); 
             const dtInp = document.getElementById('dateOfAdmission'); 
