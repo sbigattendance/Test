@@ -195,6 +195,7 @@
         .btn.checkin-btn { background-color: var(--success-green); color: #fff; }
         .btn.checkin-btn:disabled, .btn.checkout-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
         .btn.checkout-btn { background-color: var(--error-red); color: #fff; }
+        .geo-hidden { display: none !important; visibility: hidden !important; pointer-events: none !important; }
         .hr-section-label { max-width: 900px; margin: 1.8rem auto 0.8rem auto; font-size: 0.88rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.2px; border-left: 4px solid var(--accent-orange); padding-left: 10px; }
         .staff-kpi-row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 900px; margin: 0 auto 1.8rem auto; }
         .staff-kpi-card { background: var(--bg-panel); border: 2px solid var(--border-color); border-radius: 12px; padding: 1.2rem 0.8rem; text-align: center; cursor: pointer; transition: all 0.22s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
@@ -425,11 +426,11 @@
                 <div id="staff-geofence-locked-msg" style="display:block; padding:0.9rem 1rem; border-radius:8px; background:#fdecea; border:1px solid #f5b7b1; color:var(--error-red); font-size:0.84rem; font-weight:800; text-align:center;">
                     🔒 Check-In & Check-Out options are hidden until your location is verified within 20m of the Studio Center Point.
                 </div>
-                <div class="hr-punch-btns" id="staff-punch-btns-container" style="display:none;">
-                    <button type="button" id="btn-staff-checkin" class="btn checkin-btn" style="display:none;" onclick="window.moduleContext.staffPunchIn()">
+                <div class="hr-punch-btns geo-hidden" id="staff-punch-btns-container" style="display:none !important;">
+                    <button type="button" id="btn-staff-checkin" class="btn checkin-btn geo-hidden" style="display:none !important;" onclick="window.moduleContext.staffPunchIn()">
                         ✔ Check-In (Punch In)
                     </button>
-                    <button type="button" id="btn-staff-checkout" class="btn checkout-btn" style="display:none;" onclick="window.moduleContext.staffPunchOut()">
+                    <button type="button" id="btn-staff-checkout" class="btn checkout-btn geo-hidden" style="display:none !important;" onclick="window.moduleContext.staffPunchOut()">
                         ⏹ Check-Out (Punch Out)
                     </button>
                 </div>
@@ -2903,10 +2904,27 @@
                             if (!targetMap[staffKey]) targetMap[staffKey] = {};
                             Object.keys(dayObj).forEach(dKey => {
                                 const incRec = dayObj[dKey];
-                                if (!incRec || !incRec.checkIn) return;
+                                if (!incRec || (!incRec.checkIn && !incRec.slots && incRec.status !== 'Leave')) return;
                                 const curRec = targetMap[staffKey][dKey];
-                                if (!curRec || (!curRec.checkOut && incRec.checkOut)) {
+                                if (!curRec) {
                                     targetMap[staffKey][dKey] = incRec;
+                                } else {
+                                    // Merge slots per shift so a new slot punch is never overwritten by an older slot
+                                    const mergedSlots = { ...(incRec.slots || {}), ...(curRec.slots || {}) };
+                                    if (incRec.slots && curRec.slots) {
+                                        Object.keys(incRec.slots).forEach(slKey => {
+                                            const incSl = incRec.slots[slKey];
+                                            const curSl = curRec.slots[slKey];
+                                            if (!curSl || (!curSl.checkOut && incSl && incSl.checkOut)) {
+                                                mergedSlots[slKey] = incSl;
+                                            }
+                                        });
+                                    }
+                                    const curTime = curRec.updatedAt || curRec.checkOutIso || curRec.checkInIso || '';
+                                    const incTime = incRec.updatedAt || incRec.checkOutIso || incRec.checkInIso || '';
+                                    const baseRec = (incTime > curTime) ? { ...curRec, ...incRec } : { ...incRec, ...curRec };
+                                    baseRec.slots = mergedSlots;
+                                    targetMap[staffKey][dKey] = baseRec;
                                 }
                             });
                         });
@@ -2959,18 +2977,23 @@
                         const localStaff = storage.get('revive_staff_db', []);
                         const backupStaff = (data.settings && Array.isArray(data.settings.staffBackup)) ? data.settings.staffBackup : [];
                         const mergedStaff = data.staff.map((st, idx) => {
+                            const rawPin = String(st.pin != null ? st.pin : (st.PIN != null ? st.PIN : '')).trim();
+                            const rawId = String(st.id || st.ID || st.staffId || '').trim();
+                            const matchLocal = localStaff.find(ls => (rawId && String(ls.id) === rawId) || (rawPin && String(ls.pin) === rawPin))
+                                || backupStaff.find(bs => (rawId && String(bs.id) === rawId) || (rawPin && String(bs.pin) === rawPin));
+                            const matchBackup = backupStaff.find(bs => (rawId && String(bs.id) === rawId) || (rawPin && String(bs.pin) === rawPin));
+                            const preservedShifts = st.shifts || (matchLocal && matchLocal.shifts) || (matchBackup && matchBackup.shifts) || ['Morning', 'Evening'];
                             const normSt = ensureStaffObject(st, idx);
-                            const matchLocal = localStaff.find(ls => String(ls.id) === String(normSt.id) || String(ls.pin) === String(normSt.pin))
-                                || backupStaff.find(bs => String(bs.id) === String(normSt.id) || String(bs.pin) === String(normSt.pin));
                             return ensureStaffObject({
+                                ...(matchBackup || {}),
                                 ...(matchLocal || {}),
                                 ...normSt,
-                                id: (matchLocal && matchLocal.id) || normSt.id,
-                                joiningDate: st.joiningDate || (matchLocal && matchLocal.joiningDate) || '2026-01-01',
-                                contact: st.contact || (matchLocal && matchLocal.contact) || '',
-                                role: st.role || (matchLocal && matchLocal.role) || 'Staff',
-                                shifts: st.shifts || (matchLocal && matchLocal.shifts) || ['Morning', 'Evening'],
-                                lastWorkingDay: st.lastWorkingDay || (matchLocal && matchLocal.lastWorkingDay) || ''
+                                id: (matchLocal && matchLocal.id) || (matchBackup && matchBackup.id) || normSt.id,
+                                joiningDate: st.joiningDate || (matchLocal && matchLocal.joiningDate) || (matchBackup && matchBackup.joiningDate) || '2026-01-01',
+                                contact: st.contact || (matchLocal && matchLocal.contact) || (matchBackup && matchBackup.contact) || '',
+                                role: st.role || (matchLocal && matchLocal.role) || (matchBackup && matchBackup.role) || 'Staff',
+                                shifts: preservedShifts,
+                                lastWorkingDay: st.lastWorkingDay || (matchLocal && matchLocal.lastWorkingDay) || (matchBackup && matchBackup.lastWorkingDay) || ''
                             }, idx);
                         });
                         storage.set('revive_staff_db', mergedStaff);
@@ -3025,15 +3048,29 @@
                                         staffName: a.fullName || payload.staffName || 'Staff',
                                         staffPin: sPin,
                                         dateKey: dKey,
+                                        slot: payload.slot || '',
                                         checkIn: payload.checkIn || '',
                                         checkInIso: payload.checkInIso || '',
                                         checkOut: payload.checkOut || '',
                                         checkOutIso: payload.checkOutIso || '',
                                         duration: payload.duration || '',
-                                        status: 'Present'
+                                        slots: (payload.slots && typeof payload.slots === 'object') ? payload.slots : {},
+                                        updatedAt: payload.updatedAt || payload.checkOutIso || payload.checkInIso || '',
+                                        status: payload.status || 'Present'
                                     };
-                                    if (!existing || (!existing.checkOut && reconstructed.checkOut)) {
+                                    if (!existing) {
                                         saCurrent[sId][dKey] = reconstructed;
+                                    } else {
+                                        const mergedSlots = { ...(reconstructed.slots || {}), ...(existing.slots || {}) };
+                                        Object.keys(reconstructed.slots || {}).forEach(slKey => {
+                                            const rSl = reconstructed.slots[slKey];
+                                            const eSl = existing.slots ? existing.slots[slKey] : null;
+                                            if (!eSl || (!eSl.checkOut && rSl && rSl.checkOut)) {
+                                                mergedSlots[slKey] = rSl;
+                                            }
+                                        });
+                                        existing.slots = mergedSlots;
+                                        saCurrent[sId][dKey] = existing;
                                     }
                                 } catch (err) {}
                                 return;
@@ -4273,7 +4310,6 @@
                 let saDb = storage.get('revive_staff_attendance_db', {});
                 if (!saDb || typeof saDb !== 'object' || Array.isArray(saDb)) saDb = {};
                 const pinKey = `PIN_${String(st.pin || '').trim()}`;
-                let bestRec = null;
 
                 const candidates = [];
                 if (saDb[st.id] && saDb[st.id][targetDateKey]) candidates.push(saDb[st.id][targetDateKey]);
@@ -4292,13 +4328,34 @@
                         }
                     }
                 }
+
+                let bestRec = null;
+                const mergedSlots = {};
                 candidates.forEach(c => {
                     if (!c || (!c.checkIn && c.status !== 'Leave' && !c.slots)) return;
-                    if (!bestRec || (!bestRec.checkOut && c.checkOut) || (c.slots && Object.keys(c.slots).length > Object.keys(bestRec.slots || {}).length)) {
-                        bestRec = c;
+                    if (c.slots && typeof c.slots === 'object') {
+                        Object.keys(c.slots).forEach(slName => {
+                            const slObj = c.slots[slName];
+                            if (!slObj) return;
+                            const prevSl = mergedSlots[slName];
+                            if (!prevSl || (!prevSl.checkOut && slObj.checkOut) || ((slObj.updatedAt || '') > (prevSl.updatedAt || ''))) {
+                                mergedSlots[slName] = slObj;
+                            }
+                        });
+                    }
+                    if (!bestRec) {
+                        bestRec = { ...c };
+                    } else {
+                        const cTime = c.updatedAt || c.checkOutIso || c.checkInIso || '';
+                        const bTime = bestRec.updatedAt || bestRec.checkOutIso || bestRec.checkInIso || '';
+                        if (cTime >= bTime || Object.keys(c.slots || {}).length > Object.keys(bestRec.slots || {}).length) {
+                            bestRec = { ...bestRec, ...c };
+                        }
                     }
                 });
+
                 if (bestRec) {
+                    bestRec.slots = mergedSlots;
                     if (!saDb[st.id]) saDb[st.id] = {};
                     saDb[st.id][targetDateKey] = bestRec;
                     if (st.pin) {
@@ -4314,6 +4371,29 @@
                 return window.moduleContext.getStaffPunchRecordForDate(st, todayKey);
             },
 
+            // Check if a given shift slot is currently LIVE based on current clock time and Working Timing Config
+            isShiftSlotLiveNow: function(slotName, timingsCfg, nowDate) {
+                const timings = timingsCfg || getWorkingTimingsConfig();
+                const tc = timings[slotName];
+                if (!tc) return false;
+                const now = nowDate || new Date();
+                const nowMins = now.getHours() * 60 + now.getMinutes();
+                const startMins = parseTime12ToMinutes(tc.start);
+                const endMins = parseTime12ToMinutes(tc.end);
+                if (startMins == null || endMins == null) return false;
+                // Allow a 30-minute early check-in buffer before shift start and 30-minute buffer after shift end
+                const bufferedStart = Math.max(0, startMins - 30);
+                const bufferedEnd = Math.min(24 * 60, endMins + 30);
+                if (endMins >= startMins) {
+                    return nowMins >= bufferedStart && nowMins <= bufferedEnd;
+                } else {
+                    return nowMins >= bufferedStart || nowMins <= bufferedEnd;
+                }
+            },
+
+            // Strictly controls visibility of Check-In & Check-Out buttons:
+            // When outside 20m range: completely hidden (.geo-hidden + display: none !important)
+            // When inside 20m range: visible and active for the selected/live shift slot
             setStaffPunchButtonsVisibility: function(isInside20m, reasonMsg) {
                 window._staffInsideGeoFence = !!isInside20m;
                 const btnsContainer = document.getElementById('staff-punch-btns-container');
@@ -4322,18 +4402,30 @@
                 const lockedBanner = document.getElementById('staff-geofence-locked-msg');
 
                 if (!isInside20m) {
-                    if (btnsContainer) btnsContainer.style.display = 'none';
-                    if (btnIn) { btnIn.style.display = 'none'; btnIn.disabled = true; }
-                    if (btnOut) { btnOut.style.display = 'none'; btnOut.disabled = true; }
+                    if (btnsContainer) {
+                        btnsContainer.classList.add('geo-hidden');
+                        btnsContainer.style.setProperty('display', 'none', 'important');
+                    }
+                    if (btnIn) {
+                        btnIn.classList.add('geo-hidden');
+                        btnIn.style.setProperty('display', 'none', 'important');
+                        btnIn.disabled = true;
+                    }
+                    if (btnOut) {
+                        btnOut.classList.add('geo-hidden');
+                        btnOut.style.setProperty('display', 'none', 'important');
+                        btnOut.disabled = true;
+                    }
                     if (lockedBanner) {
                         lockedBanner.style.display = 'block';
                         if (reasonMsg) lockedBanner.innerText = reasonMsg;
                     }
                 } else {
                     if (lockedBanner) lockedBanner.style.display = 'none';
-                    if (btnsContainer) btnsContainer.style.display = 'grid';
-                    if (btnIn) btnIn.style.display = 'inline-flex';
-                    if (btnOut) btnOut.style.display = 'inline-flex';
+                    if (btnsContainer) {
+                        btnsContainer.classList.remove('geo-hidden');
+                        btnsContainer.style.setProperty('display', 'grid', 'important');
+                    }
                     window.moduleContext.applySlotButtonEnableState();
                 }
             },
@@ -4349,46 +4441,101 @@
                 const todayPretty = now.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
                 document.getElementById('staff-punch-date-title').innerText = todayPretty;
 
-                // Populate Assigned Shift Slots dropdown for this staff member
                 const timings = getWorkingTimingsConfig();
                 const assignedShifts = (Array.isArray(st.shifts) && st.shifts.length > 0) ? st.shifts : ['Morning', 'Evening'];
+
+                // Ensure any currently LIVE shift slot from Working Timing Config is also accessible in the dropdown if needed
+                const dropdownShifts = [...assignedShifts];
+                HR_SHIFT_SLOTS.forEach(sName => {
+                    if (!dropdownShifts.includes(sName) && window.moduleContext.isShiftSlotLiveNow(sName, timings, now)) {
+                        dropdownShifts.push(sName);
+                    }
+                });
+
                 const slotSel = document.getElementById('staff-punch-slot-select');
-                const prevSelectedSlot = slotSel ? slotSel.value : '';
                 if (slotSel) {
                     slotSel.innerHTML = '';
                     const todayRecInit = window.moduleContext.getTodayStaffPunchRecord(st, todayKey);
                     const slotsMapInit = (todayRecInit && todayRecInit.slots) ? todayRecInit.slots : {};
-                    let autoPickSlot = assignedShifts[0];
 
-                    for (const sName of assignedShifts) {
-                        const sr = slotsMapInit[sName];
-                        if (sr && sr.checkIn && !sr.checkOut) {
-                            autoPickSlot = sName;
-                            break;
+                    // Determine the best slot to auto-select:
+                    // 1. User manually chosen slot in this session
+                    // 2. Currently Checked-In (open) slot awaiting Check-Out
+                    // 3. Assigned shift slot that is LIVE right now (and not yet completed)
+                    // 4. AnyAssigned shift slot that is LIVE right now (even if completed)
+                    // 5. Any configured shift slot that is LIVE right now
+                    // 6. First uncompleted assigned shift slot
+                    let autoPickSlot = '';
+
+                    if (window._userSelectedStaffSlot && dropdownShifts.includes(window._userSelectedStaffSlot)) {
+                        autoPickSlot = window._userSelectedStaffSlot;
+                    }
+                    if (!autoPickSlot) {
+                        for (const sName of dropdownShifts) {
+                            const sr = slotsMapInit[sName];
+                            if (sr && sr.checkIn && !sr.checkOut && sr.checkIn !== 'Leave') {
+                                autoPickSlot = sName;
+                                break;
+                            }
                         }
                     }
-                    if (prevSelectedSlot && assignedShifts.includes(prevSelectedSlot)) {
-                        autoPickSlot = prevSelectedSlot;
+                    if (!autoPickSlot) {
+                        for (const sName of assignedShifts) {
+                            const sr = slotsMapInit[sName];
+                            const isCompleted = sr && sr.checkIn && sr.checkOut;
+                            if (!isCompleted && window.moduleContext.isShiftSlotLiveNow(sName, timings, now)) {
+                                autoPickSlot = sName;
+                                break;
+                            }
+                        }
+                    }
+                    if (!autoPickSlot) {
+                        for (const sName of dropdownShifts) {
+                            if (window.moduleContext.isShiftSlotLiveNow(sName, timings, now)) {
+                                autoPickSlot = sName;
+                                break;
+                            }
+                        }
+                    }
+                    if (!autoPickSlot) {
+                        for (const sName of assignedShifts) {
+                            const sr = slotsMapInit[sName];
+                            if (!sr || !sr.checkOut) {
+                                autoPickSlot = sName;
+                                break;
+                            }
+                        }
+                    }
+                    if (!autoPickSlot) {
+                        autoPickSlot = assignedShifts[0];
                     }
 
-                    assignedShifts.forEach(sName => {
+                    dropdownShifts.forEach(sName => {
                         const tc = timings[sName] || timings.Morning;
+                        const isLive = window.moduleContext.isShiftSlotLiveNow(sName, timings, now);
                         const opt = document.createElement('option');
                         opt.value = sName;
-                        opt.innerText = `${sName} Shift (${tc.start} – ${tc.end})`;
+                        opt.innerText = `${isLive ? '🟢 LIVE: ' : ''}${sName} Shift (${tc.start} – ${tc.end})`;
                         if (sName === autoPickSlot) opt.selected = true;
                         slotSel.appendChild(opt);
                     });
                 }
 
+                // Immediately enforce button visibility based on current geo-fence state
+                window.moduleContext.setStaffPunchButtonsVisibility(!!window._staffInsideGeoFence);
                 window.moduleContext.onStaffPunchSlotChange();
                 window.moduleContext.refreshStaffCurrentMonthKpiRow();
-                // Automatically verify 20m geo-fence and hide Check-In/Check-Out buttons if outside 20m
+                // Start live GPS watch + verify 20m geo-fence
+                window.moduleContext.startStaffGeoWatch();
                 window.moduleContext.verifyStaffGeoFence(null, false);
             },
 
             onStaffPunchSlotChange: function() {
                 if (appContext.currentRole !== 'staff') return;
+                const slotSel = document.getElementById('staff-punch-slot-select');
+                if (slotSel && slotSel.value) {
+                    window._userSelectedStaffSlot = slotSel.value;
+                }
                 window.moduleContext.applySlotButtonEnableState();
             },
 
@@ -4404,25 +4551,27 @@
                 const slotSel = document.getElementById('staff-punch-slot-select');
                 const activeSlot = (slotSel && slotSel.value) ? slotSel.value : assignedShifts[0];
                 const slotTiming = timings[activeSlot] || timings.Morning;
+                const isLiveNow = window.moduleContext.isShiftSlotLiveNow(activeSlot, timings, now);
 
                 const timingPill = document.getElementById('staff-slot-timing-pill');
                 if (timingPill) {
-                    timingPill.innerHTML = `⏰ Slot Window: <strong style="color:var(--accent-orange);">${slotTiming.start} – ${slotTiming.end}</strong> (All assigned shifts must Check-In & Check-Out)`;
+                    timingPill.innerHTML = `⏰ Slot Window: <strong style="color:var(--accent-orange);">${slotTiming.start} – ${slotTiming.end}</strong> ${isLiveNow ? '<span style="background:#eefbf3; color:#1b9f4a; border:1px solid #b7ebc9; padding:2px 8px; border-radius:12px; font-size:0.74rem; margin-left:6px;">🟢 LIVE SLOT NOW</span>' : ''}`;
                 }
 
                 const holInfo = getDayHolidayInfo(todayKey);
                 const badgeEl = document.getElementById('staff-day-type-badge');
                 const subEl = document.getElementById('staff-punch-substatus');
+                const btnsContainer = document.getElementById('staff-punch-btns-container');
                 const btnIn = document.getElementById('btn-staff-checkin');
                 const btnOut = document.getElementById('btn-staff-checkout');
                 const summaryBox = document.getElementById('staff-today-slots-summary');
 
                 const todayRec = window.moduleContext.getTodayStaffPunchRecord(st, todayKey);
-                const slotsMap = (todayRec && todayRec.slots) ? { ...todayRec.slots } : {};
-                if (todayRec && todayRec.checkIn && Object.keys(slotsMap).length === 0) {
-                    const fbSlot = todayRec.slot || assignedShifts[0];
-                    slotsMap[fbSlot] = {
-                        slot: fbSlot,
+                const slotsMap = (todayRec && todayRec.slots && typeof todayRec.slots === 'object') ? { ...todayRec.slots } : {};
+                // Only fall back to top-level checkIn if todayRec explicitly matches activeSlot
+                if (todayRec && todayRec.checkIn && Object.keys(slotsMap).length === 0 && todayRec.slot === activeSlot) {
+                    slotsMap[activeSlot] = {
+                        slot: activeSlot,
                         checkIn: todayRec.checkIn,
                         checkInIso: todayRec.checkInIso || '',
                         checkOut: todayRec.checkOut || '',
@@ -4431,7 +4580,7 @@
                 }
 
                 if (summaryBox) {
-                    let sHtml = '<div style="display:flex; flex-wrap:wrap; gap:8px;">';
+                    let sHtml = '<div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">';
                     assignedShifts.forEach(sName => {
                         const sr = slotsMap[sName];
                         const tc = timings[sName] || timings.Morning;
@@ -4440,9 +4589,9 @@
                         } else if (sr && sr.checkIn && sr.checkOut) {
                             sHtml += `<span class="hr-status-pill hr-pill-working">✔ ${sName}: In ${sr.checkIn} | Out ${sr.checkOut}</span>`;
                         } else if (sr && sr.checkIn && !sr.checkOut) {
-                            sHtml += `<span class="hr-status-pill hr-pill-pending" style="border-color:var(--accent-orange);">⏳ ${sName}: In ${sr.checkIn} (Check-Out Required!)</span>`;
+                            sHtml += `<span class="hr-status-pill hr-pill-pending" style="border-color:var(--accent-orange);">⏳ ${sName}: In ${sr.checkIn} (Check-Out Pending)</span>`;
                         } else {
-                            sHtml += `<span class="hr-status-pill" style="background:#f1f3f5; color:#555; border:1px solid #ddd;">○ ${sName} (${tc.start}-${tc.end}): Pending</span>`;
+                            sHtml += `<span class="hr-status-pill" style="background:#f1f3f5; color:#555; border:1px solid #ddd;">○ ${sName} (${tc.start}-${tc.end}): Not Checked In</span>`;
                         }
                     });
                     sHtml += '</div>';
@@ -4451,37 +4600,112 @@
 
                 if (holInfo.isHoliday) {
                     badgeEl.innerHTML = `<span class="hr-status-pill hr-pill-holiday">🎉 ${holInfo.name}</span>`;
-                    subEl.innerText = `Holiday — Attendance Inactive`;
-                    btnIn.disabled = true;
-                    btnOut.disabled = true;
-                    btnIn.innerText = '✔ Check-In (Holiday)';
-                    btnOut.innerText = '⏹ Check-Out (Holiday)';
+                } else {
+                    badgeEl.innerHTML = `<span class="hr-status-pill hr-pill-working">● Working Day</span>`;
+                }
+
+                const insideGeo = !!window._staffInsideGeoFence;
+                const currSlotRec = slotsMap[activeSlot];
+
+                // If NOT inside 20m range, keep Check-In and Check-Out buttons 100% hidden!
+                if (!insideGeo) {
+                    if (btnsContainer) {
+                        btnsContainer.classList.add('geo-hidden');
+                        btnsContainer.style.setProperty('display', 'none', 'important');
+                    }
+                    if (btnIn) {
+                        btnIn.classList.add('geo-hidden');
+                        btnIn.style.setProperty('display', 'none', 'important');
+                        btnIn.disabled = true;
+                    }
+                    if (btnOut) {
+                        btnOut.classList.add('geo-hidden');
+                        btnOut.style.setProperty('display', 'none', 'important');
+                        btnOut.disabled = true;
+                    }
+                    if (!currSlotRec || !currSlotRec.checkIn) {
+                        subEl.innerHTML = `Selected Slot (<strong>${activeSlot}</strong>): <strong style="color:var(--error-red);">Not Checked In</strong>`;
+                    } else if (currSlotRec.checkIn && !currSlotRec.checkOut) {
+                        subEl.innerHTML = `Selected Slot (<strong>${activeSlot}</strong>): <strong style="color:var(--warning-yellow);">Checked In at ${currSlotRec.checkIn} — Check-Out Required</strong>`;
+                    } else {
+                        subEl.innerHTML = `Selected Slot (<strong>${activeSlot}</strong>): In <strong>${currSlotRec.checkIn}</strong> &nbsp;|&nbsp; Out <strong>${currSlotRec.checkOut}</strong> (${currSlotRec.duration || 'Completed'})`;
+                    }
                     return;
                 }
 
-                badgeEl.innerHTML = `<span class="hr-status-pill hr-pill-working">● Working Day</span>`;
-                const currSlotRec = slotsMap[activeSlot];
-                const insideGeo = !!window._staffInsideGeoFence;
+                // Staff IS inside 20m Geo-Fence: show container and active buttons!
+                if (btnsContainer) {
+                    btnsContainer.classList.remove('geo-hidden');
+                    btnsContainer.style.setProperty('display', 'grid', 'important');
+                }
+                if (btnIn) {
+                    btnIn.classList.remove('geo-hidden');
+                    btnIn.style.setProperty('display', 'inline-flex', 'important');
+                }
+                if (btnOut) {
+                    btnOut.classList.remove('geo-hidden');
+                    btnOut.style.setProperty('display', 'inline-flex', 'important');
+                }
 
-                if (!currSlotRec || !currSlotRec.checkIn) {
-                    subEl.innerHTML = `Selected Slot (<strong>${activeSlot}</strong>): <strong style="color:var(--error-red);">Not Checked In</strong>`;
-                    btnIn.disabled = !insideGeo;
+                if (!currSlotRec || !currSlotRec.checkIn || currSlotRec.checkIn === 'Leave') {
+                    // Ready to Check-In for this slot
+                    subEl.innerHTML = `Selected Slot (<strong>${activeSlot}</strong>): <strong style="color:var(--success-green);">Ready to Check-In (Within 20m Geo-Fence)</strong>`;
+                    btnIn.disabled = false;
                     btnOut.disabled = true;
                     btnIn.innerText = `✔ Check-In (${activeSlot})`;
                     btnOut.innerText = `⏹ Check-Out (${activeSlot})`;
                 } else if (currSlotRec.checkIn && !currSlotRec.checkOut) {
-                    subEl.innerHTML = `Selected Slot (<strong>${activeSlot}</strong>): <strong style="color:var(--warning-yellow);">Checked In at ${currSlotRec.checkIn} — Must Check-Out to Count Attendance</strong>`;
+                    // Checked In -> Ready to Check-Out for this slot
+                    subEl.innerHTML = `Selected Slot (<strong>${activeSlot}</strong>): <strong style="color:var(--warning-yellow);">Checked In at ${currSlotRec.checkIn} — Click Check-Out to Complete Shift</strong>`;
                     btnIn.disabled = true;
-                    btnOut.disabled = !insideGeo;
-                    btnIn.innerText = `✔ In (${currSlotRec.checkIn})`;
+                    btnOut.disabled = false;
+                    btnIn.innerText = `✔ Checked In (${currSlotRec.checkIn})`;
                     btnOut.innerText = `⏹ Check-Out (${activeSlot})`;
                 } else {
-                    subEl.innerHTML = `Selected Slot (<strong>${activeSlot}</strong>): In <strong>${currSlotRec.checkIn}</strong> &nbsp;|&nbsp; Out <strong>${currSlotRec.checkOut}</strong> (${currSlotRec.duration || 'Completed'})`;
-                    btnIn.disabled = true;
-                    btnOut.disabled = true;
-                    btnIn.innerText = `✔ In (${currSlotRec.checkIn})`;
-                    btnOut.innerText = `⏹ Out (${currSlotRec.checkOut})`;
+                    // Slot already has Check-In & Check-Out today -> allow re-Check-In if needed so buttons are never stuck dead during live shifts
+                    subEl.innerHTML = `Selected Slot (<strong>${activeSlot}</strong>): Completed (In <strong>${currSlotRec.checkIn}</strong> | Out <strong>${currSlotRec.checkOut}</strong> — ${currSlotRec.duration || 'Done'})`;
+                    btnIn.disabled = false;
+                    btnOut.disabled = false;
+                    btnIn.innerText = `✔ Re-Check-In (${activeSlot})`;
+                    btnOut.innerText = `⏹ Update Check-Out (${activeSlot})`;
                 }
+            },
+
+            // Live continuous GPS watcher while Staff Portal is open so entering/leaving 20m updates buttons automatically
+            startStaffGeoWatch: function() {
+                if (window._staffGeoWatchId != null || !navigator.geolocation) return;
+                window._staffGeoWatchId = navigator.geolocation.watchPosition(
+                    function(pos) {
+                        if (appContext.currentRole !== 'staff') return;
+                        const studio = getStudioDetails();
+                        if (studio.lat == null || studio.lng == null) return;
+                        const distMeters = calculateGeoDistanceMeters(studio.lat, studio.lng, pos.coords.latitude, pos.coords.longitude);
+                        const roundedDist = Math.round(distMeters * 10) / 10;
+                        window._lastGeoFix = {
+                            lat: pos.coords.latitude,
+                            lng: pos.coords.longitude,
+                            distMeters: roundedDist,
+                            timestamp: Date.now()
+                        };
+                        const statusTxtEl = document.getElementById('staff-geofence-status-text');
+                        if (distMeters <= 20) {
+                            if (statusTxtEl) {
+                                statusTxtEl.style.color = 'var(--success-green)';
+                                statusTxtEl.innerText = `✔ Inside 20m Studio Geo-Fence (${roundedDist}m from Studio Center)`;
+                            }
+                            window.moduleContext.setStaffPunchButtonsVisibility(true, "");
+                        } else {
+                            const outMsg = `🔒 Check-In & Check-Out Hidden: You are ${roundedDist}m away from the Studio Center Point (Allowed limit: 20m).`;
+                            if (statusTxtEl) {
+                                statusTxtEl.style.color = 'var(--error-red)';
+                                statusTxtEl.innerText = `✖ Outside 20m Geo-Fence (${roundedDist}m away — Limit: 20m)`;
+                            }
+                            window.moduleContext.setStaffPunchButtonsVisibility(false, outMsg);
+                        }
+                    },
+                    function() {},
+                    { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
+                );
             },
 
             // Verify 20-meter Geo-Fence around Admin-fixed Studio Center Point
@@ -4513,59 +4737,88 @@
                     return;
                 }
 
-                if (statusTxtEl) {
+                // If a punch callback is requested and we already have a fresh verified GPS fix within the last 25 seconds, use it immediately so mobile GPS never hangs!
+                if (typeof onSuccessCallback === 'function' && !isManualTest && window._lastGeoFix && (Date.now() - window._lastGeoFix.timestamp) < 25000) {
+                    if (window._lastGeoFix.distMeters <= 20) {
+                        window.moduleContext.setStaffPunchButtonsVisibility(true, "");
+                        onSuccessCallback(window._lastGeoFix.distMeters);
+                        return;
+                    } else {
+                        const outMsg = `🔒 Check-In & Check-Out Hidden: You are ${window._lastGeoFix.distMeters}m away from the Studio Center Point (Allowed limit: 20m).`;
+                        window.moduleContext.setStaffPunchButtonsVisibility(false, outMsg);
+                        window._staffPunchInProgress = false;
+                        showNotice(`Outside 20m Geo-Fence (${window._lastGeoFix.distMeters}m away)! Check-In & Check-Out hidden.`, "error");
+                        return;
+                    }
+                }
+
+                if (statusTxtEl && !window._staffInsideGeoFence) {
                     statusTxtEl.style.color = 'var(--accent-orange)';
                     statusTxtEl.innerText = '📡 Checking live GPS distance from Studio Center Point (20m limit)...';
                 }
 
-                navigator.geolocation.getCurrentPosition(
-                    function(pos) {
-                        const staffLat = pos.coords.latitude;
-                        const staffLng = pos.coords.longitude;
-                        const distMeters = calculateGeoDistanceMeters(studio.lat, studio.lng, staffLat, staffLng);
-                        const roundedDist = Math.round(distMeters * 10) / 10;
+                const handleGeoPosition = function(pos) {
+                    const staffLat = pos.coords.latitude;
+                    const staffLng = pos.coords.longitude;
+                    const distMeters = calculateGeoDistanceMeters(studio.lat, studio.lng, staffLat, staffLng);
+                    const roundedDist = Math.round(distMeters * 10) / 10;
+                    window._lastGeoFix = {
+                        lat: staffLat,
+                        lng: staffLng,
+                        distMeters: roundedDist,
+                        timestamp: Date.now()
+                    };
 
-                        if (distMeters <= 20) {
-                            if (statusTxtEl) {
-                                statusTxtEl.style.color = 'var(--success-green)';
-                                statusTxtEl.innerText = `✔ Inside 20m Studio Geo-Fence (${roundedDist}m from Studio Center)`;
-                            }
-                            window.moduleContext.setStaffPunchButtonsVisibility(true, "");
-                            if (isManualTest) {
-                                showNotice(`✔ Inside 20m Geo-Fence (${roundedDist}m)! Check-In & Check-Out unlocked.`, "success");
-                            }
-                            if (typeof onSuccessCallback === 'function') {
-                                onSuccessCallback(roundedDist);
-                            } else {
-                                window._staffPunchInProgress = false;
-                            }
-                        } else {
-                            const outMsg = `🔒 Check-In & Check-Out Hidden: You are ${roundedDist}m away from the Studio Center Point (Allowed limit: 20m). Move within 20m and click "Verify / Refresh Location".`;
-                            if (statusTxtEl) {
-                                statusTxtEl.style.color = 'var(--error-red)';
-                                statusTxtEl.innerText = `✖ Outside 20m Geo-Fence (${roundedDist}m away — Limit: 20m)`;
-                            }
-                            // Immediately hide Check-In and Check-Out buttons so staff cannot click them when outside 20m!
-                            window.moduleContext.setStaffPunchButtonsVisibility(false, outMsg);
-                            window._staffPunchInProgress = false;
-                            if (isManualTest || typeof onSuccessCallback === 'function') {
-                                showNotice(`Outside 20m Geo-Fence (${roundedDist}m away)! Check-In & Check-Out hidden.`, "error");
-                            }
+                    if (distMeters <= 20) {
+                        if (statusTxtEl) {
+                            statusTxtEl.style.color = 'var(--success-green)';
+                            statusTxtEl.innerText = `✔ Inside 20m Studio Geo-Fence (${roundedDist}m from Studio Center)`;
                         }
-                    },
-                    function(err) {
-                        const errMsg = "🔒 Check-In & Check-Out Hidden: GPS Location Permission is required to verify you are within 20m of the studio.";
+                        window.moduleContext.setStaffPunchButtonsVisibility(true, "");
+                        if (isManualTest) {
+                            showNotice(`✔ Inside 20m Geo-Fence (${roundedDist}m)! Check-In & Check-Out active.`, "success");
+                        }
+                        if (typeof onSuccessCallback === 'function') {
+                            onSuccessCallback(roundedDist);
+                        } else {
+                            window._staffPunchInProgress = false;
+                        }
+                    } else {
+                        const outMsg = `🔒 Check-In & Check-Out Hidden: You are ${roundedDist}m away from the Studio Center Point (Allowed limit: 20m). Move within 20m and click "Check My Distance".`;
                         if (statusTxtEl) {
                             statusTxtEl.style.color = 'var(--error-red)';
-                            statusTxtEl.innerText = '✖ GPS Location Permission Denied / Unavailable';
+                            statusTxtEl.innerText = `✖ Outside 20m Geo-Fence (${roundedDist}m away — Limit: 20m)`;
                         }
-                        window.moduleContext.setStaffPunchButtonsVisibility(false, errMsg);
+                        window.moduleContext.setStaffPunchButtonsVisibility(false, outMsg);
                         window._staffPunchInProgress = false;
                         if (isManualTest || typeof onSuccessCallback === 'function') {
-                            showNotice("Please enable GPS Location permission to verify you are within 20m of the studio.", "error");
+                            showNotice(`Outside 20m Geo-Fence (${roundedDist}m away)! Check-In & Check-Out hidden.`, "error");
                         }
+                    }
+                };
+
+                navigator.geolocation.getCurrentPosition(
+                    handleGeoPosition,
+                    function(err) {
+                        // Fallback to standard accuracy if high-accuracy GPS timed out indoors
+                        navigator.geolocation.getCurrentPosition(
+                            handleGeoPosition,
+                            function(err2) {
+                                const errMsg = "🔒 Check-In & Check-Out Hidden: GPS Location Permission is required to verify you are within 20m of the studio.";
+                                if (statusTxtEl) {
+                                    statusTxtEl.style.color = 'var(--error-red)';
+                                    statusTxtEl.innerText = '✖ GPS Location Unavailable — Click "Check My Distance"';
+                                }
+                                window.moduleContext.setStaffPunchButtonsVisibility(false, errMsg);
+                                window._staffPunchInProgress = false;
+                                if (isManualTest || typeof onSuccessCallback === 'function') {
+                                    showNotice("Unable to read GPS location. Please enable Location Permission and click Check My Distance.", "error");
+                                }
+                            },
+                            { enableHighAccuracy: false, timeout: 10000, maximumAge: 15000 }
+                        );
                     },
-                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                    { enableHighAccuracy: true, timeout: 8000, maximumAge: 10000 }
                 );
             },
 
@@ -4720,7 +4973,7 @@
                 return true;
             },
 
-            // Live Check-In: Enforces 20-meter Geo-Fence around Studio Center Point & blocks multi-click bypass
+            // Live Check-In: Enforces 20-meter Geo-Fence around Studio Center Point & works seamlessly on the Live Slot
             staffPunchIn: function() {
                 if (appContext.currentRole !== 'staff') return;
                 if (window._staffPunchInProgress) return;
@@ -4732,13 +4985,6 @@
                 const st = window.moduleContext.resolveActiveStaff();
                 if (!st) {
                     showNotice("Session expired. Please log in again.", "error");
-                    return;
-                }
-                const now = new Date();
-                const todayKey = toIsoDateKey(now);
-                const holInfo = getDayHolidayInfo(todayKey);
-                if (holInfo.isHoliday) {
-                    showNotice(`Today is ${holInfo.name}. Attendance is inactive on holidays.`, "warning");
                     return;
                 }
 
@@ -4764,8 +5010,10 @@
                     const assignedShifts = (Array.isArray(st.shifts) && st.shifts.length > 0) ? st.shifts : ['Morning', 'Evening'];
                     const slotSel = document.getElementById('staff-punch-slot-select');
                     const activeSlot = (slotSel && slotSel.value) ? slotSel.value : assignedShifts[0];
+                    window._userSelectedStaffSlot = activeSlot;
 
                     const timeStr = punchNow.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                    const isoNow = punchNow.toISOString();
                     let saDb = storage.get('revive_staff_attendance_db', {});
                     if (!saDb || typeof saDb !== 'object' || Array.isArray(saDb)) saDb = {};
                     if (!saDb[st.id]) saDb[st.id] = {};
@@ -4777,7 +5025,7 @@
                         staffPin: st.pin,
                         dateKey: punchKey,
                         checkIn: timeStr,
-                        checkInIso: punchNow.toISOString(),
+                        checkInIso: isoNow,
                         checkOut: '',
                         checkOutIso: '',
                         duration: '',
@@ -4788,17 +5036,19 @@
                     existing.slots[activeSlot] = {
                         slot: activeSlot,
                         checkIn: timeStr,
-                        checkInIso: punchNow.toISOString(),
+                        checkInIso: isoNow,
                         checkOut: '',
                         checkOutIso: '',
                         duration: '',
                         geoInDist: `${verifiedDistMeters}m`,
+                        updatedAt: isoNow,
                         status: 'Incomplete'
                     };
                     existing.slot = activeSlot;
-                    if (!existing.checkIn || existing.checkIn === 'Leave') existing.checkIn = timeStr;
-                    existing.checkInIso = punchNow.toISOString();
+                    existing.checkIn = timeStr;
+                    existing.checkInIso = isoNow;
                     existing.checkOut = '';
+                    existing.updatedAt = isoNow;
 
                     const pinKey = `PIN_${String(st.pin || '').trim()}`;
                     saDb[st.id][punchKey] = existing;
@@ -4812,17 +5062,26 @@
                         dateKey: punchKey,
                         userId: `__STAFF_ATT__:${st.pin}:${st.id}`,
                         fullName: st.name,
-                        timestamp: JSON.stringify({ checkIn: existing.checkIn, checkInIso: existing.checkInIso, checkOut: '', duration: '', slots: existing.slots }),
+                        timestamp: JSON.stringify({
+                            slot: activeSlot,
+                            checkIn: existing.checkIn,
+                            checkInIso: existing.checkInIso,
+                            checkOut: '',
+                            duration: existing.duration || '',
+                            slots: existing.slots,
+                            updatedAt: isoNow
+                        }),
                         month: punchNow.toLocaleString('default', { month: 'long' })
                     });
                     syncHrBackupToSettings();
 
-                    showNotice(`✔ Checked in for ${activeSlot} Shift at ${timeStr} (Geo-verified: ${verifiedDistMeters}m)!`, "success");
-                    window.moduleContext.refreshDashboardHrState();
+                    showNotice(`✔ Checked in for ${activeSlot} Shift at ${timeStr} (Verified within 20m: ${verifiedDistMeters}m)!`, "success");
+                    window.moduleContext.applySlotButtonEnableState();
+                    window.moduleContext.refreshStaffCurrentMonthKpiRow();
                 }, false);
             },
 
-            // Live Check-Out: Enforces 20-meter Geo-Fence around Studio Center Point & blocks multi-click bypass
+            // Live Check-Out: Enforces 20-meter Geo-Fence around Studio Center Point & works seamlessly on the Live Slot
             staffPunchOut: function() {
                 if (appContext.currentRole !== 'staff') return;
                 if (window._staffPunchInProgress) return;
@@ -4844,6 +5103,7 @@
                 const assignedShifts = (Array.isArray(st.shifts) && st.shifts.length > 0) ? st.shifts : ['Morning', 'Evening'];
                 const slotSel = document.getElementById('staff-punch-slot-select');
                 const activeSlot = (slotSel && slotSel.value) ? slotSel.value : (recPre.slot || assignedShifts[0]);
+                window._userSelectedStaffSlot = activeSlot;
                 const slotRecPre = (recPre.slots && recPre.slots[activeSlot]) ? recPre.slots[activeSlot] : (recPre.checkIn ? { slot: activeSlot, checkIn: recPre.checkIn, checkInIso: recPre.checkInIso } : null);
                 if (!slotRecPre || !slotRecPre.checkIn) {
                     showNotice(`Please Check-In for ${activeSlot} Shift first.`, "error");
@@ -4859,6 +5119,7 @@
                     }
                     const outNow = new Date();
                     const outKey = toIsoDateKey(outNow);
+                    const isoNow = outNow.toISOString();
                     let saDb = storage.get('revive_staff_attendance_db', {});
                     if (!saDb || typeof saDb !== 'object' || Array.isArray(saDb)) saDb = {};
                     const rec = window.moduleContext.getTodayStaffPunchRecord(st, outKey);
@@ -4868,8 +5129,9 @@
 
                     const timeStr = outNow.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
                     slotRec.checkOut = timeStr;
-                    slotRec.checkOutIso = outNow.toISOString();
+                    slotRec.checkOutIso = isoNow;
                     slotRec.geoOutDist = `${verifiedDistMeters}m`;
+                    slotRec.updatedAt = isoNow;
                     slotRec.status = 'Present';
 
                     if (slotRec.checkInIso) {
@@ -4883,11 +5145,12 @@
                         slotRec.duration = formatDurationFromMinutes(inM, outM);
                     }
                     rec.slots[activeSlot] = slotRec;
+                    rec.slot = activeSlot;
                     rec.checkOut = timeStr;
-                    rec.checkOutIso = outNow.toISOString();
+                    rec.checkOutIso = isoNow;
+                    rec.updatedAt = isoNow;
                     rec.duration = Object.values(rec.slots).map(s => `${s.slot}: ${s.duration || 'Incomplete'}`).join(', ');
 
-                    // Check if all assigned shifts for this staff member have both checkIn and checkOut completed
                     const allAssignedDone = assignedShifts.every(sName => {
                         const sr = rec.slots[sName];
                         return sr && ((sr.checkIn && sr.checkOut && sr.checkIn !== 'Leave') || sr.status === 'Leave');
@@ -4907,13 +5170,23 @@
                         dateKey: outKey,
                         userId: `__STAFF_ATT__:${st.pin}:${st.id}`,
                         fullName: st.name,
-                        timestamp: JSON.stringify({ checkIn: rec.checkIn, checkInIso: rec.checkInIso, checkOut: rec.checkOut, checkOutIso: rec.checkOutIso, duration: rec.duration, slots: rec.slots }),
+                        timestamp: JSON.stringify({
+                            slot: activeSlot,
+                            checkIn: rec.checkIn,
+                            checkInIso: rec.checkInIso,
+                            checkOut: rec.checkOut,
+                            checkOutIso: rec.checkOutIso,
+                            duration: rec.duration,
+                            slots: rec.slots,
+                            updatedAt: isoNow
+                        }),
                         month: outNow.toLocaleString('default', { month: 'long' })
                     });
                     syncHrBackupToSettings();
 
                     showNotice(`✔ Checked out of ${activeSlot} Shift at ${timeStr} (${slotRec.duration}, Geo: ${verifiedDistMeters}m)!`, "success");
-                    window.moduleContext.refreshDashboardHrState();
+                    window.moduleContext.applySlotButtonEnableState();
+                    window.moduleContext.refreshStaffCurrentMonthKpiRow();
                 }, false);
             },
 
