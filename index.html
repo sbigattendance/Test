@@ -418,15 +418,18 @@
                     <div id="staff-slot-timing-pill" style="font-size:0.82rem; font-weight:800; color:var(--text-muted); padding-top:1rem;"></div>
                 </div>
                 <div id="staff-today-slots-summary" style="margin-bottom:0.8rem;"></div>
-                <div id="staff-geofence-status-bar" style="margin-bottom:1rem; padding:0.65rem 0.9rem; border-radius:8px; background:#f8fafc; border:1px dashed var(--border-color); font-size:0.8rem; font-weight:700; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-                    <span id="staff-geofence-status-text">📍 20m Studio Geo-Fence Required for Check-In & Check-Out</span>
-                    <button type="button" class="btn secondary" style="width:auto; padding:0.3rem 0.7rem; font-size:0.72rem;" onclick="window.moduleContext.verifyStaffGeoFence(null, true)">📡 Check My Distance</button>
+                <div id="staff-geofence-status-bar" style="margin-bottom:1rem; padding:0.75rem 1rem; border-radius:8px; background:#f8fafc; border:1.5px dashed var(--border-color); font-size:0.82rem; font-weight:700; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                    <span id="staff-geofence-status-text">📍 Verifying 20m Studio Geo-Fence...</span>
+                    <button type="button" class="btn secondary" style="width:auto; padding:0.35rem 0.8rem; font-size:0.74rem; border-color:var(--accent-orange); color:var(--accent-orange);" onclick="window.moduleContext.verifyStaffGeoFence(null, true)">📡 Check My Distance</button>
                 </div>
-                <div class="hr-punch-btns">
-                    <button type="button" id="btn-staff-checkin" class="btn checkin-btn" onclick="window.moduleContext.staffPunchIn()">
+                <div id="staff-geofence-locked-msg" style="display:block; padding:0.9rem 1rem; border-radius:8px; background:#fdecea; border:1px solid #f5b7b1; color:var(--error-red); font-size:0.84rem; font-weight:800; text-align:center;">
+                    🔒 Check-In & Check-Out options are hidden until your location is verified within 20m of the Studio Center Point.
+                </div>
+                <div class="hr-punch-btns" id="staff-punch-btns-container" style="display:none;">
+                    <button type="button" id="btn-staff-checkin" class="btn checkin-btn" style="display:none;" onclick="window.moduleContext.staffPunchIn()">
                         ✔ Check-In (Punch In)
                     </button>
-                    <button type="button" id="btn-staff-checkout" class="btn checkout-btn" onclick="window.moduleContext.staffPunchOut()">
+                    <button type="button" id="btn-staff-checkout" class="btn checkout-btn" style="display:none;" onclick="window.moduleContext.staffPunchOut()">
                         ⏹ Check-Out (Punch Out)
                     </button>
                 </div>
@@ -4311,6 +4314,30 @@
                 return window.moduleContext.getStaffPunchRecordForDate(st, todayKey);
             },
 
+            setStaffPunchButtonsVisibility: function(isInside20m, reasonMsg) {
+                window._staffInsideGeoFence = !!isInside20m;
+                const btnsContainer = document.getElementById('staff-punch-btns-container');
+                const btnIn = document.getElementById('btn-staff-checkin');
+                const btnOut = document.getElementById('btn-staff-checkout');
+                const lockedBanner = document.getElementById('staff-geofence-locked-msg');
+
+                if (!isInside20m) {
+                    if (btnsContainer) btnsContainer.style.display = 'none';
+                    if (btnIn) { btnIn.style.display = 'none'; btnIn.disabled = true; }
+                    if (btnOut) { btnOut.style.display = 'none'; btnOut.disabled = true; }
+                    if (lockedBanner) {
+                        lockedBanner.style.display = 'block';
+                        if (reasonMsg) lockedBanner.innerText = reasonMsg;
+                    }
+                } else {
+                    if (lockedBanner) lockedBanner.style.display = 'none';
+                    if (btnsContainer) btnsContainer.style.display = 'grid';
+                    if (btnIn) btnIn.style.display = 'inline-flex';
+                    if (btnOut) btnOut.style.display = 'inline-flex';
+                    window.moduleContext.applySlotButtonEnableState();
+                }
+            },
+
             refreshDashboardHrState: function() {
                 if (appContext.currentRole !== 'staff') return;
                 autoCheckoutExpiredSlots();
@@ -4333,7 +4360,6 @@
                     const slotsMapInit = (todayRecInit && todayRecInit.slots) ? todayRecInit.slots : {};
                     let autoPickSlot = assignedShifts[0];
 
-                    // Pick the first assigned slot that is currently checked-in (open) or not yet checked in
                     for (const sName of assignedShifts) {
                         const sr = slotsMapInit[sName];
                         if (sr && sr.checkIn && !sr.checkOut) {
@@ -4357,9 +4383,16 @@
 
                 window.moduleContext.onStaffPunchSlotChange();
                 window.moduleContext.refreshStaffCurrentMonthKpiRow();
+                // Automatically verify 20m geo-fence and hide Check-In/Check-Out buttons if outside 20m
+                window.moduleContext.verifyStaffGeoFence(null, false);
             },
 
             onStaffPunchSlotChange: function() {
+                if (appContext.currentRole !== 'staff') return;
+                window.moduleContext.applySlotButtonEnableState();
+            },
+
+            applySlotButtonEnableState: function() {
                 if (appContext.currentRole !== 'staff') return;
                 const st = window.moduleContext.resolveActiveStaff();
                 if (!st) return;
@@ -4428,17 +4461,18 @@
 
                 badgeEl.innerHTML = `<span class="hr-status-pill hr-pill-working">● Working Day</span>`;
                 const currSlotRec = slotsMap[activeSlot];
+                const insideGeo = !!window._staffInsideGeoFence;
 
                 if (!currSlotRec || !currSlotRec.checkIn) {
                     subEl.innerHTML = `Selected Slot (<strong>${activeSlot}</strong>): <strong style="color:var(--error-red);">Not Checked In</strong>`;
-                    btnIn.disabled = false;
+                    btnIn.disabled = !insideGeo;
                     btnOut.disabled = true;
                     btnIn.innerText = `✔ Check-In (${activeSlot})`;
                     btnOut.innerText = `⏹ Check-Out (${activeSlot})`;
                 } else if (currSlotRec.checkIn && !currSlotRec.checkOut) {
                     subEl.innerHTML = `Selected Slot (<strong>${activeSlot}</strong>): <strong style="color:var(--warning-yellow);">Checked In at ${currSlotRec.checkIn} — Must Check-Out to Count Attendance</strong>`;
                     btnIn.disabled = true;
-                    btnOut.disabled = false;
+                    btnOut.disabled = !insideGeo;
                     btnIn.innerText = `✔ In (${currSlotRec.checkIn})`;
                     btnOut.innerText = `⏹ Check-Out (${activeSlot})`;
                 } else {
@@ -4450,29 +4484,38 @@
                 }
             },
 
-            // Verify 20-meter Geo-Fence around Admin-fixed Studio Center Point (Required ONLY for live Check-In & Check-Out)
+            // Verify 20-meter Geo-Fence around Admin-fixed Studio Center Point
+            // Strictly hides Check-In and Check-Out options whenever outside 20m range!
             verifyStaffGeoFence: function(onSuccessCallback, isManualTest = false) {
                 const statusTxtEl = document.getElementById('staff-geofence-status-text');
                 const studio = getStudioDetails();
 
                 if (studio.lat == null || studio.lng == null) {
-                    const msg = "Studio Geo-Fence Center Point is not fixed yet! Ask Admin to capture the Studio Location in Studio Details.";
+                    const msg = "🔒 Check-In & Check-Out Hidden: Studio Geo-Fence Center Point is not fixed yet in Admin → Studio Details.";
                     if (statusTxtEl) {
                         statusTxtEl.style.color = 'var(--error-red)';
-                        statusTxtEl.innerText = `⚠ ${msg}`;
+                        statusTxtEl.innerText = `⚠ Studio Geo-Fence Center Point Not Configured`;
                     }
-                    showNotice(msg, "error");
+                    window.moduleContext.setStaffPunchButtonsVisibility(false, msg);
+                    if (isManualTest || typeof onSuccessCallback === 'function') {
+                        showNotice("Studio Geo-Fence Center Point is not fixed yet! Ask Admin to capture Studio Location.", "error");
+                    }
+                    window._staffPunchInProgress = false;
                     return;
                 }
 
                 if (!navigator.geolocation) {
-                    showNotice("Geolocation is not supported on this device/browser.", "error");
+                    window.moduleContext.setStaffPunchButtonsVisibility(false, "🔒 Check-In & Check-Out Hidden: Geolocation is not supported on this device/browser.");
+                    if (isManualTest || typeof onSuccessCallback === 'function') {
+                        showNotice("Geolocation is not supported on this device/browser.", "error");
+                    }
+                    window._staffPunchInProgress = false;
                     return;
                 }
 
                 if (statusTxtEl) {
                     statusTxtEl.style.color = 'var(--accent-orange)';
-                    statusTxtEl.innerText = '📡 Verifying your live GPS distance from Studio Center Point (Max 20m)...';
+                    statusTxtEl.innerText = '📡 Checking live GPS distance from Studio Center Point (20m limit)...';
                 }
 
                 navigator.geolocation.getCurrentPosition(
@@ -4487,28 +4530,42 @@
                                 statusTxtEl.style.color = 'var(--success-green)';
                                 statusTxtEl.innerText = `✔ Inside 20m Studio Geo-Fence (${roundedDist}m from Studio Center)`;
                             }
+                            window.moduleContext.setStaffPunchButtonsVisibility(true, "");
                             if (isManualTest) {
-                                showNotice(`✔ You are ${roundedDist}m from the Studio Center (Within 20m limit)!`, "success");
+                                showNotice(`✔ Inside 20m Geo-Fence (${roundedDist}m)! Check-In & Check-Out unlocked.`, "success");
                             }
                             if (typeof onSuccessCallback === 'function') {
                                 onSuccessCallback(roundedDist);
+                            } else {
+                                window._staffPunchInProgress = false;
                             }
                         } else {
+                            const outMsg = `🔒 Check-In & Check-Out Hidden: You are ${roundedDist}m away from the Studio Center Point (Allowed limit: 20m). Move within 20m and click "Verify / Refresh Location".`;
                             if (statusTxtEl) {
                                 statusTxtEl.style.color = 'var(--error-red)';
-                                statusTxtEl.innerText = `✖ Outside 20m Geo-Fence! You are ${roundedDist}m away from Studio Center (Max allowed: 20m).`;
+                                statusTxtEl.innerText = `✖ Outside 20m Geo-Fence (${roundedDist}m away — Limit: 20m)`;
                             }
-                            showNotice(`Outside 20m Geo-Fence! You are ${roundedDist}m away from the studio (Limit: 20m).`, "error");
+                            // Immediately hide Check-In and Check-Out buttons so staff cannot click them when outside 20m!
+                            window.moduleContext.setStaffPunchButtonsVisibility(false, outMsg);
+                            window._staffPunchInProgress = false;
+                            if (isManualTest || typeof onSuccessCallback === 'function') {
+                                showNotice(`Outside 20m Geo-Fence (${roundedDist}m away)! Check-In & Check-Out hidden.`, "error");
+                            }
                         }
                     },
                     function(err) {
+                        const errMsg = "🔒 Check-In & Check-Out Hidden: GPS Location Permission is required to verify you are within 20m of the studio.";
                         if (statusTxtEl) {
                             statusTxtEl.style.color = 'var(--error-red)';
-                            statusTxtEl.innerText = '✖ GPS Location Permission Required to verify 20m Studio Geo-Fence.';
+                            statusTxtEl.innerText = '✖ GPS Location Permission Denied / Unavailable';
                         }
-                        showNotice("Please allow GPS Location access to verify you are within 20m of the studio.", "error");
+                        window.moduleContext.setStaffPunchButtonsVisibility(false, errMsg);
+                        window._staffPunchInProgress = false;
+                        if (isManualTest || typeof onSuccessCallback === 'function') {
+                            showNotice("Please enable GPS Location permission to verify you are within 20m of the studio.", "error");
+                        }
                     },
-                    { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
             },
 
@@ -4663,9 +4720,15 @@
                 return true;
             },
 
-            // Live Check-In: Enforces 20-meter Geo-Fence around Studio Center Point
+            // Live Check-In: Enforces 20-meter Geo-Fence around Studio Center Point & blocks multi-click bypass
             staffPunchIn: function() {
                 if (appContext.currentRole !== 'staff') return;
+                if (window._staffPunchInProgress) return;
+                if (!window._staffInsideGeoFence) {
+                    window.moduleContext.setStaffPunchButtonsVisibility(false, "🔒 Check-In & Check-Out Hidden: You are outside the 20m Studio Geo-Fence.");
+                    showNotice("Cannot Check-In: You are outside the 20m Studio Geo-Fence!", "error");
+                    return;
+                }
                 const st = window.moduleContext.resolveActiveStaff();
                 if (!st) {
                     showNotice("Session expired. Please log in again.", "error");
@@ -4679,7 +4742,13 @@
                     return;
                 }
 
+                window._staffPunchInProgress = true;
                 window.moduleContext.verifyStaffGeoFence(function(verifiedDistMeters) {
+                    window._staffPunchInProgress = false;
+                    if (verifiedDistMeters == null || verifiedDistMeters > 20 || !window._staffInsideGeoFence) {
+                        window.moduleContext.setStaffPunchButtonsVisibility(false);
+                        return;
+                    }
                     const punchNow = new Date();
                     const punchKey = toIsoDateKey(punchNow);
                     if (punchKey < st.joiningDate) {
@@ -4753,9 +4822,15 @@
                 }, false);
             },
 
-            // Live Check-Out: Enforces 20-meter Geo-Fence around Studio Center Point
+            // Live Check-Out: Enforces 20-meter Geo-Fence around Studio Center Point & blocks multi-click bypass
             staffPunchOut: function() {
                 if (appContext.currentRole !== 'staff') return;
+                if (window._staffPunchInProgress) return;
+                if (!window._staffInsideGeoFence) {
+                    window.moduleContext.setStaffPunchButtonsVisibility(false, "🔒 Check-In & Check-Out Hidden: You are outside the 20m Studio Geo-Fence.");
+                    showNotice("Cannot Check-Out: You are outside the 20m Studio Geo-Fence!", "error");
+                    return;
+                }
                 const st = window.moduleContext.resolveActiveStaff();
                 if (!st) return;
                 const now = new Date();
@@ -4775,7 +4850,13 @@
                     return;
                 }
 
+                window._staffPunchInProgress = true;
                 window.moduleContext.verifyStaffGeoFence(function(verifiedDistMeters) {
+                    window._staffPunchInProgress = false;
+                    if (verifiedDistMeters == null || verifiedDistMeters > 20 || !window._staffInsideGeoFence) {
+                        window.moduleContext.setStaffPunchButtonsVisibility(false);
+                        return;
+                    }
                     const outNow = new Date();
                     const outKey = toIsoDateKey(outNow);
                     let saDb = storage.get('revive_staff_attendance_db', {});
