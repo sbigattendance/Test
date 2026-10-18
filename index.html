@@ -342,7 +342,11 @@
                 </div>
                 <div class="module-card" onclick="window.appContext.switchView('attendance')">
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                    <h3>Daily Attendance</h3>
+                    <h3>Client Attendance</h3>
+                </div>
+                <div class="module-card" onclick="window.moduleContext.openUserSearch('fee')">
+                    <svg class="module-icon-svg" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                    <h3>Fee Collection</h3>
                 </div>
                 <div class="module-card" onclick="window.appContext.switchView('supplement-store')">
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
@@ -416,17 +420,13 @@
                 </div>
             </div>
 
-            <div id="staff-ops-section-label" class="hr-section-label" style="display:none;">Studio Operations</div>
-            <div id="staff-ops-locked-notice" class="analysis-box" style="display:none; max-width:900px; margin:0 auto 1.5rem auto; background:#fff8f3; border-left:4px solid var(--error-red); text-align:center;">
-                <div style="font-weight:800; color:var(--error-red); font-size:1rem; margin-bottom:4px;" id="staff-ops-locked-title">🔒 Studio Operations Locked</div>
-                <div style="font-size:0.86rem; color:var(--text-muted);" id="staff-ops-locked-desc">Mark Check-In above to unlock Fee Collection & User Details.</div>
+            <div id="staff-ops-section-label" style="display:none !important;"></div>
+            <div id="staff-ops-locked-notice" style="display:none !important;">
+                <span id="staff-ops-locked-title"></span>
+                <span id="staff-ops-locked-desc"></span>
             </div>
             <div class="compact-grid" id="main-operations-grid">
-                <div class="module-card staff-shift-gated" onclick="window.moduleContext.openUserSearch('fee')">
-                    <svg class="module-icon-svg" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                    <h3>Fee Collection</h3>
-                </div>
-                <div class="module-card staff-shift-gated" onclick="window.moduleContext.openUserSearch('details')">
+                <div class="module-card admin-only" onclick="window.moduleContext.openUserSearch('details')">
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     <h3>User Details</h3>
                 </div>
@@ -543,7 +543,7 @@
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                         Back
                     </button>
-                    <h2 class="module-title">Daily Attendance Marker</h2>
+                    <h2 class="module-title">Client Attendance</h2>
                 </div>
 
                 <form id="attendanceForm" onsubmit="window.moduleContext.markAttendance(event); return false;">
@@ -2929,6 +2929,7 @@
             },
             loadDashboard: function(roleTitle) {
                 const subEl = document.getElementById('dashboard-subtitle');
+                const mainOpsGrid = document.getElementById('main-operations-grid');
                 if (appContext.currentRole === 'staff' && appContext.currentStaffObj) {
                     const st = appContext.currentStaffObj;
                     document.getElementById('dashboard-title').innerHTML = `WELCOME, <span>${st.name.toUpperCase()}</span>`;
@@ -2936,15 +2937,14 @@
                     document.getElementById('staff-hr-punch-panel').style.display = 'block';
                     document.getElementById('staff-hr-section-label').style.display = 'block';
                     document.getElementById('staff-hr-modules-grid').style.display = 'grid';
-                    document.getElementById('staff-ops-section-label').style.display = 'block';
+                    if (mainOpsGrid) mainOpsGrid.style.display = 'none';
                 } else {
                     document.getElementById('dashboard-title').innerHTML = `ADMIN <span>PORTAL</span>`;
                     if (subEl) subEl.innerText = '';
                     document.getElementById('staff-hr-punch-panel').style.display = 'none';
                     document.getElementById('staff-hr-section-label').style.display = 'none';
                     document.getElementById('staff-hr-modules-grid').style.display = 'none';
-                    document.getElementById('staff-ops-section-label').style.display = 'none';
-                    window.moduleContext.setStaffOperationsAccess(true);
+                    if (mainOpsGrid) mainOpsGrid.style.display = 'grid';
                 }
                 document.querySelectorAll('.admin-only').forEach(el => { el.style.display = appContext.currentRole === 'admin' ? 'flex' : 'none'; });
                 window.appContext.switchView('dashboard');
@@ -3579,25 +3579,9 @@
                 }
             },
 
-            setStaffOperationsAccess: function(unlocked, lockTitle, lockDesc) {
-                const gatedCards = document.querySelectorAll('.staff-shift-gated');
+            setStaffOperationsAccess: function() {
                 const lockNotice = document.getElementById('staff-ops-locked-notice');
-                if (appContext.currentRole !== 'staff') {
-                    gatedCards.forEach(el => { el.style.display = 'flex'; });
-                    if (lockNotice) lockNotice.style.display = 'none';
-                    return;
-                }
-                if (unlocked) {
-                    gatedCards.forEach(el => { el.style.display = 'flex'; });
-                    if (lockNotice) lockNotice.style.display = 'none';
-                } else {
-                    gatedCards.forEach(el => { el.style.display = 'none'; });
-                    if (lockNotice) {
-                        lockNotice.style.display = 'block';
-                        if (lockTitle) document.getElementById('staff-ops-locked-title').innerText = lockTitle;
-                        if (lockDesc) document.getElementById('staff-ops-locked-desc').innerText = lockDesc;
-                    }
-                }
+                if (lockNotice) lockNotice.style.display = 'none';
             },
 
             isStaffOnActiveShift: function() {
@@ -3673,7 +3657,7 @@
                 });
                 syncHrBackupToSettings();
 
-                showNotice(`Checked in at ${timeStr}! Studio Operations unlocked.`, "success");
+                showNotice(`Checked in at ${timeStr}!`, "success");
                 window.moduleContext.refreshDashboardHrState();
             },
 
@@ -3722,7 +3706,7 @@
                 });
                 syncHrBackupToSettings();
 
-                showNotice(`Checked out at ${timeStr} (${rec.duration}). Operations locked.`, "success");
+                showNotice(`Checked out at ${timeStr} (${rec.duration}).`, "success");
                 window.moduleContext.refreshDashboardHrState();
             },
 
@@ -4241,9 +4225,8 @@
             },
 
             openUserSearch: function(mode) {
-                if (appContext.currentRole === 'staff' && !window.moduleContext.isStaffOnActiveShift()) {
-                    showNotice("Access restricted: You must be actively Checked-In (and not Checked-Out) to access client details or fee collection.", "error");
-                    window.appContext.switchView('dashboard');
+                if (mode === 'details' && appContext.currentRole !== 'admin') {
+                    showNotice("User Details is restricted to Admin.", "error");
                     return;
                 }
                 currentHubMode = mode;
@@ -4282,7 +4265,7 @@
                             <img src="${photoUrl}" alt="${user.fullName}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-orange);">
                             <div style="flex:1; text-align:left;">
                                 <div style="color:var(--text-main); font-weight:800; font-size:0.98rem;">${user.fullName} <span style="font-size:0.72rem; background:#fff5eb; color:var(--accent-orange); padding:2px 6px; border-radius:4px; border:1px solid #ffcc99; margin-left:4px;">${user.admissionCategory || 'Individual'}</span></div>
-                                <div style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">ID: <strong>${user.id}</strong> | Ph: ${appContext.currentRole === 'staff' ? maskPhoneLast4(user.primaryContact) : user.primaryContact} | Joined: ${user.date || '-'}</div>
+                                <div style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">ID: <strong>${user.id}</strong> | Ph: ${appContext.currentRole !== 'admin' ? maskPhoneLast4(user.primaryContact) : user.primaryContact} | Joined: ${user.date || '-'}</div>
                             </div>
                         </div>`;
                     });
@@ -4320,7 +4303,7 @@
                 if (famSwitcher) {
                     if (samePhoneMembers.length > 1) {
                         famSwitcher.style.display = 'block';
-                        let famHtml = `<div style="font-size:0.8rem; font-weight:800; color:var(--accent-orange); text-transform:uppercase; margin-bottom:8px;">👨‍👩‍👧‍👦 ${samePhoneMembers.length} Members Registered Under Phone ${appContext.currentRole === 'staff' ? maskPhoneLast4(user.primaryContact) : user.primaryContact} (Click to Switch):</div>`;
+                        let famHtml = `<div style="font-size:0.8rem; font-weight:800; color:var(--accent-orange); text-transform:uppercase; margin-bottom:8px;">👨‍👩‍👧‍👦 ${samePhoneMembers.length} Members Registered Under Phone ${appContext.currentRole !== 'admin' ? maskPhoneLast4(user.primaryContact) : user.primaryContact} (Click to Switch):</div>`;
                         famHtml += `<div style="display:flex; flex-wrap:wrap; gap:8px;">`;
                         samePhoneMembers.forEach(fm => {
                             const isCurr = String(fm.id) === String(user.id);
@@ -4372,7 +4355,7 @@
                 
                 const callBtn = document.getElementById('hub-call-btn'); const waBtn = document.getElementById('hub-wa-btn'); const pContact = document.getElementById('hub-phone');
 
-                if (appContext.currentRole === 'staff') {
+                if (appContext.currentRole !== 'admin') {
                     photoEl.style.pointerEvents = 'none'; photoEl.style.userSelect = 'none'; photoEl.style.webkitUserDrag = 'none'; photoEl.oncontextmenu = (ev) => ev.preventDefault();
                     pContact.innerText = `******${String(user.primaryContact).slice(-4)}`;
                     if(callBtn) callBtn.style.display = 'none'; if(waBtn) waBtn.style.display = 'none';
