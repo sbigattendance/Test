@@ -196,6 +196,19 @@
         .btn.checkin-btn:disabled, .btn.checkout-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
         .btn.checkout-btn { background-color: var(--error-red); color: #fff; }
         .hr-section-label { max-width: 900px; margin: 1.8rem auto 0.8rem auto; font-size: 0.88rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.2px; border-left: 4px solid var(--accent-orange); padding-left: 10px; }
+        .staff-kpi-row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 900px; margin: 0 auto 1.8rem auto; }
+        .staff-kpi-card { background: var(--bg-panel); border: 2px solid var(--border-color); border-radius: 12px; padding: 1.2rem 0.8rem; text-align: center; cursor: pointer; transition: all 0.22s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .staff-kpi-card:hover { transform: translateY(-3px); border-color: var(--accent-orange); box-shadow: 0 8px 20px rgba(255,102,0,0.12); }
+        .staff-kpi-card h4 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 800; }
+        .staff-kpi-card .kpi-num { font-size: 2rem; font-weight: 900; line-height: 1.1; }
+        .staff-kpi-card .kpi-hint { font-size: 0.72rem; color: var(--text-muted); margin-top: 5px; font-weight: 700; }
+        .hr-subpanel { display: none; animation: fadeIn 0.25s ease-in-out; }
+        .hr-subpanel.active-hr-panel { display: block; }
+        .shift-chip-label { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: var(--bg-panel); border: 1.5px solid var(--border-color); border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 700; color: var(--text-main); text-transform: none; margin: 0; transition: all 0.2s; }
+        .shift-chip-label input[type="checkbox"] { width: 16px; height: 16px; margin: 0; accent-color: var(--accent-orange); }
+        .shift-chip-label:hover { border-color: var(--accent-orange); background: #fff8f3; }
+        .hr-pill-leave { background: #eef6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .hr-pill-pending { background: #fef9c3; color: #a16207; border: 1px solid #fde047; }
 
         .calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); gap: 10px; margin-top: 1rem; }
         .cal-month { padding: 14px 6px; border-radius: 8px; text-align: center; border: 2px solid transparent; cursor: pointer; color: #fff; transition: transform 0.2s; }
@@ -387,15 +400,27 @@
                 <p id="dashboard-subtitle" style="color: var(--text-muted); font-size: 0.9rem;"></p>
             </div>
 
-            <!-- Staff-Only HR Attendance Punch-In / Punch-Out Panel -->
+            <!-- Staff-Only HR Attendance Punch-In / Punch-Out Panel (Slot-Assigned + Auto-Checkout) -->
             <div id="staff-hr-punch-panel" class="hr-punch-card" style="display:none;">
                 <div class="hr-punch-header">
                     <div>
-                        <div style="font-size:0.78rem; font-weight:800; color:var(--accent-orange); text-transform:uppercase; letter-spacing:1px;">Daily Attendance</div>
+                        <div style="font-size:0.78rem; font-weight:800; color:var(--accent-orange); text-transform:uppercase; letter-spacing:1px;">Daily Shift Attendance</div>
                         <h3 id="staff-punch-date-title" style="font-size:1.15rem; color:var(--text-main); margin-top:3px;">Today</h3>
                         <p id="staff-punch-substatus" style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;"></p>
                     </div>
                     <div id="staff-day-type-badge"></div>
+                </div>
+                <div class="form-row" style="align-items:center; margin-bottom:1rem; background:var(--bg-main); padding:0.85rem 1rem; border-radius:10px; border:1px solid var(--border-color);">
+                    <div class="form-group" style="margin:0;">
+                        <label for="staff-punch-slot-select" style="margin-bottom:0.35rem; font-size:0.76rem; color:var(--accent-orange);">Assigned Working Shift Slot</label>
+                        <select id="staff-punch-slot-select" onchange="window.moduleContext.onStaffPunchSlotChange()" style="background:#fff; font-weight:800;"></select>
+                    </div>
+                    <div id="staff-slot-timing-pill" style="font-size:0.82rem; font-weight:800; color:var(--text-muted); padding-top:1rem;"></div>
+                </div>
+                <div id="staff-today-slots-summary" style="margin-bottom:0.8rem;"></div>
+                <div id="staff-geofence-status-bar" style="margin-bottom:1rem; padding:0.65rem 0.9rem; border-radius:8px; background:#f8fafc; border:1px dashed var(--border-color); font-size:0.8rem; font-weight:700; color:var(--text-muted); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                    <span id="staff-geofence-status-text">📍 20m Studio Geo-Fence Required for Check-In & Check-Out</span>
+                    <button type="button" class="btn secondary" style="width:auto; padding:0.3rem 0.7rem; font-size:0.72rem;" onclick="window.moduleContext.verifyStaffGeoFence(null, true)">📡 Check My Distance</button>
                 </div>
                 <div class="hr-punch-btns">
                     <button type="button" id="btn-staff-checkin" class="btn checkin-btn" onclick="window.moduleContext.staffPunchIn()">
@@ -404,6 +429,63 @@
                     <button type="button" id="btn-staff-checkout" class="btn checkout-btn" onclick="window.moduleContext.staffPunchOut()">
                         ⏹ Check-Out (Punch Out)
                     </button>
+                </div>
+            </div>
+
+            <!-- Staff-Only 3-in-a-Row Current Month KPI Modules: Present, Leave, Absent -->
+            <div id="staff-month-kpi-row" class="staff-kpi-row3" style="display:none;">
+                <div class="staff-kpi-card" style="border-bottom: 4px solid var(--success-green);" onclick="window.appContext.switchView('staff-my-attendance')">
+                    <h4>Present (<span class="staff-curr-month-lbl">Month</span>)</h4>
+                    <div class="kpi-num" style="color:var(--success-green);" id="staff-curr-present-count">0</div>
+                    <div class="kpi-hint">View Attendance Log →</div>
+                </div>
+                <div class="staff-kpi-card" style="border-bottom: 4px solid #1d4ed8;" onclick="window.moduleContext.openStaffAbsentActionPanel('LEAVE')">
+                    <h4>Leave (<span class="staff-curr-month-lbl">Month</span>)</h4>
+                    <div class="kpi-num" style="color:#1d4ed8;" id="staff-curr-leave-count">0</div>
+                    <div class="kpi-hint">Apply / View Leave →</div>
+                </div>
+                <div class="staff-kpi-card" style="border-bottom: 4px solid var(--error-red);" onclick="window.moduleContext.openStaffAbsentActionPanel('ABSENT')">
+                    <h4>Absent (<span class="staff-curr-month-lbl">Month</span>)</h4>
+                    <div class="kpi-num" style="color:var(--error-red);" id="staff-curr-absent-count">0</div>
+                    <div class="kpi-hint" style="color:var(--accent-orange);">Click to Regularise / Leave →</div>
+                </div>
+            </div>
+
+            <!-- Staff Interactive Absent Days Regularisation & Leave Application Drawer -->
+            <div id="staff-absent-action-box" class="hr-punch-card" style="display:none; border-color:var(--error-red); background:#fffdf9;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.8rem; border-bottom:1px solid var(--border-color); padding-bottom:0.8rem; margin-bottom:1rem;">
+                    <div>
+                        <h3 style="color:var(--accent-orange); font-size:1.08rem; text-transform:uppercase; margin:0;">Absent Days — Regularise Attendance or Apply Leave</h3>
+                        <p style="font-size:0.82rem; color:var(--text-muted); margin-top:3px;">Select an absent day & shift slot below to raise an Attendance Regularisation (for Admin approval) or Apply Leave.</p>
+                    </div>
+                    <button type="button" class="btn secondary" style="width:auto; padding:0.45rem 0.9rem; font-size:0.78rem;" onclick="document.getElementById('staff-absent-action-box').style.display='none'">✕ Close</button>
+                </div>
+                <div class="table-responsive" style="margin-bottom:1.2rem;">
+                    <table class="data-table" id="table-staff-absent-days">
+                        <thead><tr><th>Absent Date</th><th>Day</th><th>Missing Shift Slot(s)</th><th>Task Status</th><th>Select Slot & Action</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div style="background:var(--bg-main); padding:1rem; border-radius:8px; border:1px dashed var(--accent-orange);">
+                    <h4 style="font-size:0.85rem; color:var(--accent-orange); text-transform:uppercase; margin-bottom:0.8rem;">Quick Apply Leave / Regularisation for Any Date</h4>
+                    <div class="form-row" style="margin-bottom:0; align-items:flex-end;">
+                        <div class="form-group">
+                            <label>Select Date</label>
+                            <input type="date" id="staff-custom-req-date">
+                        </div>
+                        <div class="form-group">
+                            <label>Select Shift Slot</label>
+                            <select id="staff-custom-req-slot"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Reason / Note</label>
+                            <input type="text" id="staff-custom-req-note" placeholder="Optional note">
+                        </div>
+                        <div style="display:flex; gap:8px;">
+                            <button type="button" class="btn primary" style="width:auto; padding:0.85rem 1rem; font-size:0.78rem; white-space:nowrap;" onclick="window.moduleContext.submitCustomStaffRequest('REGULARISATION')">Raise Regularisation</button>
+                            <button type="button" class="btn secondary" style="width:auto; padding:0.85rem 1rem; font-size:0.78rem; white-space:nowrap; border-color:#1d4ed8; color:#1d4ed8;" onclick="window.moduleContext.submitCustomStaffRequest('LEAVE')">Apply Leave</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -430,10 +512,7 @@
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                     <h3>User Details</h3>
                 </div>
-                <div class="module-card admin-only" onclick="window.appContext.switchView('admin-staff-attendance')">
-                    <svg class="module-icon-svg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M9 16l2 2 4-4"></path></svg>
-                    <h3>Staff Attendance</h3>
-                </div>
+
                 <div class="module-card admin-only" onclick="window.appContext.switchView('supplement-admin')">
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
                     <h3>Supplement Inventory</h3>
@@ -464,7 +543,7 @@
                 </div>
                 <div class="module-card admin-only" onclick="window.appContext.switchView('staff-editor')">
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                    <h3>Staff Access</h3>
+                    <h3>HR Portal</h3>
                 </div>
                 <div class="module-card admin-only" onclick="window.appContext.switchView('studio-details')">
                     <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
@@ -862,6 +941,32 @@
                             <input type="tel" id="studio-cfg-phone2" placeholder="Optional secondary contact">
                         </div>
                     </div>
+
+                    <div style="margin-top:1.4rem; padding:1.2rem; background:var(--bg-main); border-radius:10px; border:1.5px dashed var(--accent-orange);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:0.8rem;">
+                            <div>
+                                <h3 style="color:var(--accent-orange); font-size:0.98rem; text-transform:uppercase; margin:0;">📍 Studio Geo-Fence Center Point (20m Radius)</h3>
+                                <p style="font-size:0.78rem; color:var(--text-muted); margin-top:3px;">Stand at the studio center point and click below to capture & fix the GPS coordinates. Staff can Check-In and Check-Out only within a <strong>20-meter radius</strong> of this point.</p>
+                            </div>
+                            <button type="button" class="btn primary" style="width:auto; padding:0.65rem 1.1rem; font-size:0.8rem;" onclick="window.moduleContext.captureAdminStudioGeoPoint()">📍 Capture Current Studio Location</button>
+                        </div>
+                        <div class="form-row" style="margin-bottom:0.6rem;">
+                            <div class="form-group">
+                                <label for="studio-cfg-lat">Center Point Latitude</label>
+                                <input type="number" step="any" id="studio-cfg-lat" placeholder="e.g. 8.981600">
+                            </div>
+                            <div class="form-group">
+                                <label for="studio-cfg-lng">Center Point Longitude</label>
+                                <input type="number" step="any" id="studio-cfg-lng" placeholder="e.g. 76.671900">
+                            </div>
+                            <div class="form-group" style="max-width:160px;">
+                                <label>Allowed Radius</label>
+                                <input type="text" value="20 Meters (Fixed)" readonly>
+                            </div>
+                        </div>
+                        <div id="studio-geo-capture-status" style="font-size:0.82rem; font-weight:700; color:var(--text-muted);"></div>
+                    </div>
+
                     <div class="action-row">
                         <button type="submit" class="btn primary">Save Studio Details</button>
                     </div>
@@ -870,75 +975,165 @@
         </main>
 
         <main id="view-staff-editor" class="view-section">
-            <div class="form-layout" style="max-width: 850px;">
+            <div class="form-layout" style="max-width: 980px;">
                 <div class="module-toolbar">
-                    <button class="back-btn" onclick="window.appContext.goHome()" type="button"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>Back</button>
-                    <h2 class="module-title">Staff & Holiday Configuration</h2>
+                    <button class="back-btn" id="hr-portal-back-btn" onclick="window.moduleContext.handleHrPortalBack()" type="button"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg><span id="hr-portal-back-label">Back</span></button>
+                    <h2 class="module-title" id="hr-portal-main-title">HR Portal</h2>
                 </div>
 
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:1rem;">
-                    <h3 id="staff-form-heading" style="color:var(--accent-orange); font-size:1.05rem; text-transform:uppercase; margin:0;">Add / Edit Staff</h3>
-                    <button type="button" class="btn secondary" style="width:auto; padding:0.5rem 1rem; font-size:0.8rem; border-color:var(--accent-orange); color:var(--accent-orange);" onclick="window.appContext.switchView('admin-staff-attendance')">📊 View Staff Attendance Reports →</button>
+                <!-- HR Portal 6-Module Hub Grid -->
+                <div id="hr-portal-hub-grid" class="compact-grid" style="margin-bottom:1rem;">
+                    <div class="module-card" onclick="window.moduleContext.openHrSubModule('timing')">
+                        <svg class="module-icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <h3>Working Timing Config</h3>
+                    </div>
+                    <div class="module-card" onclick="window.moduleContext.openHrSubModule('weekdays')">
+                        <svg class="module-icon-svg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <h3>Working Day Configurator</h3>
+                    </div>
+                    <div class="module-card" onclick="window.moduleContext.openHrSubModule('holidays')">
+                        <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M19 4H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <h3>Annual Holiday Configurator</h3>
+                    </div>
+                    <div class="module-card" onclick="window.moduleContext.openHrSubModule('enrolment')">
+                        <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>
+                        <h3>Staff Enrolment</h3>
+                    </div>
+                    <div class="module-card" onclick="window.appContext.switchView('admin-staff-attendance')">
+                        <svg class="module-icon-svg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><path d="M9 16l2 2 4-4"></path><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <h3>Staff Attendance</h3>
+                    </div>
+                    <div class="module-card" onclick="window.moduleContext.openHrSubModule('tasks')">
+                        <svg class="module-icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                        <h3>Attendance Task <span id="hr-pending-task-badge" class="promo-badge" style="display:none;">0</span></h3>
+                    </div>
                 </div>
 
-                <form id="staffForm" onsubmit="window.moduleContext.saveStaff(event); return false;">
-                    <input type="hidden" id="staff-edit-id" value="">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Staff Full Name <span class="required">*</span></label>
-                            <input type="text" id="staff-name" placeholder="e.g. Rahul Krishnan" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Joining Date <span class="required">*</span></label>
-                            <input type="date" id="staff-joining-date" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Login & Verification PIN <span class="required">*</span></label>
-                            <input type="password" id="staff-pin" placeholder="Create PIN (4-6 digits)" maxlength="6" pattern="\d{4,6}" required>
-                        </div>
+                <!-- 1. Working Timing Config Sub-Panel -->
+                <div id="hr-panel-timing" class="hr-subpanel">
+                    <h3 style="color:var(--accent-orange); margin-bottom:0.8rem; font-size:1.1rem; text-transform:uppercase;">1. Working Timing Config (Start & End Time with AM/PM)</h3>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.2rem;">Configure the Start Time and End Time (with AM/PM) for Morning, Day, Afternoon, and Evening shifts. Staff Check-In/Out and automatic post-shift Check-Out follow these timings.</p>
+                    <div id="hr-timing-slots-container"></div>
+                    <div class="action-row">
+                        <button type="button" class="btn primary" onclick="window.moduleContext.saveWorkingTimings()">Save Working Timings</button>
                     </div>
-                    <div class="action-row" style="margin-top:1rem;">
-                        <button type="submit" id="btn-save-staff" class="btn primary">+ Add Staff Member</button>
-                        <button type="button" id="btn-cancel-staff-edit" class="btn secondary" style="display:none;" onclick="window.moduleContext.resetStaffForm()">Cancel Edit</button>
-                    </div>
-                </form>
+                </div>
 
-                <div style="margin-top: 2rem; padding-top:1.5rem; border-top:1px solid var(--border-color);">
-                    <h3 style="color:var(--accent-orange); margin-bottom:0.8rem; font-size:1.05rem; text-transform:uppercase;">Staff Accounts</h3>
-                    <div class="table-responsive">
-                        <table class="data-table" id="table-staff-list">
-                            <thead><tr><th>Staff Name</th><th>Joining Date</th><th>Verification PIN</th><th>Action</th></tr></thead>
-                            <tbody></tbody>
+                <!-- 2. Working Day Configurator Sub-Panel -->
+                <div id="hr-panel-weekdays" class="hr-subpanel">
+                    <h3 style="color:var(--accent-orange); margin-bottom:0.8rem; font-size:1.1rem; text-transform:uppercase;">2. Working Day Configurator (Weekly Schedule)</h3>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.2rem;">Select whether each day of the week is a Working Day or Weekly Holiday.</p>
+                    <div class="table-responsive" style="margin-bottom:1.2rem;">
+                        <table class="data-table" id="table-hr-weekdays">
+                            <thead><tr><th>Day of the Week</th><th>Status (Working / Holiday)</th></tr></thead>
+                            <tbody id="hr-weekdays-tbody"></tbody>
                         </table>
                     </div>
+                    <div class="action-row">
+                        <button type="button" class="btn primary" onclick="window.moduleContext.saveWorkingDaysConfig()">Save Weekly Working Days</button>
+                    </div>
                 </div>
 
-                <!-- Admin Holiday Calendar -->
-                <div style="margin-top: 2.5rem; padding: 1.5rem; background: var(--bg-main); border-radius: 10px; border: 1px dashed var(--accent-orange);">
-                    <h3 style="color:var(--accent-orange); margin-bottom:0.4rem; font-size:1.05rem; text-transform:uppercase;">Holiday Calendar</h3>
-                    
+                <!-- 3. Annual Holiday Configurator Sub-Panel -->
+                <div id="hr-panel-holidays" class="hr-subpanel">
+                    <div style="padding: 1.5rem; background: var(--bg-main); border-radius: 10px; border: 1px dashed var(--accent-orange);">
+                        <h3 style="color:var(--accent-orange); margin-bottom:0.8rem; font-size:1.05rem; text-transform:uppercase;">3. Annual Holiday Configurator</h3>
+                        <form id="holidayForm" onsubmit="window.moduleContext.saveHoliday(event); return false;">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Holiday Date <span class="required">*</span></label>
+                                    <input type="date" id="holiday-date" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Holiday / Occasion Name <span class="required">*</span></label>
+                                    <input type="text" id="holiday-name" placeholder="e.g. Thiruvonam / Vishu / Republic Day" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Details / Note</label>
+                                    <input type="text" id="holiday-desc" placeholder="e.g. Studio closed for festival">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn primary" style="width:auto; padding:0.75rem 1.5rem;">+ Add Holiday to Yearly Calendar</button>
+                        </form>
+                        <div class="table-responsive" style="margin-top:1.2rem;">
+                            <table class="data-table" id="table-admin-holidays">
+                                <thead><tr><th>Date</th><th>Day</th><th>Occasion Name</th><th>Details</th><th>Action</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
-                    <form id="holidayForm" onsubmit="window.moduleContext.saveHoliday(event); return false;">
+                <!-- 4. Staff Enrolment Sub-Panel -->
+                <div id="hr-panel-enrolment" class="hr-subpanel">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:1rem;">
+                        <h3 id="staff-form-heading" style="color:var(--accent-orange); font-size:1.05rem; text-transform:uppercase; margin:0;">4. Staff Enrolment (Add / Edit Staff)</h3>
+                        <button type="button" class="btn secondary" style="width:auto; padding:0.5rem 1rem; font-size:0.8rem; border-color:var(--accent-orange); color:var(--accent-orange);" onclick="window.appContext.switchView('admin-staff-attendance')">📊 View Staff Attendance Reports →</button>
+                    </div>
+
+                    <form id="staffForm" onsubmit="window.moduleContext.saveStaff(event); return false;" style="background:var(--bg-main); padding:1.5rem; border-radius:10px; border:1px dashed var(--accent-orange);">
+                        <input type="hidden" id="staff-edit-id" value="">
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Holiday Date <span class="required">*</span></label>
-                                <input type="date" id="holiday-date" required>
+                                <label>Staff Full Name <span class="required">*</span></label>
+                                <input type="text" id="staff-name" placeholder="e.g. Rahul Krishnan" required>
                             </div>
                             <div class="form-group">
-                                <label>Holiday / Occasion Name <span class="required">*</span></label>
-                                <input type="text" id="holiday-name" placeholder="e.g. Thiruvonam / Vishu / Republic Day" required>
+                                <label>Contact Number <span class="required">*</span></label>
+                                <input type="tel" id="staff-contact" placeholder="10-digit mobile number" pattern="\d{10}" maxlength="10" required>
                             </div>
                             <div class="form-group">
-                                <label>Details / Note</label>
-                                <input type="text" id="holiday-desc" placeholder="e.g. Studio closed for festival">
+                                <label>Date of Joining <span class="required">*</span></label>
+                                <input type="date" id="staff-joining-date" required>
                             </div>
                         </div>
-                        <button type="submit" class="btn secondary" style="width:auto; padding:0.75rem 1.5rem; border-color:var(--accent-orange); color:var(--accent-orange);">+ Add Holiday to Yearly Calendar</button>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Role <span class="required">*</span></label>
+                                <select id="staff-role" required>
+                                    <option value="Staff">Staff</option>
+                                    <option value="Manager">Manager</option>
+                                    <option value="Receptionist">Receptionist</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="flex:2;">
+                                <label>Working Shift (Can Choose Multiple Combinations) <span class="required">*</span></label>
+                                <div style="display:flex; flex-wrap:wrap; gap:10px; padding-top:4px;" id="staff-shifts-checkbox-group">
+                                    <label class="shift-chip-label"><input type="checkbox" name="staff-shift-chk" value="Morning" checked> Morning</label>
+                                    <label class="shift-chip-label"><input type="checkbox" name="staff-shift-chk" value="Day"> Day</label>
+                                    <label class="shift-chip-label"><input type="checkbox" name="staff-shift-chk" value="Afternoon"> Afternoon</label>
+                                    <label class="shift-chip-label"><input type="checkbox" name="staff-shift-chk" value="Evening" checked> Evening</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Login PIN (4 to 6 digits) <span class="required">*</span></label>
+                                <input type="password" id="staff-pin" placeholder="4-6 digit PIN" maxlength="6" pattern="\d{4,6}" required>
+                            </div>
+                        </div>
+                        <div class="action-row" style="margin-top:1rem;">
+                            <button type="submit" id="btn-save-staff" class="btn primary">+ Add Staff Member</button>
+                            <button type="button" id="btn-cancel-staff-edit" class="btn secondary" style="display:none;" onclick="window.moduleContext.resetStaffForm()">Cancel Edit</button>
+                        </div>
                     </form>
 
-                    <div class="table-responsive" style="margin-top:1.2rem;">
-                        <table class="data-table" id="table-admin-holidays">
-                            <thead><tr><th>Date</th><th>Day</th><th>Occasion Name</th><th>Details</th><th>Action</th></tr></thead>
+                    <div style="margin-top: 2rem; padding-top:1.5rem; border-top:1px solid var(--border-color);">
+                        <h3 style="color:var(--accent-orange); margin-bottom:0.8rem; font-size:1.05rem; text-transform:uppercase;">Enrolled Staff Directory</h3>
+                        <div class="table-responsive">
+                            <table class="data-table" id="table-staff-list">
+                                <thead><tr><th>Name & Role</th><th>Contact</th><th>Joining / Last Day</th><th>Assigned Shifts</th><th>PIN</th><th>Action</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Attendance Task (Regularisations & Leave Requests) Sub-Panel -->
+                <div id="hr-panel-tasks" class="hr-subpanel">
+                    <h3 style="color:var(--accent-orange); margin-bottom:0.6rem; font-size:1.1rem; text-transform:uppercase;">6. Attendance Task (Regularisations & Leave Approvals)</h3>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1.2rem;">Review and Accept or Reject attendance regularisations and leave requests raised by staff.</p>
+                    <div class="table-responsive">
+                        <table class="data-table" id="table-hr-attendance-tasks">
+                            <thead><tr><th>Staff Name</th><th>Date</th><th>Slot</th><th>Request Type & Note</th><th>Status</th><th>Action</th></tr></thead>
                             <tbody></tbody>
                         </table>
                     </div>
@@ -1023,7 +1218,7 @@
         <main id="view-admin-staff-attendance" class="view-section">
             <div class="form-layout" style="max-width: 1000px;">
                 <div class="module-toolbar">
-                    <button class="back-btn" onclick="window.appContext.goHome()" type="button"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>Back</button>
+                    <button class="back-btn" onclick="window.appContext.switchView('staff-editor')" type="button"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>Back to HR Portal</button>
                     <h2 class="module-title">Staff Attendance & HR Reports</h2>
                 </div>
 
@@ -1046,7 +1241,7 @@
                 <h3 style="color:var(--accent-orange); margin:1.5rem 0 0.8rem 0; font-size:1.05rem; text-transform:uppercase;">Monthly Summary</h3>
                 <div class="table-responsive" style="margin-bottom:2rem;">
                     <table class="data-table" id="table-admin-staff-summary">
-                        <thead><tr><th>Staff Name</th><th>Joining Date</th><th>Working Days</th><th>Present</th><th>Absent</th><th>Sundays / Holidays</th><th>Attendance %</th></tr></thead>
+                        <thead><tr><th>Staff Name & Shifts</th><th>Joining / LWD</th><th>Working Days</th><th>Present</th><th>Leave</th><th>Absent</th><th>Holidays</th><th>Attendance %</th></tr></thead>
                         <tbody></tbody>
                     </table>
                 </div>
@@ -1783,6 +1978,23 @@
             </div>
         </div>
 
+        <!-- Modal to Delete / Relieve Staff with Last Working Day -->
+        <div id="staffDeleteLwdModal" class="modal">
+            <div class="modal-content" style="max-width:440px; text-align:left;">
+                <h3 class="orange-text" style="text-align:center; margin-top:0; font-size:1.2rem;">Relieve / Delete Staff Member</h3>
+                <p id="lwd-staff-modal-desc" style="color:var(--text-muted); font-size:0.88rem; margin-bottom:1rem;"></p>
+                <input type="hidden" id="lwd-target-staff-id" value="">
+                <div class="form-group" style="margin-bottom:1.2rem;">
+                    <label for="lwd-date-input">Last Working Day <span class="required">*</span></label>
+                    <input type="date" id="lwd-date-input" required>
+                </div>
+                <div class="action-row" style="margin-top:0.5rem;">
+                    <button type="button" class="btn secondary" onclick="document.getElementById('staffDeleteLwdModal').style.display='none'">Cancel</button>
+                    <button type="button" class="btn danger" onclick="window.moduleContext.confirmDeleteStaffWithLwd()">Confirm & Relieve Staff</button>
+                </div>
+            </div>
+        </div>
+
         <!-- In-page Confirmation Modal (avoids browser blocking confirm()) -->
         <div id="confirmDialogModal" class="modal">
             <div class="modal-content" style="max-width:400px;">
@@ -2009,12 +2221,29 @@
         function getStudioDetails() {
             const s = (typeof storage !== 'undefined' && storage.get) ? storage.get('revive_settings_db', {}) : {};
             const sd = (s && s.studioDetails && typeof s.studioDetails === 'object') ? s.studioDetails : {};
+            const rawLat = sd.lat != null && sd.lat !== '' ? parseFloat(sd.lat) : (s.studioLat != null && s.studioLat !== '' ? parseFloat(s.studioLat) : null);
+            const rawLng = sd.lng != null && sd.lng !== '' ? parseFloat(sd.lng) : (s.studioLng != null && s.studioLng !== '' ? parseFloat(s.studioLng) : null);
             return {
                 address: String(sd.address || s.studioAddress || APP_CONFIG.studioAddress).trim(),
                 email: String(sd.email || s.studioEmail || APP_CONFIG.studioEmail).trim(),
                 contact1: String(sd.contact1 || s.studioContact1 || APP_CONFIG.studioContact1).trim(),
-                contact2: String(sd.contact2 != null ? sd.contact2 : (s.studioContact2 || APP_CONFIG.studioContact2)).trim()
+                contact2: String(sd.contact2 != null ? sd.contact2 : (s.studioContact2 || APP_CONFIG.studioContact2)).trim(),
+                lat: (rawLat != null && !isNaN(rawLat)) ? rawLat : null,
+                lng: (rawLng != null && !isNaN(rawLng)) ? rawLng : null,
+                geoRadiusMeters: 20
             };
+        }
+
+        function calculateGeoDistanceMeters(lat1, lon1, lat2, lon2) {
+            const R = 6371000; // Earth radius in meters
+            const toRad = (deg) => (deg * Math.PI) / 180;
+            const dLat = toRad(lat2 - lat1);
+            const dLon = toRad(lon2 - lon1);
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
         }
 
         function applyStudioDetailsToAllTemplates() {
@@ -2341,18 +2570,112 @@
             return `${info.year}-${String(info.monthIdx + 1).padStart(2, '0')}-${String(info.day).padStart(2, '0')}`;
         }
 
+        var HR_SHIFT_SLOTS = ['Morning', 'Day', 'Afternoon', 'Evening'];
+        var HR_WEEKDAYS_ORDER = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+        function getWorkingTimingsConfig() {
+            const defaults = {
+                Morning:   { startHour: '05', startMin: '30', startPeriod: 'AM', endHour: '10', endMin: '30', endPeriod: 'AM', start: '05:30 AM', end: '10:30 AM' },
+                Day:       { startHour: '09', startMin: '00', startPeriod: 'AM', endHour: '05', endMin: '00', endPeriod: 'PM', start: '09:00 AM', end: '05:00 PM' },
+                Afternoon: { startHour: '12', startMin: '00', startPeriod: 'PM', endHour: '04', endMin: '00', endPeriod: 'PM', start: '12:00 PM', end: '04:00 PM' },
+                Evening:   { startHour: '04', startMin: '00', startPeriod: 'PM', endHour: '09', endMin: '30', endPeriod: 'PM', start: '04:00 PM', end: '09:30 PM' }
+            };
+            const s = storage.get('revive_settings_db', {});
+            const saved = storage.get('revive_hr_timings_db', null) || (s && s.hrTimingsBackup) || null;
+            if (!saved || typeof saved !== 'object') return defaults;
+            const merged = {};
+            HR_SHIFT_SLOTS.forEach(slot => {
+                const sc = saved[slot] || defaults[slot];
+                const sh = String(sc.startHour || defaults[slot].startHour).padStart(2, '0');
+                const sm = String(sc.startMin || defaults[slot].startMin).padStart(2, '0');
+                const sp = sc.startPeriod === 'PM' ? 'PM' : 'AM';
+                const eh = String(sc.endHour || defaults[slot].endHour).padStart(2, '0');
+                const em = String(sc.endMin || defaults[slot].endMin).padStart(2, '0');
+                const ep = sc.endPeriod === 'AM' ? 'AM' : 'PM';
+                merged[slot] = {
+                    startHour: sh, startMin: sm, startPeriod: sp,
+                    endHour: eh, endMin: em, endPeriod: ep,
+                    start: `${sh}:${sm} ${sp}`,
+                    end: `${eh}:${em} ${ep}`
+                };
+            });
+            return merged;
+        }
+
+        function parseTime12ToMinutes(time12Str) {
+            if (!time12Str) return null;
+            const m = String(time12Str).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+            if (!m) return null;
+            let hr = parseInt(m[1], 10);
+            const mn = parseInt(m[2], 10);
+            const pd = m[3].toUpperCase();
+            if (pd === 'PM' && hr < 12) hr += 12;
+            if (pd === 'AM' && hr === 12) hr = 0;
+            return hr * 60 + mn;
+        }
+
+        function formatDurationFromMinutes(startMins, endMins) {
+            if (startMins == null || endMins == null) return 'Completed';
+            let diff = endMins - startMins;
+            if (diff <= 0) diff = 60;
+            const h = Math.floor(diff / 60);
+            const m = diff % 60;
+            return `${h}h ${m}m`;
+        }
+
+        function getWorkingDaysConfig() {
+            const defaults = {
+                Monday: 'Working',
+                Tuesday: 'Working',
+                Wednesday: 'Working',
+                Thursday: 'Working',
+                Friday: 'Working',
+                Saturday: 'Working',
+                Sunday: 'Holiday'
+            };
+            const s = storage.get('revive_settings_db', {});
+            const saved = storage.get('revive_hr_weekdays_db', null) || (s && s.hrWeekdaysBackup) || null;
+            if (!saved || typeof saved !== 'object') return defaults;
+            return { ...defaults, ...saved };
+        }
+
+        function getHrTasksDb() {
+            const s = storage.get('revive_settings_db', {});
+            let tasks = storage.get('revive_hr_tasks_db', null);
+            if (!Array.isArray(tasks)) {
+                tasks = (s && Array.isArray(s.hrTasksBackup)) ? s.hrTasksBackup : [];
+                storage.set('revive_hr_tasks_db', tasks);
+            }
+            return tasks;
+        }
+
         function ensureStaffObject(st, idx = 0) {
             if (!st) return null;
             const cleanName = String(st.name || st.Name || st.staffName || 'Staff').trim();
             const cleanPin = String(st.pin != null ? st.pin : (st.PIN != null ? st.PIN : '')).trim();
             const cleanId = String(st.id || st.ID || st.staffId || (`STF-${cleanPin || (idx + 1)}`)).trim();
             const rawJoin = st.joiningDate || st.JoiningDate || st.date || '2026-01-01';
+            const cleanContact = String(st.contact || st.phone || st.primaryContact || '').trim();
+            const cleanRole = String(st.role || 'Staff').trim();
+            let shiftsArr = st.shifts;
+            if (typeof shiftsArr === 'string') {
+                shiftsArr = shiftsArr.split(',').map(x => x.trim()).filter(Boolean);
+            }
+            if (!Array.isArray(shiftsArr) || shiftsArr.length === 0) {
+                shiftsArr = ['Morning', 'Evening'];
+            }
+            const cleanLwd = st.lastWorkingDay ? normalizeStaffJoiningIso(st.lastWorkingDay) : '';
             return {
                 ...st,
                 id: cleanId,
                 name: cleanName,
+                contact: cleanContact,
+                role: cleanRole,
+                shifts: shiftsArr,
                 pin: cleanPin,
-                joiningDate: normalizeStaffJoiningIso(rawJoin)
+                joiningDate: normalizeStaffJoiningIso(rawJoin),
+                lastWorkingDay: cleanLwd,
+                isRelieved: !!st.isRelieved || !!cleanLwd
             };
         }
 
@@ -2370,10 +2693,12 @@
             const hols = ensureDefaultHolidays();
             const customHol = hols.find(h => String(h.date) === String(isoDateStr));
             if (customHol) {
-                return { isHoliday: true, type: 'Public/Festival Holiday', name: customHol.name, desc: customHol.desc || 'Annual Non-Working Day' };
+                return { isHoliday: true, type: 'Annual Holiday', name: customHol.name, desc: customHol.desc || 'Annual Non-Working Day' };
             }
-            if (dObj.getDay() === 0) {
-                return { isHoliday: true, type: 'Weekly Off', name: 'Sunday Holiday', desc: 'Weekly Non-Working Day' };
+            const dayName = dObj.toLocaleDateString('en-US', { weekday: 'long' });
+            const weekCfg = getWorkingDaysConfig();
+            if (weekCfg[dayName] === 'Holiday') {
+                return { isHoliday: true, type: 'Weekly Off', name: `${dayName} Holiday`, desc: 'Configured Weekly Non-Working Day' };
             }
             return { isHoliday: false, type: 'Working Day', name: '', desc: '' };
         }
@@ -2383,8 +2708,16 @@
             s.holidaysBackup = storage.get('revive_holidays_db', []);
             s.staffAttendanceBackup = storage.get('revive_staff_attendance_db', {});
             s.staffBackup = storage.get('revive_staff_db', []);
+            s.hrTimingsBackup = storage.get('revive_hr_timings_db', getWorkingTimingsConfig());
+            s.hrWeekdaysBackup = storage.get('revive_hr_weekdays_db', getWorkingDaysConfig());
+            s.hrTasksBackup = storage.get('revive_hr_tasks_db', []);
             storage.set('revive_settings_db', s);
             cloudSync.push('pushSettings', s);
+        }
+
+        // Auto Check-Out removed as per studio policy: staff must manually Check-In and Check-Out for all assigned shifts
+        function autoCheckoutExpiredSlots() {
+            return false;
         }
 
         function ensureDefaultSupplements() {
@@ -2590,6 +2923,15 @@
                         if (data.settings.suppCouponsBackup) {
                             storage.set('revive_supp_coupons_db', data.settings.suppCouponsBackup);
                         }
+                        if (data.settings.hrTimingsBackup) {
+                            storage.set('revive_hr_timings_db', data.settings.hrTimingsBackup);
+                        }
+                        if (data.settings.hrWeekdaysBackup) {
+                            storage.set('revive_hr_weekdays_db', data.settings.hrWeekdaysBackup);
+                        }
+                        if (Array.isArray(data.settings.hrTasksBackup)) {
+                            storage.set('revive_hr_tasks_db', data.settings.hrTasksBackup);
+                        }
                         combinedSettings.staffAttendanceBackup = mergedSa;
                         storage.set('revive_settings_db', combinedSettings);
                     }
@@ -2618,9 +2960,14 @@
                             const matchLocal = localStaff.find(ls => String(ls.id) === String(normSt.id) || String(ls.pin) === String(normSt.pin))
                                 || backupStaff.find(bs => String(bs.id) === String(normSt.id) || String(bs.pin) === String(normSt.pin));
                             return ensureStaffObject({
+                                ...(matchLocal || {}),
                                 ...normSt,
                                 id: (matchLocal && matchLocal.id) || normSt.id,
-                                joiningDate: st.joiningDate || (matchLocal && matchLocal.joiningDate) || '2026-01-01'
+                                joiningDate: st.joiningDate || (matchLocal && matchLocal.joiningDate) || '2026-01-01',
+                                contact: st.contact || (matchLocal && matchLocal.contact) || '',
+                                role: st.role || (matchLocal && matchLocal.role) || 'Staff',
+                                shifts: st.shifts || (matchLocal && matchLocal.shifts) || ['Morning', 'Evening'],
+                                lastWorkingDay: st.lastWorkingDay || (matchLocal && matchLocal.lastWorkingDay) || ''
                             }, idx);
                         });
                         storage.set('revive_staff_db', mergedStaff);
@@ -2911,6 +3258,11 @@
                     const matchingStaff = staffDb.find(s => String(s.pin) === pin);
                     
                     if (matchingStaff) {
+                        const todayIso = toIsoDateKey(new Date());
+                        if (matchingStaff.lastWorkingDay && todayIso > matchingStaff.lastWorkingDay) {
+                            showNotice(`Access ended on Last Working Day (${formatDateStr(matchingStaff.lastWorkingDay)}).`, 'error');
+                            return;
+                        }
                         appContext.currentRole = 'staff'; 
                         appContext.currentStaffName = matchingStaff.name;
                         appContext.currentStaffObj = ensureStaffObject(matchingStaff);
@@ -2930,11 +3282,16 @@
             loadDashboard: function(roleTitle) {
                 const subEl = document.getElementById('dashboard-subtitle');
                 const mainOpsGrid = document.getElementById('main-operations-grid');
+                const kpiRowEl = document.getElementById('staff-month-kpi-row');
+                const absBoxEl = document.getElementById('staff-absent-action-box');
+                if (absBoxEl) absBoxEl.style.display = 'none';
                 if (appContext.currentRole === 'staff' && appContext.currentStaffObj) {
-                    const st = appContext.currentStaffObj;
+                    const st = ensureStaffObject(appContext.currentStaffObj);
+                    appContext.currentStaffObj = st;
                     document.getElementById('dashboard-title').innerHTML = `WELCOME, <span>${st.name.toUpperCase()}</span>`;
-                    if (subEl) subEl.innerHTML = `Joined: <strong>${formatDateStr(st.joiningDate)}</strong>`;
+                    if (subEl) subEl.innerHTML = `Role: <strong>${st.role || 'Staff'}</strong> &nbsp;|&nbsp; Shifts: <strong>${(st.shifts || ['Morning','Evening']).join(', ')}</strong> &nbsp;|&nbsp; Joined: <strong>${formatDateStr(st.joiningDate)}</strong>`;
                     document.getElementById('staff-hr-punch-panel').style.display = 'block';
+                    if (kpiRowEl) kpiRowEl.style.display = 'grid';
                     document.getElementById('staff-hr-section-label').style.display = 'block';
                     document.getElementById('staff-hr-modules-grid').style.display = 'grid';
                     if (mainOpsGrid) mainOpsGrid.style.display = 'none';
@@ -2942,6 +3299,7 @@
                     document.getElementById('dashboard-title').innerHTML = `ADMIN <span>PORTAL</span>`;
                     if (subEl) subEl.innerText = '';
                     document.getElementById('staff-hr-punch-panel').style.display = 'none';
+                    if (kpiRowEl) kpiRowEl.style.display = 'none';
                     document.getElementById('staff-hr-section-label').style.display = 'none';
                     document.getElementById('staff-hr-modules-grid').style.display = 'none';
                     if (mainOpsGrid) mainOpsGrid.style.display = 'grid';
@@ -3266,6 +3624,53 @@
                 document.getElementById('studio-cfg-email').value = d.email;
                 document.getElementById('studio-cfg-phone1').value = d.contact1;
                 document.getElementById('studio-cfg-phone2').value = d.contact2;
+                const latEl = document.getElementById('studio-cfg-lat');
+                const lngEl = document.getElementById('studio-cfg-lng');
+                const statusEl = document.getElementById('studio-geo-capture-status');
+                if (latEl) latEl.value = d.lat != null ? d.lat : '';
+                if (lngEl) lngEl.value = d.lng != null ? d.lng : '';
+                if (statusEl) {
+                    if (d.lat != null && d.lng != null) {
+                        statusEl.style.color = 'var(--success-green)';
+                        statusEl.innerText = `✔ Active Geo-Fence Center Point: Lat ${d.lat.toFixed(6)}, Lng ${d.lng.toFixed(6)} (20m Radius Enforced)`;
+                    } else {
+                        statusEl.style.color = 'var(--warning-yellow)';
+                        statusEl.innerText = '⚠ No Geo-Fence Center Point fixed yet. Click "Capture Current Studio Location" while at the studio.';
+                    }
+                }
+            },
+            captureAdminStudioGeoPoint: function() {
+                const statusEl = document.getElementById('studio-geo-capture-status');
+                if (!navigator.geolocation) {
+                    showNotice("Geolocation is not supported by this browser/device.", "error");
+                    return;
+                }
+                if (statusEl) {
+                    statusEl.style.color = 'var(--accent-orange)';
+                    statusEl.innerText = '📡 Capturing high-accuracy GPS coordinates for Studio Center Point...';
+                }
+                navigator.geolocation.getCurrentPosition(
+                    function(pos) {
+                        const lat = parseFloat(pos.coords.latitude.toFixed(6));
+                        const lng = parseFloat(pos.coords.longitude.toFixed(6));
+                        const acc = Math.round(pos.coords.accuracy || 0);
+                        document.getElementById('studio-cfg-lat').value = lat;
+                        document.getElementById('studio-cfg-lng').value = lng;
+                        if (statusEl) {
+                            statusEl.style.color = 'var(--success-green)';
+                            statusEl.innerText = `✔ Captured Studio Center Point: Lat ${lat}, Lng ${lng} (GPS Accuracy: ±${acc}m). Click "Save Studio Details" below to lock it.`;
+                        }
+                        showNotice(`Studio Center Point captured (${lat}, ${lng})!`, "success");
+                    },
+                    function(err) {
+                        if (statusEl) {
+                            statusEl.style.color = 'var(--error-red)';
+                            statusEl.innerText = '✖ Unable to capture GPS location. Please enable Location Permission in your browser/device and try again.';
+                        }
+                        showNotice("Location access denied or unavailable. Please enable GPS permission.", "error");
+                    },
+                    { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+                );
             },
             saveStudioDetails: function(e) {
                 if (e) e.preventDefault();
@@ -3273,64 +3678,270 @@
                 const email = document.getElementById('studio-cfg-email').value.trim();
                 const contact1 = document.getElementById('studio-cfg-phone1').value.trim();
                 const contact2 = document.getElementById('studio-cfg-phone2').value.trim();
+                const latRaw = document.getElementById('studio-cfg-lat').value.trim();
+                const lngRaw = document.getElementById('studio-cfg-lng').value.trim();
+                const lat = latRaw !== '' ? parseFloat(latRaw) : null;
+                const lng = lngRaw !== '' ? parseFloat(lngRaw) : null;
 
                 if (!address || !email || !contact1) {
                     showNotice("Please fill Address, Email ID, and Contact Number 1.", "error");
                     return;
                 }
                 const s = storage.get('revive_settings_db', {});
-                s.studioDetails = { address, email, contact1, contact2 };
+                s.studioDetails = { address, email, contact1, contact2, lat, lng, geoRadiusMeters: 20 };
                 s.studioAddress = address;
                 s.studioEmail = email;
                 s.studioContact1 = contact1;
                 s.studioContact2 = contact2;
+                s.studioLat = lat;
+                s.studioLng = lng;
                 storage.set('revive_settings_db', s);
                 cloudSync.push('pushSettings', s);
                 applyStudioDetailsToAllTemplates();
-                showNotice("Studio Details updated & applied to all invoices and forms!", "success");
+                showNotice("Studio Details & 20m Geo-Fence Center Point saved!", "success");
                 window.appContext.goHome();
             },
 
+            activeHrSubModule: null,
+
             initStaffEditor: function() {
                 ensureDefaultHolidays();
-                window.moduleContext.resetStaffForm();
-                window.moduleContext.renderStaffList();
-                window.moduleContext.renderAdminHolidays();
+                autoCheckoutExpiredSlots();
+                window.moduleContext.openHrSubModule(null);
+                window.moduleContext.updateHrPendingTaskBadge();
             },
+
+            handleHrPortalBack: function() {
+                if (window.moduleContext.activeHrSubModule) {
+                    window.moduleContext.openHrSubModule(null);
+                } else {
+                    window.appContext.goHome();
+                }
+            },
+
+            openHrSubModule: function(subName) {
+                window.moduleContext.activeHrSubModule = subName;
+                const hubGrid = document.getElementById('hr-portal-hub-grid');
+                const titleEl = document.getElementById('hr-portal-main-title');
+                const backLbl = document.getElementById('hr-portal-back-label');
+                document.querySelectorAll('#view-staff-editor .hr-subpanel').forEach(el => el.classList.remove('active-hr-panel'));
+
+                if (!subName) {
+                    if (hubGrid) hubGrid.style.display = 'grid';
+                    if (titleEl) titleEl.innerText = 'HR Portal';
+                    if (backLbl) backLbl.innerText = 'Back';
+                    window.moduleContext.updateHrPendingTaskBadge();
+                    return;
+                }
+
+                if (hubGrid) hubGrid.style.display = 'none';
+                if (backLbl) backLbl.innerText = 'Back to HR Portal';
+
+                const panel = document.getElementById(`hr-panel-${subName}`);
+                if (panel) panel.classList.add('active-hr-panel');
+
+                if (subName === 'timing') {
+                    if (titleEl) titleEl.innerText = 'Working Timing Config';
+                    window.moduleContext.renderWorkingTimingsConfig();
+                } else if (subName === 'weekdays') {
+                    if (titleEl) titleEl.innerText = 'Working Day Configurator';
+                    window.moduleContext.renderWorkingDaysConfig();
+                } else if (subName === 'holidays') {
+                    if (titleEl) titleEl.innerText = 'Annual Holiday Configurator';
+                    window.moduleContext.renderAdminHolidays();
+                } else if (subName === 'enrolment') {
+                    if (titleEl) titleEl.innerText = 'Staff Enrolment';
+                    window.moduleContext.resetStaffForm();
+                    window.moduleContext.renderStaffList();
+                } else if (subName === 'tasks') {
+                    if (titleEl) titleEl.innerText = 'Attendance Task';
+                    window.moduleContext.renderHrAttendanceTasks();
+                }
+            },
+
+            updateHrPendingTaskBadge: function() {
+                const badge = document.getElementById('hr-pending-task-badge');
+                if (!badge) return;
+                const tasks = getHrTasksDb();
+                const pendingCount = tasks.filter(t => t && t.status === 'Pending').length;
+                if (pendingCount > 0) {
+                    badge.style.display = 'inline-block';
+                    badge.innerText = `${pendingCount} Pending`;
+                } else {
+                    badge.style.display = 'none';
+                }
+            },
+
+            // 1. Working Timing Config (Morning, Day, Afternoon, Evening with Start & End Time + AM/PM)
+            renderWorkingTimingsConfig: function() {
+                const container = document.getElementById('hr-timing-slots-container');
+                if (!container) return;
+                const cfg = getWorkingTimingsConfig();
+                const hours = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+                const mins = ['00','05','10','15','20','25','30','35','40','45','50','55'];
+
+                let htmlOut = '';
+                HR_SHIFT_SLOTS.forEach(slot => {
+                    const sc = cfg[slot];
+                    const mkHourOpts = (selH) => hours.map(h => `<option value="${h}" ${h === selH ? 'selected' : ''}>${h}</option>`).join('');
+                    const mkMinOpts = (selM) => {
+                        const list = mins.includes(selM) ? mins : [...mins, selM].sort();
+                        return list.map(m => `<option value="${m}" ${m === selM ? 'selected' : ''}>${m}</option>`).join('');
+                    };
+
+                    htmlOut += `
+                    <div class="tariff-row" style="margin-bottom:1rem;">
+                        <div class="tariff-month-name" style="display:flex; justify-content:space-between; align-items:center;">
+                            <span>${slot} Shift</span>
+                            <span style="font-size:0.85rem; color:var(--text-muted); font-weight:700;">Active: ${sc.start} – ${sc.end}</span>
+                        </div>
+                        <div class="form-row" style="margin-bottom:0;">
+                            <div class="form-group">
+                                <label>Start Time (HH : MM AM/PM)</label>
+                                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+                                    <select id="hr-tm-${slot}-sh">${mkHourOpts(sc.startHour)}</select>
+                                    <select id="hr-tm-${slot}-sm">${mkMinOpts(sc.startMin)}</select>
+                                    <select id="hr-tm-${slot}-sp">
+                                        <option value="AM" ${sc.startPeriod === 'AM' ? 'selected' : ''}>AM</option>
+                                        <option value="PM" ${sc.startPeriod === 'PM' ? 'selected' : ''}>PM</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>End Time (HH : MM AM/PM)</label>
+                                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+                                    <select id="hr-tm-${slot}-eh">${mkHourOpts(sc.endHour)}</select>
+                                    <select id="hr-tm-${slot}-em">${mkMinOpts(sc.endMin)}</select>
+                                    <select id="hr-tm-${slot}-ep">
+                                        <option value="AM" ${sc.endPeriod === 'AM' ? 'selected' : ''}>AM</option>
+                                        <option value="PM" ${sc.endPeriod === 'PM' ? 'selected' : ''}>PM</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+                container.innerHTML = htmlOut;
+            },
+
+            saveWorkingTimings: function() {
+                const newCfg = {};
+                HR_SHIFT_SLOTS.forEach(slot => {
+                    const sh = document.getElementById(`hr-tm-${slot}-sh`).value;
+                    const sm = document.getElementById(`hr-tm-${slot}-sm`).value;
+                    const sp = document.getElementById(`hr-tm-${slot}-sp`).value;
+                    const eh = document.getElementById(`hr-tm-${slot}-eh`).value;
+                    const em = document.getElementById(`hr-tm-${slot}-em`).value;
+                    const ep = document.getElementById(`hr-tm-${slot}-ep`).value;
+                    newCfg[slot] = {
+                        startHour: sh, startMin: sm, startPeriod: sp,
+                        endHour: eh, endMin: em, endPeriod: ep,
+                        start: `${sh}:${sm} ${sp}`,
+                        end: `${eh}:${em} ${ep}`
+                    };
+                });
+                storage.set('revive_hr_timings_db', newCfg);
+                syncHrBackupToSettings();
+                autoCheckoutExpiredSlots();
+                window.moduleContext.renderWorkingTimingsConfig();
+                showNotice("Working Shift Timings (Morning, Day, Afternoon, Evening) saved!", "success");
+            },
+
+            // 2. Working Day Configurator (Days of the Week -> Working / Holiday)
+            renderWorkingDaysConfig: function() {
+                const tbody = document.getElementById('hr-weekdays-tbody');
+                if (!tbody) return;
+                const cfg = getWorkingDaysConfig();
+                tbody.innerHTML = '';
+                HR_WEEKDAYS_ORDER.forEach(dayName => {
+                    const st = cfg[dayName] === 'Holiday' ? 'Holiday' : 'Working';
+                    tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${dayName}</strong></td>
+                        <td style="max-width:240px;">
+                            <select id="hr-wd-${dayName}" style="font-weight:800; color:${st === 'Holiday' ? 'var(--error-red)' : 'var(--success-green)'};" onchange="this.style.color = this.value === 'Holiday' ? '#d32f2f' : '#25D366'">
+                                <option value="Working" ${st === 'Working' ? 'selected' : ''}>✔ Working Day</option>
+                                <option value="Holiday" ${st === 'Holiday' ? 'selected' : ''}>🎉 Weekly Holiday</option>
+                            </select>
+                        </td>
+                    </tr>`;
+                });
+            },
+
+            saveWorkingDaysConfig: function() {
+                const newCfg = {};
+                HR_WEEKDAYS_ORDER.forEach(dayName => {
+                    const el = document.getElementById(`hr-wd-${dayName}`);
+                    newCfg[dayName] = el ? el.value : (dayName === 'Sunday' ? 'Holiday' : 'Working');
+                });
+                storage.set('revive_hr_weekdays_db', newCfg);
+                syncHrBackupToSettings();
+                window.moduleContext.renderWorkingDaysConfig();
+                showNotice("Weekly Working Days & Holidays configuration saved!", "success");
+            },
+
+            // 4. Staff Enrolment (Name, Contact Number, Date of Joining, Role, Multi-Shift Combinations, PIN, Delete with Last Working Day)
             resetStaffForm: function() {
                 const f = document.getElementById('staffForm');
                 if (f) f.reset();
                 document.getElementById('staff-edit-id').value = '';
                 document.getElementById('staff-joining-date').value = toIsoDateKey(new Date());
-                document.getElementById('staff-form-heading').innerText = 'Add / Edit Staff';
+                const roleEl = document.getElementById('staff-role');
+                if (roleEl) roleEl.value = 'Staff';
+                document.querySelectorAll('input[name="staff-shift-chk"]').forEach(chk => {
+                    chk.checked = (chk.value === 'Morning' || chk.value === 'Evening');
+                });
+                document.getElementById('staff-form-heading').innerText = '4. Staff Enrolment (Add / Edit Staff)';
                 document.getElementById('btn-save-staff').innerText = '+ Add Staff Member';
                 document.getElementById('btn-cancel-staff-edit').style.display = 'none';
             },
+
             editStaffMember: function(id) {
-                const db = storage.get('revive_staff_db', []);
+                const db = getNormalizedStaffDb();
                 const st = db.find(s => String(s.id) === String(id));
                 if (!st) return;
                 document.getElementById('staff-edit-id').value = st.id;
                 document.getElementById('staff-name').value = st.name;
+                const contactEl = document.getElementById('staff-contact');
+                if (contactEl) contactEl.value = st.contact || '';
                 document.getElementById('staff-joining-date').value = normalizeStaffJoiningIso(st.joiningDate);
+                const roleEl = document.getElementById('staff-role');
+                if (roleEl) roleEl.value = st.role || 'Staff';
+                const shiftsArr = Array.isArray(st.shifts) && st.shifts.length > 0 ? st.shifts : ['Morning', 'Evening'];
+                document.querySelectorAll('input[name="staff-shift-chk"]').forEach(chk => {
+                    chk.checked = shiftsArr.includes(chk.value);
+                });
                 document.getElementById('staff-pin').value = st.pin;
                 document.getElementById('staff-form-heading').innerText = `Edit Staff: ${st.name}`;
                 document.getElementById('btn-save-staff').innerText = 'Update Staff Details';
                 document.getElementById('btn-cancel-staff-edit').style.display = 'inline-flex';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             },
+
             saveStaff: function(e) {
                 if(e) e.preventDefault();
                 const editId = document.getElementById('staff-edit-id').value.trim();
                 const name = document.getElementById('staff-name').value.trim();
+                const contact = document.getElementById('staff-contact').value.trim();
                 const joiningDate = normalizeStaffJoiningIso(document.getElementById('staff-joining-date').value);
+                const role = document.getElementById('staff-role').value;
                 const pin = document.getElementById('staff-pin').value.trim();
-                
-                let db = storage.get('revive_staff_db', []);
+
+                const selectedShifts = [];
+                document.querySelectorAll('input[name="staff-shift-chk"]:checked').forEach(chk => {
+                    selectedShifts.push(chk.value);
+                });
+                if (selectedShifts.length === 0) {
+                    showNotice("Please select at least one Working Shift slot (e.g. Morning / Evening).", "error");
+                    return;
+                }
+
+                let db = getNormalizedStaffDb();
                 const s = storage.get('revive_settings_db', {});
                 const adminPin = s.adminPin != null ? String(s.adminPin) : '1234';
 
                 if (pin === adminPin || db.some(st => String(st.pin) === pin && String(st.id) !== editId)) {
-                    showNotice("This PIN is already in use. Choose a unique PIN.", "error");
+                    showNotice("This PIN is already in use. Choose a unique 4-6 digit PIN.", "error");
                     return;
                 }
 
@@ -3338,66 +3949,129 @@
                     const idx = db.findIndex(st => String(st.id) === editId);
                     if (idx !== -1) {
                         db[idx].name = name;
+                        db[idx].contact = contact;
                         db[idx].joiningDate = joiningDate;
+                        db[idx].role = role;
+                        db[idx].shifts = selectedShifts;
                         db[idx].pin = pin;
                         storage.set('revive_staff_db', db);
                         cloudSync.push('pushStaff', db[idx]);
                         syncHrBackupToSettings();
-                        showNotice(`Staff member ${name} updated.`, "success");
+                        showNotice(`Staff member ${name} (${role}) updated.`, "success");
                     }
                 } else {
-                    const staffMember = { id: 'STF-' + Date.now(), name: name, joiningDate: joiningDate, pin: pin };
+                    const staffMember = ensureStaffObject({
+                        id: 'STF-' + Date.now(),
+                        name: name,
+                        contact: contact,
+                        joiningDate: joiningDate,
+                        role: role,
+                        shifts: selectedShifts,
+                        pin: pin,
+                        lastWorkingDay: '',
+                        isRelieved: false
+                    });
                     db.push(staffMember);
                     storage.set('revive_staff_db', db);
                     cloudSync.push('pushStaff', staffMember);
                     syncHrBackupToSettings();
-                    showNotice(`Staff member ${name} added (Attendance active from ${formatDateStr(joiningDate)}).`, "success");
+                    showNotice(`Staff member ${name} (${role}) enrolled with shifts: ${selectedShifts.join(', ')}!`, "success");
                 }
-                window.moduleContext.initStaffEditor();
+                window.moduleContext.resetStaffForm();
+                window.moduleContext.renderStaffList();
             },
+
             deleteStaff: function(id) {
+                const db = getNormalizedStaffDb();
+                const st = db.find(s => String(s.id) === String(id));
+                if (!st) return;
+                document.getElementById('lwd-target-staff-id').value = st.id;
+                document.getElementById('lwd-date-input').value = st.lastWorkingDay || toIsoDateKey(new Date());
+                document.getElementById('lwd-staff-modal-desc').innerHTML = `Select the <strong>Last Working Day</strong> for <strong>${st.name}</strong> (${st.role || 'Staff'}). Their attendance will be tracked up to this date and login access will end after this date.`;
+                document.getElementById('staffDeleteLwdModal').style.display = 'flex';
+            },
+
+            confirmDeleteStaffWithLwd: function() {
+                const id = document.getElementById('lwd-target-staff-id').value;
+                const lwdVal = document.getElementById('lwd-date-input').value;
+                if (!id || !lwdVal) {
+                    showNotice("Please select the Last Working Day.", "error");
+                    return;
+                }
+                let db = getNormalizedStaffDb();
+                const idx = db.findIndex(s => String(s.id) === String(id));
+                if (idx !== -1) {
+                    db[idx].lastWorkingDay = normalizeStaffJoiningIso(lwdVal);
+                    db[idx].isRelieved = true;
+                    storage.set('revive_staff_db', db);
+                    cloudSync.push('pushStaff', db[idx]);
+                    syncHrBackupToSettings();
+                    showNotice(`${db[idx].name} marked relieved with Last Working Day: ${formatDateStr(lwdVal)}.`, "info");
+                }
+                document.getElementById('staffDeleteLwdModal').style.display = 'none';
+                window.moduleContext.renderStaffList();
+            },
+
+            permanentlyRemoveStaff: function(id) {
                 window.appContext.askConfirm(
-                    "Revoke Staff Access",
-                    "Revoke access for this staff member? Their PIN will no longer work for login or fee verification.",
+                    "Remove Staff Record",
+                    "Permanently remove this staff account from the directory?",
                     function() {
-                        let db = storage.get('revive_staff_db', []);
-                        db = db.filter(s => s.id !== id);
+                        let db = getNormalizedStaffDb();
+                        db = db.filter(s => String(s.id) !== String(id));
                         storage.set('revive_staff_db', db);
                         cloudSync.push('deleteStaff', { id: id });
                         syncHrBackupToSettings();
                         window.moduleContext.renderStaffList();
-                        showNotice("Staff access revoked.", "info");
+                        showNotice("Staff record removed.", "info");
                     }
                 );
             },
+
             renderStaffList: function() {
-                let db = storage.get('revive_staff_db', []);
+                let db = getNormalizedStaffDb();
                 const tbody = document.querySelector('#table-staff-list tbody');
+                if (!tbody) return;
                 tbody.innerHTML = '';
                 
                 if(db.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No staff accounts configured.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No staff accounts enrolled yet.</td></tr>';
                     return;
                 }
                 
+                const timings = getWorkingTimingsConfig();
                 db.forEach(staff => {
                     const jDate = formatDateStr(normalizeStaffJoiningIso(staff.joiningDate));
+                    const lwdBadge = staff.lastWorkingDay
+                        ? `<br><span class="deleted-badge" style="margin-left:0;">Last Day: ${formatDateStr(staff.lastWorkingDay)}</span>`
+                        : '';
+                    const shiftsList = (staff.shifts || ['Morning', 'Evening']).map(sl => {
+                        const tc = timings[sl];
+                        return `<span style="display:inline-block; background:#fff5eb; color:var(--accent-orange); border:1px solid #ffcc99; padding:2px 7px; border-radius:12px; font-size:0.74rem; font-weight:800; margin:2px 3px 2px 0;">${sl}${tc ? ' (' + tc.start + '-' + tc.end + ')' : ''}</span>`;
+                    }).join('');
+
                     tbody.innerHTML += `
                     <tr>
-                        <td><strong>${staff.name}</strong></td>
-                        <td><span style="font-weight:700; color:var(--success-green);">${jDate}</span></td>
+                        <td>
+                            <strong>${staff.name}</strong>
+                            <br><span style="font-size:0.75rem; font-weight:800; color:var(--accent-orange); text-transform:uppercase;">${staff.role || 'Staff'}</span>
+                        </td>
+                        <td>${staff.contact || '-'}</td>
+                        <td><span style="font-weight:700; color:var(--success-green);">Joined: ${jDate}</span>${lwdBadge}</td>
+                        <td>${shiftsList}</td>
                         <td style="letter-spacing: 2px;">••••${String(staff.pin).slice(-2)}</td>
                         <td>
-                            <div style="display:flex; gap:6px;">
-                                <button type="button" class="btn secondary" style="padding:0.35rem 0.8rem; font-size:0.75rem; width:auto;" onclick="window.moduleContext.editStaffMember('${staff.id}')">Edit</button>
-                                <button type="button" class="btn danger" style="padding:0.35rem 0.8rem; font-size:0.75rem; width:auto; border:none;" onclick="window.moduleContext.deleteStaff('${staff.id}')">Remove</button>
+                            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                                <button type="button" class="btn secondary" style="padding:0.35rem 0.75rem; font-size:0.74rem; width:auto;" onclick="window.moduleContext.editStaffMember('${staff.id}')">Edit</button>
+                                <button type="button" class="btn danger" style="padding:0.35rem 0.75rem; font-size:0.74rem; width:auto;" onclick="window.moduleContext.deleteStaff('${staff.id}')">${staff.lastWorkingDay ? 'Update LWD' : 'Delete / LWD'}</button>
+                                ${staff.lastWorkingDay ? `<button type="button" class="btn danger" style="padding:0.35rem 0.6rem; font-size:0.72rem; width:auto; border:none;" onclick="window.moduleContext.permanentlyRemoveStaff('${staff.id}')" title="Permanently Delete">✕</button>` : ''}
                             </div>
                         </td>
                     </tr>`;
                 });
             },
 
-            // Admin Yearly Holiday Calendar Management
+            // 3. Admin Yearly Holiday Calendar Management
             saveHoliday: function(e) {
                 if (e) e.preventDefault();
                 const dVal = document.getElementById('holiday-date').value;
@@ -3437,7 +4111,7 @@
                 if (!tbody) return;
                 tbody.innerHTML = '';
                 if (hols.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No custom holidays configured. Sundays are automatically holidays.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No custom holidays configured.</td></tr>';
                     return;
                 }
                 hols.sort((a, b) => new Date(a.date) - new Date(b.date)).forEach(h => {
@@ -3454,7 +4128,120 @@
                 });
             },
 
-            // Staff HR Portal: Live Check-In & Check-Out State & Actions
+            // 6. Admin Attendance Task Module (Accept / Reject Staff Regularisations & Leave Requests)
+            renderHrAttendanceTasks: function() {
+                const tbody = document.querySelector('#table-hr-attendance-tasks tbody');
+                if (!tbody) return;
+                const tasks = getHrTasksDb();
+                tbody.innerHTML = '';
+                if (tasks.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No attendance regularisation or leave requests raised yet.</td></tr>';
+                    return;
+                }
+                [...tasks].reverse().forEach(t => {
+                    const typeBadge = t.requestType === 'LEAVE'
+                        ? `<span class="hr-status-pill hr-pill-leave">Leave Request</span>`
+                        : `<span class="hr-status-pill hr-pill-pending" style="background:#fff5eb; color:var(--accent-orange); border-color:#ffcc99;">Attendance Regularisation</span>`;
+                    let statusBadge = '';
+                    if (t.status === 'Approved') statusBadge = `<span class="hr-status-pill hr-pill-working">✔ Accepted</span>`;
+                    else if (t.status === 'Rejected') statusBadge = `<span class="hr-status-pill hr-pill-absent">✖ Rejected</span>`;
+                    else statusBadge = `<span class="hr-status-pill hr-pill-pending">⏳ Pending</span>`;
+
+                    const actionHtml = t.status === 'Pending'
+                        ? `<div style="display:flex; gap:6px;">
+                            <button type="button" class="btn primary" style="width:auto; padding:0.35rem 0.8rem; font-size:0.74rem; background:var(--success-green);" onclick="window.moduleContext.resolveHrAttendanceTask('${t.id}', 'Approved')">✔ Accept</button>
+                            <button type="button" class="btn danger" style="width:auto; padding:0.35rem 0.8rem; font-size:0.74rem;" onclick="window.moduleContext.resolveHrAttendanceTask('${t.id}', 'Rejected')">✖ Reject</button>
+                           </div>`
+                        : `<span style="font-size:0.75rem; color:var(--text-muted);">Processed</span>`;
+
+                    tbody.innerHTML += `<tr>
+                        <td><strong>${t.staffName}</strong></td>
+                        <td><strong>${formatDateStr(t.dateKey)}</strong></td>
+                        <td><strong style="color:var(--accent-orange);">${t.slot}</strong></td>
+                        <td>${typeBadge}${t.note ? `<br><span style="font-size:0.78rem; color:var(--text-muted);">${t.note}</span>` : ''}</td>
+                        <td>${statusBadge}</td>
+                        <td>${actionHtml}</td>
+                    </tr>`;
+                });
+                window.moduleContext.updateHrPendingTaskBadge();
+            },
+
+            resolveHrAttendanceTask: function(taskId, decision) {
+                let tasks = getHrTasksDb();
+                const idx = tasks.findIndex(t => String(t.id) === String(taskId));
+                if (idx === -1) return;
+                const task = tasks[idx];
+                task.status = decision;
+                task.resolvedAt = new Date().toISOString();
+                storage.set('revive_hr_tasks_db', tasks);
+
+                if (decision === 'Approved') {
+                    const timings = getWorkingTimingsConfig();
+                    const slotCfg = timings[task.slot] || timings.Morning;
+                    let saDb = storage.get('revive_staff_attendance_db', {});
+                    if (!saDb || typeof saDb !== 'object' || Array.isArray(saDb)) saDb = {};
+                    if (!saDb[task.staffId]) saDb[task.staffId] = {};
+
+                    const existing = saDb[task.staffId][task.dateKey] || {
+                        id: `SATT-${task.staffId}-${task.dateKey}`,
+                        staffId: task.staffId,
+                        staffName: task.staffName,
+                        staffPin: task.staffPin || '',
+                        dateKey: task.dateKey,
+                        checkIn: '',
+                        checkOut: '',
+                        duration: '',
+                        status: 'Present',
+                        slots: {}
+                    };
+                    if (!existing.slots || typeof existing.slots !== 'object') existing.slots = {};
+
+                    if (task.requestType === 'LEAVE') {
+                        existing.slots[task.slot] = {
+                            slot: task.slot,
+                            checkIn: 'Leave',
+                            checkOut: 'Leave',
+                            duration: `Leave (${task.slot})`,
+                            status: 'Leave'
+                        };
+                        existing.status = 'Leave';
+                        existing.leaveSlot = task.slot;
+                        if (!existing.checkIn) existing.checkIn = 'Leave';
+                        if (!existing.checkOut) existing.checkOut = 'Leave';
+                        existing.duration = `Approved Leave (${task.slot})`;
+                    } else {
+                        const sMins = parseTime12ToMinutes(slotCfg.start);
+                        const eMins = parseTime12ToMinutes(slotCfg.end);
+                        const durStr = formatDurationFromMinutes(sMins, eMins);
+                        existing.slots[task.slot] = {
+                            slot: task.slot,
+                            checkIn: `${slotCfg.start} (Reg)`,
+                            checkOut: `${slotCfg.end} (Reg)`,
+                            duration: durStr,
+                            status: 'Present'
+                        };
+                        existing.status = 'Present';
+                        existing.checkIn = existing.checkIn && existing.checkIn !== 'Leave' ? existing.checkIn : `${slotCfg.start} (Reg)`;
+                        existing.checkOut = `${slotCfg.end} (Reg)`;
+                        existing.duration = `Regularised (${task.slot}: ${durStr})`;
+                    }
+
+                    saDb[task.staffId][task.dateKey] = existing;
+                    if (task.staffPin) {
+                        const pinKey = `PIN_${String(task.staffPin).trim()}`;
+                        if (!saDb[pinKey]) saDb[pinKey] = {};
+                        saDb[pinKey][task.dateKey] = existing;
+                    }
+                    storage.set('revive_staff_attendance_db', saDb);
+                    cloudSync.push('pushStaffAttendance', existing);
+                }
+
+                syncHrBackupToSettings();
+                window.moduleContext.renderHrAttendanceTasks();
+                showNotice(`Task for ${task.staffName} (${formatDateStr(task.dateKey)} - ${task.slot}) ${decision === 'Approved' ? 'Accepted & Updated!' : 'Rejected.'}`, decision === 'Approved' ? 'success' : 'info');
+            },
+
+            // Staff HR Portal: Live Slot-Assigned Check-In & Check-Out State & Actions
             resolveActiveStaff: function() {
                 const staffDb = getNormalizedStaffDb();
                 if (appContext.currentStaffObj) {
@@ -3503,8 +4290,8 @@
                     }
                 }
                 candidates.forEach(c => {
-                    if (!c || !c.checkIn) return;
-                    if (!bestRec || (!bestRec.checkOut && c.checkOut)) {
+                    if (!c || (!c.checkIn && c.status !== 'Leave' && !c.slots)) return;
+                    if (!bestRec || (!bestRec.checkOut && c.checkOut) || (c.slots && Object.keys(c.slots).length > Object.keys(bestRec.slots || {}).length)) {
                         bestRec = c;
                     }
                 });
@@ -3526,6 +4313,7 @@
 
             refreshDashboardHrState: function() {
                 if (appContext.currentRole !== 'staff') return;
+                autoCheckoutExpiredSlots();
                 const st = window.moduleContext.resolveActiveStaff();
                 if (!st) return;
 
@@ -3534,15 +4322,100 @@
                 const todayPretty = now.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
                 document.getElementById('staff-punch-date-title').innerText = todayPretty;
 
+                // Populate Assigned Shift Slots dropdown for this staff member
+                const timings = getWorkingTimingsConfig();
+                const assignedShifts = (Array.isArray(st.shifts) && st.shifts.length > 0) ? st.shifts : ['Morning', 'Evening'];
+                const slotSel = document.getElementById('staff-punch-slot-select');
+                const prevSelectedSlot = slotSel ? slotSel.value : '';
+                if (slotSel) {
+                    slotSel.innerHTML = '';
+                    const todayRecInit = window.moduleContext.getTodayStaffPunchRecord(st, todayKey);
+                    const slotsMapInit = (todayRecInit && todayRecInit.slots) ? todayRecInit.slots : {};
+                    let autoPickSlot = assignedShifts[0];
+
+                    // Pick the first assigned slot that is currently checked-in (open) or not yet checked in
+                    for (const sName of assignedShifts) {
+                        const sr = slotsMapInit[sName];
+                        if (sr && sr.checkIn && !sr.checkOut) {
+                            autoPickSlot = sName;
+                            break;
+                        }
+                    }
+                    if (prevSelectedSlot && assignedShifts.includes(prevSelectedSlot)) {
+                        autoPickSlot = prevSelectedSlot;
+                    }
+
+                    assignedShifts.forEach(sName => {
+                        const tc = timings[sName] || timings.Morning;
+                        const opt = document.createElement('option');
+                        opt.value = sName;
+                        opt.innerText = `${sName} Shift (${tc.start} – ${tc.end})`;
+                        if (sName === autoPickSlot) opt.selected = true;
+                        slotSel.appendChild(opt);
+                    });
+                }
+
+                window.moduleContext.onStaffPunchSlotChange();
+                window.moduleContext.refreshStaffCurrentMonthKpiRow();
+            },
+
+            onStaffPunchSlotChange: function() {
+                if (appContext.currentRole !== 'staff') return;
+                const st = window.moduleContext.resolveActiveStaff();
+                if (!st) return;
+
+                const now = new Date();
+                const todayKey = toIsoDateKey(now);
+                const timings = getWorkingTimingsConfig();
+                const assignedShifts = (Array.isArray(st.shifts) && st.shifts.length > 0) ? st.shifts : ['Morning', 'Evening'];
+                const slotSel = document.getElementById('staff-punch-slot-select');
+                const activeSlot = (slotSel && slotSel.value) ? slotSel.value : assignedShifts[0];
+                const slotTiming = timings[activeSlot] || timings.Morning;
+
+                const timingPill = document.getElementById('staff-slot-timing-pill');
+                if (timingPill) {
+                    timingPill.innerHTML = `⏰ Slot Window: <strong style="color:var(--accent-orange);">${slotTiming.start} – ${slotTiming.end}</strong> (All assigned shifts must Check-In & Check-Out)`;
+                }
+
                 const holInfo = getDayHolidayInfo(todayKey);
                 const badgeEl = document.getElementById('staff-day-type-badge');
                 const subEl = document.getElementById('staff-punch-substatus');
                 const btnIn = document.getElementById('btn-staff-checkin');
                 const btnOut = document.getElementById('btn-staff-checkout');
+                const summaryBox = document.getElementById('staff-today-slots-summary');
 
                 const todayRec = window.moduleContext.getTodayStaffPunchRecord(st, todayKey);
+                const slotsMap = (todayRec && todayRec.slots) ? { ...todayRec.slots } : {};
+                if (todayRec && todayRec.checkIn && Object.keys(slotsMap).length === 0) {
+                    const fbSlot = todayRec.slot || assignedShifts[0];
+                    slotsMap[fbSlot] = {
+                        slot: fbSlot,
+                        checkIn: todayRec.checkIn,
+                        checkInIso: todayRec.checkInIso || '',
+                        checkOut: todayRec.checkOut || '',
+                        duration: todayRec.duration || ''
+                    };
+                }
 
-                // Check if today is Sunday or a configured Yearly Holiday
+                if (summaryBox) {
+                    let sHtml = '<div style="display:flex; flex-wrap:wrap; gap:8px;">';
+                    assignedShifts.forEach(sName => {
+                        const sr = slotsMap[sName];
+                        const tc = timings[sName] || timings.Morning;
+                        if (sr && sr.status === 'Leave') {
+                            sHtml += `<span class="hr-status-pill hr-pill-leave">${sName}: Approved Leave</span>`;
+                        } else if (sr && sr.checkIn && sr.checkOut) {
+                            sHtml += `<span class="hr-status-pill hr-pill-working">✔ ${sName}: In ${sr.checkIn} | Out ${sr.checkOut}</span>`;
+                        } else if (sr && sr.checkIn && !sr.checkOut) {
+                            sHtml += `<span class="hr-status-pill hr-pill-pending" style="border-color:var(--accent-orange);">⏳ ${sName}: In ${sr.checkIn} (Check-Out Required!)</span>`;
+                        } else {
+                            sHtml += `<span class="hr-status-pill" style="background:#f1f3f5; color:#555; border:1px solid #ddd;">○ ${sName} (${tc.start}-${tc.end}): Pending</span>`;
+                        }
+                    });
+                    sHtml += '</div>';
+                    summaryBox.innerHTML = sHtml;
+                }
+
                 if (holInfo.isHoliday) {
                     badgeEl.innerHTML = `<span class="hr-status-pill hr-pill-holiday">🎉 ${holInfo.name}</span>`;
                     subEl.innerText = `Holiday — Attendance Inactive`;
@@ -3550,33 +4423,235 @@
                     btnOut.disabled = true;
                     btnIn.innerText = '✔ Check-In (Holiday)';
                     btnOut.innerText = '⏹ Check-Out (Holiday)';
-                    window.moduleContext.setStaffOperationsAccess(false, `🔒 Holiday (${holInfo.name})`, 'Operations are locked on non-working days.');
                     return;
                 }
 
                 badgeEl.innerHTML = `<span class="hr-status-pill hr-pill-working">● Working Day</span>`;
-                if (!todayRec || !todayRec.checkIn) {
-                    subEl.innerHTML = `Status: <strong style="color:var(--error-red);">Not Checked In</strong>`;
+                const currSlotRec = slotsMap[activeSlot];
+
+                if (!currSlotRec || !currSlotRec.checkIn) {
+                    subEl.innerHTML = `Selected Slot (<strong>${activeSlot}</strong>): <strong style="color:var(--error-red);">Not Checked In</strong>`;
                     btnIn.disabled = false;
                     btnOut.disabled = true;
-                    btnIn.innerText = '✔ Check-In';
-                    btnOut.innerText = '⏹ Check-Out';
-                    window.moduleContext.setStaffOperationsAccess(false, '🔒 Check In Required', 'Mark Check-In above to unlock Fee Collection & User Details.');
-                } else if (todayRec.checkIn && !todayRec.checkOut) {
-                    subEl.innerHTML = `Checked In: <strong style="color:var(--success-green);">${todayRec.checkIn}</strong> (On Shift)`;
+                    btnIn.innerText = `✔ Check-In (${activeSlot})`;
+                    btnOut.innerText = `⏹ Check-Out (${activeSlot})`;
+                } else if (currSlotRec.checkIn && !currSlotRec.checkOut) {
+                    subEl.innerHTML = `Selected Slot (<strong>${activeSlot}</strong>): <strong style="color:var(--warning-yellow);">Checked In at ${currSlotRec.checkIn} — Must Check-Out to Count Attendance</strong>`;
                     btnIn.disabled = true;
                     btnOut.disabled = false;
-                    btnIn.innerText = `✔ In (${todayRec.checkIn})`;
-                    btnOut.innerText = '⏹ Check-Out';
-                    window.moduleContext.setStaffOperationsAccess(true);
+                    btnIn.innerText = `✔ In (${currSlotRec.checkIn})`;
+                    btnOut.innerText = `⏹ Check-Out (${activeSlot})`;
                 } else {
-                    subEl.innerHTML = `In: <strong>${todayRec.checkIn}</strong> &nbsp;|&nbsp; Out: <strong>${todayRec.checkOut}</strong> (${todayRec.duration || 'Done'})`;
+                    subEl.innerHTML = `Selected Slot (<strong>${activeSlot}</strong>): In <strong>${currSlotRec.checkIn}</strong> &nbsp;|&nbsp; Out <strong>${currSlotRec.checkOut}</strong> (${currSlotRec.duration || 'Completed'})`;
                     btnIn.disabled = true;
                     btnOut.disabled = true;
-                    btnIn.innerText = `✔ In (${todayRec.checkIn})`;
-                    btnOut.innerText = `⏹ Out (${todayRec.checkOut})`;
-                    window.moduleContext.setStaffOperationsAccess(false, `🔒 Checked Out (${todayRec.checkOut})`, 'Operations are locked after Check-Out.');
+                    btnIn.innerText = `✔ In (${currSlotRec.checkIn})`;
+                    btnOut.innerText = `⏹ Out (${currSlotRec.checkOut})`;
                 }
+            },
+
+            // Verify 20-meter Geo-Fence around Admin-fixed Studio Center Point (Required ONLY for live Check-In & Check-Out)
+            verifyStaffGeoFence: function(onSuccessCallback, isManualTest = false) {
+                const statusTxtEl = document.getElementById('staff-geofence-status-text');
+                const studio = getStudioDetails();
+
+                if (studio.lat == null || studio.lng == null) {
+                    const msg = "Studio Geo-Fence Center Point is not fixed yet! Ask Admin to capture the Studio Location in Studio Details.";
+                    if (statusTxtEl) {
+                        statusTxtEl.style.color = 'var(--error-red)';
+                        statusTxtEl.innerText = `⚠ ${msg}`;
+                    }
+                    showNotice(msg, "error");
+                    return;
+                }
+
+                if (!navigator.geolocation) {
+                    showNotice("Geolocation is not supported on this device/browser.", "error");
+                    return;
+                }
+
+                if (statusTxtEl) {
+                    statusTxtEl.style.color = 'var(--accent-orange)';
+                    statusTxtEl.innerText = '📡 Verifying your live GPS distance from Studio Center Point (Max 20m)...';
+                }
+
+                navigator.geolocation.getCurrentPosition(
+                    function(pos) {
+                        const staffLat = pos.coords.latitude;
+                        const staffLng = pos.coords.longitude;
+                        const distMeters = calculateGeoDistanceMeters(studio.lat, studio.lng, staffLat, staffLng);
+                        const roundedDist = Math.round(distMeters * 10) / 10;
+
+                        if (distMeters <= 20) {
+                            if (statusTxtEl) {
+                                statusTxtEl.style.color = 'var(--success-green)';
+                                statusTxtEl.innerText = `✔ Inside 20m Studio Geo-Fence (${roundedDist}m from Studio Center)`;
+                            }
+                            if (isManualTest) {
+                                showNotice(`✔ You are ${roundedDist}m from the Studio Center (Within 20m limit)!`, "success");
+                            }
+                            if (typeof onSuccessCallback === 'function') {
+                                onSuccessCallback(roundedDist);
+                            }
+                        } else {
+                            if (statusTxtEl) {
+                                statusTxtEl.style.color = 'var(--error-red)';
+                                statusTxtEl.innerText = `✖ Outside 20m Geo-Fence! You are ${roundedDist}m away from Studio Center (Max allowed: 20m).`;
+                            }
+                            showNotice(`Outside 20m Geo-Fence! You are ${roundedDist}m away from the studio (Limit: 20m).`, "error");
+                        }
+                    },
+                    function(err) {
+                        if (statusTxtEl) {
+                            statusTxtEl.style.color = 'var(--error-red)';
+                            statusTxtEl.innerText = '✖ GPS Location Permission Required to verify 20m Studio Geo-Fence.';
+                        }
+                        showNotice("Please allow GPS Location access to verify you are within 20m of the studio.", "error");
+                    },
+                    { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+                );
+            },
+
+            refreshStaffCurrentMonthKpiRow: function() {
+                if (appContext.currentRole !== 'staff') return;
+                const st = window.moduleContext.resolveActiveStaff();
+                if (!st) return;
+                const now = new Date();
+                const mName = now.toLocaleString('default', { month: 'short' });
+                document.querySelectorAll('.staff-curr-month-lbl').forEach(el => { el.innerText = mName; });
+
+                const data = window.moduleContext.buildStaffMonthAttendanceRows(st, now.getFullYear(), now.getMonth());
+                const pEl = document.getElementById('staff-curr-present-count');
+                const lEl = document.getElementById('staff-curr-leave-count');
+                const aEl = document.getElementById('staff-curr-absent-count');
+                if (pEl) pEl.innerText = data.present;
+                if (lEl) lEl.innerText = data.leave || 0;
+                if (aEl) aEl.innerText = data.absent;
+            },
+
+            openStaffAbsentActionPanel: function(mode) {
+                if (appContext.currentRole !== 'staff') return;
+                const st = window.moduleContext.resolveActiveStaff();
+                if (!st) return;
+
+                const box = document.getElementById('staff-absent-action-box');
+                if (!box) return;
+                box.style.display = 'block';
+
+                const now = new Date();
+                const todayIso = toIsoDateKey(now);
+                const assignedShifts = (Array.isArray(st.shifts) && st.shifts.length > 0) ? st.shifts : ['Morning', 'Evening'];
+
+                const customDateEl = document.getElementById('staff-custom-req-date');
+                if (customDateEl && !customDateEl.value) customDateEl.value = todayIso;
+                const customSlotEl = document.getElementById('staff-custom-req-slot');
+                if (customSlotEl) {
+                    customSlotEl.innerHTML = assignedShifts.map(s => `<option value="${s}">${s} Shift</option>`).join('');
+                }
+
+                const data = window.moduleContext.buildStaffMonthAttendanceRows(st, now.getFullYear(), now.getMonth());
+                const absentOrLeaveRows = data.rows.filter(r => r.status === 'Absent' || r.status === 'Leave');
+                const tasks = getHrTasksDb();
+                const tbody = document.querySelector('#table-staff-absent-days tbody');
+                tbody.innerHTML = '';
+
+                if (absentOrLeaveRows.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--success-green); font-weight:800;">🎉 Zero absent days in ${now.toLocaleString('default', { month: 'long' })}! You can still apply for leave below (subject to Admin approval).</td></tr>`;
+                } else {
+                    absentOrLeaveRows.forEach(r => {
+                        const existingTasks = tasks.filter(t => String(t.staffId) === String(st.id) && String(t.dateKey) === String(r.dateIso));
+                        let taskStatusHtml = '<span style="color:var(--text-muted); font-size:0.78rem;">No request raised</span>';
+                        if (existingTasks.length > 0) {
+                            taskStatusHtml = existingTasks.map(t => {
+                                const col = t.status === 'Approved' ? 'var(--success-green)' : (t.status === 'Rejected' ? 'var(--error-red)' : '#a16207');
+                                return `<div style="font-size:0.76rem; font-weight:800; color:${col};">${t.requestType} (${t.slot}): ${t.status}</div>`;
+                            }).join('');
+                        }
+
+                        const incompleteSlotsList = (r.incompleteSlots && r.incompleteSlots.length > 0) ? r.incompleteSlots : assignedShifts;
+                        const slotOpts = incompleteSlotsList.map(s => `<option value="${s}">${s}</option>`).join('');
+                        tbody.innerHTML += `<tr>
+                            <td><strong>${r.dateFormatted}</strong></td>
+                            <td>${r.dayName}</td>
+                            <td><span class="hr-status-pill ${r.status === 'Leave' ? 'hr-pill-leave' : 'hr-pill-absent'}">${r.status === 'Leave' ? r.statusDetail : 'Incomplete: ' + incompleteSlotsList.join(', ')}</span></td>
+                            <td>${taskStatusHtml}</td>
+                            <td>
+                                <div style="display:flex; flex-wrap:wrap; gap:6px; align-items:center;">
+                                    <select id="abs-slot-${r.dateIso}" style="width:auto; padding:0.4rem 0.6rem; font-size:0.78rem; font-weight:700;">${slotOpts}</select>
+                                    <button type="button" class="btn primary" style="width:auto; padding:0.4rem 0.75rem; font-size:0.74rem;" onclick="window.moduleContext.raiseStaffAttendanceTask('${r.dateIso}', document.getElementById('abs-slot-${r.dateIso}').value, 'REGULARISATION', 'Regularise Attendance')">Regularise</button>
+                                    <button type="button" class="btn secondary" style="width:auto; padding:0.4rem 0.75rem; font-size:0.74rem; border-color:#1d4ed8; color:#1d4ed8;" onclick="window.moduleContext.raiseStaffAttendanceTask('${r.dateIso}', document.getElementById('abs-slot-${r.dateIso}').value, 'LEAVE', 'Leave Request')">Apply Leave</button>
+                                </div>
+                            </td>
+                        </tr>`;
+                    });
+                }
+                box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            },
+
+            submitCustomStaffRequest: function(reqType) {
+                const dVal = document.getElementById('staff-custom-req-date').value;
+                const slotVal = document.getElementById('staff-custom-req-slot').value;
+                const noteVal = document.getElementById('staff-custom-req-note').value.trim();
+                if (!dVal || !slotVal) {
+                    showNotice("Please select a date and shift slot.", "error");
+                    return;
+                }
+                const todayIso = toIsoDateKey(new Date());
+                if (reqType === 'REGULARISATION' && dVal > todayIso) {
+                    showNotice("Future days attendance cannot be regularised! Regularisation is only permitted for past or current dates.", "error");
+                    return;
+                }
+                window.moduleContext.raiseStaffAttendanceTask(dVal, slotVal, reqType, noteVal);
+                document.getElementById('staff-custom-req-note').value = '';
+            },
+
+            // Both Regularisation and Leave requests are created as 'Pending' for Admin to Accept or Reject in Attendance Task (No Geo-Fencing required for Regularisation/Leave)
+            raiseStaffAttendanceTask: function(dateKey, slotName, reqType, noteText) {
+                const st = window.moduleContext.resolveActiveStaff();
+                if (!st) return;
+
+                const todayIso = toIsoDateKey(new Date());
+                if (reqType === 'REGULARISATION' && String(dateKey) > todayIso) {
+                    showNotice("Future days attendance cannot be regularised! Regularisation is only permitted for past or current dates.", "error");
+                    return;
+                }
+
+                let tasks = getHrTasksDb();
+                const dup = tasks.find(t =>
+                    String(t.staffId) === String(st.id) &&
+                    String(t.dateKey) === String(dateKey) &&
+                    String(t.slot) === String(slotName) &&
+                    t.status === 'Pending'
+                );
+                if (dup) {
+                    showNotice(`A pending ${dup.requestType.toLowerCase()} request for ${formatDateStr(dateKey)} (${slotName}) is already awaiting Admin approval.`, "warning");
+                    return;
+                }
+
+                const newTask = {
+                    id: 'TASK-' + Date.now(),
+                    staffId: st.id,
+                    staffName: st.name,
+                    staffPin: st.pin,
+                    dateKey: dateKey,
+                    slot: slotName,
+                    requestType: reqType,
+                    note: noteText || (reqType === 'LEAVE' ? 'Leave Application' : 'Missed Punch Regularisation'),
+                    status: 'Pending',
+                    createdAt: new Date().toISOString()
+                };
+
+                tasks.push(newTask);
+                storage.set('revive_hr_tasks_db', tasks);
+                syncHrBackupToSettings();
+
+                if (reqType === 'LEAVE') {
+                    showNotice(`Leave request for ${formatDateStr(dateKey)} (${slotName} slot) sent to Admin for approval!`, "success");
+                } else {
+                    showNotice(`Attendance Regularisation raised for ${formatDateStr(dateKey)} (${slotName} slot) — sent to Admin for approval!`, "success");
+                }
+                window.moduleContext.refreshDashboardHrState();
+                window.moduleContext.openStaffAbsentActionPanel(reqType);
             },
 
             setStaffOperationsAccess: function() {
@@ -3585,17 +4660,10 @@
             },
 
             isStaffOnActiveShift: function() {
-                if (appContext.currentRole === 'admin') return true;
-                if (appContext.currentRole !== 'staff') return false;
-                const st = window.moduleContext.resolveActiveStaff();
-                if (!st) return false;
-                const todayKey = toIsoDateKey(new Date());
-                const holInfo = getDayHolidayInfo(todayKey);
-                if (holInfo.isHoliday) return false;
-                const todayRec = window.moduleContext.getTodayStaffPunchRecord(st, todayKey);
-                return !!(todayRec && todayRec.checkIn && !todayRec.checkOut);
+                return true;
             },
 
+            // Live Check-In: Enforces 20-meter Geo-Fence around Studio Center Point
             staffPunchIn: function() {
                 if (appContext.currentRole !== 'staff') return;
                 const st = window.moduleContext.resolveActiveStaff();
@@ -3611,108 +4679,170 @@
                     return;
                 }
 
-                // If staff joiningDate was set later than today, auto-align joiningDate to today so check-in never fails
-                if (todayKey < st.joiningDate) {
-                    st.joiningDate = todayKey;
-                    const db = getNormalizedStaffDb();
-                    const idx = db.findIndex(s => String(s.id) === String(st.id));
-                    if (idx !== -1) {
-                        db[idx].joiningDate = todayKey;
-                        storage.set('revive_staff_db', db);
+                window.moduleContext.verifyStaffGeoFence(function(verifiedDistMeters) {
+                    const punchNow = new Date();
+                    const punchKey = toIsoDateKey(punchNow);
+                    if (punchKey < st.joiningDate) {
+                        st.joiningDate = punchKey;
+                        const db = getNormalizedStaffDb();
+                        const idx = db.findIndex(s => String(s.id) === String(st.id));
+                        if (idx !== -1) {
+                            db[idx].joiningDate = punchKey;
+                            storage.set('revive_staff_db', db);
+                        }
                     }
-                }
 
-                const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-                let saDb = storage.get('revive_staff_attendance_db', {});
-                if (!saDb || typeof saDb !== 'object' || Array.isArray(saDb)) saDb = {};
-                if (!saDb[st.id]) saDb[st.id] = {};
+                    const assignedShifts = (Array.isArray(st.shifts) && st.shifts.length > 0) ? st.shifts : ['Morning', 'Evening'];
+                    const slotSel = document.getElementById('staff-punch-slot-select');
+                    const activeSlot = (slotSel && slotSel.value) ? slotSel.value : assignedShifts[0];
 
-                const rec = {
-                    id: `SATT-${st.id}-${todayKey}`,
-                    staffId: st.id,
-                    staffName: st.name,
-                    staffPin: st.pin,
-                    dateKey: todayKey,
-                    checkIn: timeStr,
-                    checkInIso: now.toISOString(),
-                    checkOut: '',
-                    checkOutIso: '',
-                    duration: '',
-                    status: 'Present'
-                };
-                const pinKey = `PIN_${String(st.pin || '').trim()}`;
-                saDb[st.id][todayKey] = rec;
-                if (st.pin) {
-                    if (!saDb[pinKey]) saDb[pinKey] = {};
-                    saDb[pinKey][todayKey] = rec;
-                }
-                storage.set('revive_staff_attendance_db', saDb);
-                cloudSync.push('pushStaffAttendance', rec);
-                cloudSync.push('pushAttendance', {
-                    dateKey: todayKey,
-                    userId: `__STAFF_ATT__:${st.pin}:${st.id}`,
-                    fullName: st.name,
-                    timestamp: JSON.stringify({ checkIn: rec.checkIn, checkInIso: rec.checkInIso, checkOut: '', duration: '' }),
-                    month: now.toLocaleString('default', { month: 'long' })
-                });
-                syncHrBackupToSettings();
+                    const timeStr = punchNow.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                    let saDb = storage.get('revive_staff_attendance_db', {});
+                    if (!saDb || typeof saDb !== 'object' || Array.isArray(saDb)) saDb = {};
+                    if (!saDb[st.id]) saDb[st.id] = {};
 
-                showNotice(`Checked in at ${timeStr}!`, "success");
-                window.moduleContext.refreshDashboardHrState();
+                    const existing = window.moduleContext.getTodayStaffPunchRecord(st, punchKey) || {
+                        id: `SATT-${st.id}-${punchKey}`,
+                        staffId: st.id,
+                        staffName: st.name,
+                        staffPin: st.pin,
+                        dateKey: punchKey,
+                        checkIn: timeStr,
+                        checkInIso: punchNow.toISOString(),
+                        checkOut: '',
+                        checkOutIso: '',
+                        duration: '',
+                        status: 'Incomplete',
+                        slots: {}
+                    };
+                    if (!existing.slots || typeof existing.slots !== 'object') existing.slots = {};
+                    existing.slots[activeSlot] = {
+                        slot: activeSlot,
+                        checkIn: timeStr,
+                        checkInIso: punchNow.toISOString(),
+                        checkOut: '',
+                        checkOutIso: '',
+                        duration: '',
+                        geoInDist: `${verifiedDistMeters}m`,
+                        status: 'Incomplete'
+                    };
+                    existing.slot = activeSlot;
+                    if (!existing.checkIn || existing.checkIn === 'Leave') existing.checkIn = timeStr;
+                    existing.checkInIso = punchNow.toISOString();
+                    existing.checkOut = '';
+
+                    const pinKey = `PIN_${String(st.pin || '').trim()}`;
+                    saDb[st.id][punchKey] = existing;
+                    if (st.pin) {
+                        if (!saDb[pinKey]) saDb[pinKey] = {};
+                        saDb[pinKey][punchKey] = existing;
+                    }
+                    storage.set('revive_staff_attendance_db', saDb);
+                    cloudSync.push('pushStaffAttendance', existing);
+                    cloudSync.push('pushAttendance', {
+                        dateKey: punchKey,
+                        userId: `__STAFF_ATT__:${st.pin}:${st.id}`,
+                        fullName: st.name,
+                        timestamp: JSON.stringify({ checkIn: existing.checkIn, checkInIso: existing.checkInIso, checkOut: '', duration: '', slots: existing.slots }),
+                        month: punchNow.toLocaleString('default', { month: 'long' })
+                    });
+                    syncHrBackupToSettings();
+
+                    showNotice(`✔ Checked in for ${activeSlot} Shift at ${timeStr} (Geo-verified: ${verifiedDistMeters}m)!`, "success");
+                    window.moduleContext.refreshDashboardHrState();
+                }, false);
             },
 
+            // Live Check-Out: Enforces 20-meter Geo-Fence around Studio Center Point
             staffPunchOut: function() {
                 if (appContext.currentRole !== 'staff') return;
                 const st = window.moduleContext.resolveActiveStaff();
                 if (!st) return;
                 const now = new Date();
                 const todayKey = toIsoDateKey(now);
-                let saDb = storage.get('revive_staff_attendance_db', {});
-                if (!saDb || typeof saDb !== 'object' || Array.isArray(saDb)) saDb = {};
-                const rec = window.moduleContext.getTodayStaffPunchRecord(st, todayKey);
-                if (!rec || !rec.checkIn) {
+                const recPre = window.moduleContext.getTodayStaffPunchRecord(st, todayKey);
+                if (!recPre) {
                     showNotice("Please Check-In first.", "error");
                     return;
                 }
 
-                const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-                rec.checkOut = timeStr;
-                rec.checkOutIso = now.toISOString();
-
-                if (rec.checkInIso) {
-                    const diffMs = Math.max(0, now.getTime() - new Date(rec.checkInIso).getTime());
-                    const hrs = Math.floor(diffMs / 3600000);
-                    const mins = Math.floor((diffMs % 3600000) / 60000);
-                    rec.duration = `${hrs}h ${mins}m`;
-                } else {
-                    rec.duration = 'Completed';
+                const assignedShifts = (Array.isArray(st.shifts) && st.shifts.length > 0) ? st.shifts : ['Morning', 'Evening'];
+                const slotSel = document.getElementById('staff-punch-slot-select');
+                const activeSlot = (slotSel && slotSel.value) ? slotSel.value : (recPre.slot || assignedShifts[0]);
+                const slotRecPre = (recPre.slots && recPre.slots[activeSlot]) ? recPre.slots[activeSlot] : (recPre.checkIn ? { slot: activeSlot, checkIn: recPre.checkIn, checkInIso: recPre.checkInIso } : null);
+                if (!slotRecPre || !slotRecPre.checkIn) {
+                    showNotice(`Please Check-In for ${activeSlot} Shift first.`, "error");
+                    return;
                 }
 
-                const pinKey = `PIN_${String(st.pin || '').trim()}`;
-                if (!saDb[st.id]) saDb[st.id] = {};
-                saDb[st.id][todayKey] = rec;
-                if (st.pin) {
-                    if (!saDb[pinKey]) saDb[pinKey] = {};
-                    saDb[pinKey][todayKey] = rec;
-                }
-                storage.set('revive_staff_attendance_db', saDb);
-                cloudSync.push('pushStaffAttendance', rec);
-                cloudSync.push('pushAttendance', {
-                    dateKey: todayKey,
-                    userId: `__STAFF_ATT__:${st.pin}:${st.id}`,
-                    fullName: st.name,
-                    timestamp: JSON.stringify({ checkIn: rec.checkIn, checkInIso: rec.checkInIso, checkOut: rec.checkOut, checkOutIso: rec.checkOutIso, duration: rec.duration }),
-                    month: now.toLocaleString('default', { month: 'long' })
-                });
-                syncHrBackupToSettings();
+                window.moduleContext.verifyStaffGeoFence(function(verifiedDistMeters) {
+                    const outNow = new Date();
+                    const outKey = toIsoDateKey(outNow);
+                    let saDb = storage.get('revive_staff_attendance_db', {});
+                    if (!saDb || typeof saDb !== 'object' || Array.isArray(saDb)) saDb = {};
+                    const rec = window.moduleContext.getTodayStaffPunchRecord(st, outKey);
+                    if (!rec) return;
+                    if (!rec.slots || typeof rec.slots !== 'object') rec.slots = {};
+                    const slotRec = rec.slots[activeSlot] || { slot: activeSlot, checkIn: rec.checkIn, checkInIso: rec.checkInIso };
 
-                showNotice(`Checked out at ${timeStr} (${rec.duration}).`, "success");
-                window.moduleContext.refreshDashboardHrState();
+                    const timeStr = outNow.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                    slotRec.checkOut = timeStr;
+                    slotRec.checkOutIso = outNow.toISOString();
+                    slotRec.geoOutDist = `${verifiedDistMeters}m`;
+                    slotRec.status = 'Present';
+
+                    if (slotRec.checkInIso) {
+                        const diffMs = Math.max(0, outNow.getTime() - new Date(slotRec.checkInIso).getTime());
+                        const hrs = Math.floor(diffMs / 3600000);
+                        const mins = Math.floor((diffMs % 3600000) / 60000);
+                        slotRec.duration = `${hrs}h ${mins}m`;
+                    } else {
+                        const inM = parseTime12ToMinutes(slotRec.checkIn);
+                        const outM = parseTime12ToMinutes(timeStr);
+                        slotRec.duration = formatDurationFromMinutes(inM, outM);
+                    }
+                    rec.slots[activeSlot] = slotRec;
+                    rec.checkOut = timeStr;
+                    rec.checkOutIso = outNow.toISOString();
+                    rec.duration = Object.values(rec.slots).map(s => `${s.slot}: ${s.duration || 'Incomplete'}`).join(', ');
+
+                    // Check if all assigned shifts for this staff member have both checkIn and checkOut completed
+                    const allAssignedDone = assignedShifts.every(sName => {
+                        const sr = rec.slots[sName];
+                        return sr && ((sr.checkIn && sr.checkOut && sr.checkIn !== 'Leave') || sr.status === 'Leave');
+                    });
+                    rec.status = allAssignedDone ? 'Present' : 'Incomplete';
+
+                    const pinKey = `PIN_${String(st.pin || '').trim()}`;
+                    if (!saDb[st.id]) saDb[st.id] = {};
+                    saDb[st.id][outKey] = rec;
+                    if (st.pin) {
+                        if (!saDb[pinKey]) saDb[pinKey] = {};
+                        saDb[pinKey][outKey] = rec;
+                    }
+                    storage.set('revive_staff_attendance_db', saDb);
+                    cloudSync.push('pushStaffAttendance', rec);
+                    cloudSync.push('pushAttendance', {
+                        dateKey: outKey,
+                        userId: `__STAFF_ATT__:${st.pin}:${st.id}`,
+                        fullName: st.name,
+                        timestamp: JSON.stringify({ checkIn: rec.checkIn, checkInIso: rec.checkInIso, checkOut: rec.checkOut, checkOutIso: rec.checkOutIso, duration: rec.duration, slots: rec.slots }),
+                        month: outNow.toLocaleString('default', { month: 'long' })
+                    });
+                    syncHrBackupToSettings();
+
+                    showNotice(`✔ Checked out of ${activeSlot} Shift at ${timeStr} (${slotRec.duration}, Geo: ${verifiedDistMeters}m)!`, "success");
+                    window.moduleContext.refreshDashboardHrState();
+                }, false);
             },
 
-            // Helper: Build day-by-day attendance rows for a staff member in a given year & month (0-indexed monthIdx)
+            // Build day-by-day attendance rows:
+            // STRICT RULE: Staff must complete BOTH Check-In AND Check-Out for ALL assigned shift slots (e.g., both Morning and Evening if assigned both) to count the day as Present; otherwise the day is marked Absent!
             buildStaffMonthAttendanceRows: function(staffObj, year, monthIdx) {
-                const jDateIso = normalizeStaffJoiningIso(staffObj.joiningDate);
+                const stNorm = ensureStaffObject(staffObj);
+                const assignedShifts = (Array.isArray(stNorm.shifts) && stNorm.shifts.length > 0) ? stNorm.shifts : ['Morning', 'Evening'];
+                const jDateIso = normalizeStaffJoiningIso(stNorm.joiningDate);
+                const lwdIso = stNorm.lastWorkingDay ? normalizeStaffJoiningIso(stNorm.lastWorkingDay) : '';
                 const jp = jDateIso.split('-');
                 const jYear = parseInt(jp[0], 10);
                 const jMonth = parseInt(jp[1], 10) - 1;
@@ -3724,25 +4854,25 @@
                 const targetScore = year * 100 + monthIdx;
 
                 if (targetScore < jScore || targetScore > currScore) {
-                    return { rows: [], present: 0, absent: 0, holidays: 0, workingDays: 0 };
+                    return { rows: [], present: 0, leave: 0, absent: 0, holidays: 0, workingDays: 0 };
                 }
 
                 const saDb = storage.get('revive_staff_attendance_db', {});
-                const staffRecs = saDb[staffObj.id] || {};
+                const staffRecs = saDb[stNorm.id] || {};
                 const daysInMonth = new Date(year, monthIdx + 1, 0).getDate();
 
-                let present = 0, absent = 0, holidays = 0, workingDays = 0;
+                let present = 0, leave = 0, absent = 0, holidays = 0, workingDays = 0;
                 const rows = [];
 
                 for (let d = 1; d <= daysInMonth; d++) {
                     const dateIso = `${year}-${String(monthIdx + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-                    // Strictly from Joining Date up to Today
                     if (dateIso < jDateIso || dateIso > todayIso) continue;
+                    if (lwdIso && dateIso > lwdIso) continue;
 
                     const dObj = new Date(year, monthIdx, d);
                     const dayName = dObj.toLocaleDateString('en-IN', { weekday: 'short' });
                     const holInfo = getDayHolidayInfo(dateIso);
-                    const punch = window.moduleContext.getStaffPunchRecordForDate(staffObj, dateIso) || staffRecs[dateIso];
+                    const punch = window.moduleContext.getStaffPunchRecordForDate(stNorm, dateIso) || staffRecs[dateIso];
 
                     if (holInfo.isHoliday) {
                         holidays++;
@@ -3750,54 +4880,118 @@
                             dateIso,
                             dateFormatted: formatDateStr(dateIso),
                             dayName,
-                            staffId: staffObj.id,
-                            staffName: staffObj.name,
+                            staffId: stNorm.id,
+                            staffName: stNorm.name,
                             status: 'Holiday',
                             statusDetail: `${holInfo.name} (${holInfo.type})`,
                             checkIn: punch ? punch.checkIn : '-',
                             checkOut: punch ? punch.checkOut : '-',
-                            duration: holInfo.desc || 'Non-Working Day'
+                            duration: holInfo.desc || 'Non-Working Day',
+                            incompleteSlots: []
                         });
                     } else {
                         workingDays++;
-                        if (punch && punch.checkIn) {
+                        const slotsObj = (punch && punch.slots && typeof punch.slots === 'object') ? { ...punch.slots } : {};
+                        if (punch && punch.checkIn && Object.keys(slotsObj).length === 0 && assignedShifts.length === 1) {
+                            slotsObj[assignedShifts[0]] = {
+                                slot: assignedShifts[0],
+                                checkIn: punch.checkIn,
+                                checkOut: punch.checkOut || '',
+                                duration: punch.duration || '',
+                                status: punch.status || ''
+                            };
+                        }
+
+                        // Evaluate each assigned shift slot strictly
+                        let completedWorkSlots = 0;
+                        let approvedLeaveSlots = 0;
+                        const incompleteSlots = [];
+
+                        assignedShifts.forEach(sName => {
+                            const sr = slotsObj[sName];
+                            if (sr && sr.status === 'Leave') {
+                                approvedLeaveSlots++;
+                            } else if (sr && sr.checkIn && sr.checkIn !== 'Leave' && sr.checkOut && sr.checkOut !== 'Leave') {
+                                completedWorkSlots++;
+                            } else {
+                                incompleteSlots.push(sName);
+                            }
+                        });
+
+                        const inSummary = assignedShifts.map(sName => {
+                            const sr = slotsObj[sName];
+                            return `${sName}: ${sr && sr.checkIn ? sr.checkIn : 'Not In'}`;
+                        }).join(' | ');
+                        const outSummary = assignedShifts.map(sName => {
+                            const sr = slotsObj[sName];
+                            return `${sName}: ${sr && sr.checkOut ? sr.checkOut : (sr && sr.checkIn ? 'Not Checked Out' : 'Not Out')}`;
+                        }).join(' | ');
+                        const durSummary = assignedShifts.map(sName => {
+                            const sr = slotsObj[sName];
+                            return `${sName}: ${sr && sr.duration ? sr.duration : 'Incomplete'}`;
+                        }).join(' | ');
+
+                        // 1. All assigned slots are Admin-approved Leave
+                        if (incompleteSlots.length === 0 && approvedLeaveSlots === assignedShifts.length) {
+                            leave++;
+                            rows.push({
+                                dateIso,
+                                dateFormatted: formatDateStr(dateIso),
+                                dayName,
+                                staffId: stNorm.id,
+                                staffName: stNorm.name,
+                                status: 'Leave',
+                                statusDetail: `Approved Leave (${assignedShifts.join(', ')})`,
+                                checkIn: 'Leave',
+                                checkOut: 'Leave',
+                                duration: 'Approved Leave',
+                                incompleteSlots: []
+                            });
+                        }
+                        // 2. All assigned slots are accounted for (every assigned shift has BOTH Check-In AND Check-Out completed)
+                        else if (incompleteSlots.length === 0 && completedWorkSlots > 0) {
                             present++;
                             rows.push({
                                 dateIso,
                                 dateFormatted: formatDateStr(dateIso),
                                 dayName,
-                                staffId: staffObj.id,
-                                staffName: staffObj.name,
+                                staffId: stNorm.id,
+                                staffName: stNorm.name,
                                 status: 'Present',
-                                statusDetail: 'Present',
-                                checkIn: punch.checkIn,
-                                checkOut: punch.checkOut || 'On Shift',
-                                duration: punch.duration || (punch.checkOut ? 'Completed' : 'Active')
+                                statusDetail: 'Present (All Shifts Completed)',
+                                checkIn: inSummary,
+                                checkOut: outSummary,
+                                duration: durSummary,
+                                incompleteSlots: []
                             });
-                        } else {
+                        }
+                        // 3. Otherwise (missing Check-Out or missing any assigned shift slot) -> Marked Absent!
+                        else {
                             absent++;
+                            const anyPunchAtAll = Object.values(slotsObj).some(sr => sr && sr.checkIn);
                             rows.push({
                                 dateIso,
                                 dateFormatted: formatDateStr(dateIso),
                                 dayName,
-                                staffId: staffObj.id,
-                                staffName: staffObj.name,
+                                staffId: stNorm.id,
+                                staffName: stNorm.name,
                                 status: 'Absent',
-                                statusDetail: 'Absent (Not Punched)',
-                                checkIn: '-',
-                                checkOut: '-',
-                                duration: 'No Punch Recorded'
+                                statusDetail: anyPunchAtAll ? `Absent (Incomplete Shift: ${incompleteSlots.join(', ')})` : `Absent (Missing: ${incompleteSlots.join(', ')})`,
+                                checkIn: anyPunchAtAll ? inSummary : '-',
+                                checkOut: anyPunchAtAll ? outSummary : '-',
+                                duration: anyPunchAtAll ? 'Not Counted (Incomplete Shift / No Check-Out)' : 'No Punch Recorded',
+                                incompleteSlots: incompleteSlots
                             });
                         }
                     }
                 }
-                return { rows, present, absent, holidays, workingDays };
+                return { rows, present, leave, absent, holidays, workingDays };
             },
 
             // Staff Self-Service: My Attendance View
             initStaffMyAttendance: function() {
                 if (!appContext.currentStaffObj) return;
-                const st = appContext.currentStaffObj;
+                const st = ensureStaffObject(appContext.currentStaffObj);
                 const jIso = normalizeStaffJoiningIso(st.joiningDate);
                 const jYear = parseInt(jIso.split('-')[0], 10);
                 const nowYear = new Date().getFullYear();
@@ -3817,7 +5011,7 @@
 
             populateStaffMyAttMonths: function() {
                 if (!appContext.currentStaffObj) return;
-                const st = appContext.currentStaffObj;
+                const st = ensureStaffObject(appContext.currentStaffObj);
                 const jIso = normalizeStaffJoiningIso(st.joiningDate);
                 const jYear = parseInt(jIso.split('-')[0], 10);
                 const jMonth = parseInt(jIso.split('-')[1], 10) - 1;
@@ -3843,14 +5037,14 @@
 
             renderStaffMyAttendance: function() {
                 if (!appContext.currentStaffObj) return;
-                const st = appContext.currentStaffObj;
+                const st = ensureStaffObject(appContext.currentStaffObj);
                 const year = parseInt(document.getElementById('staff-my-att-year').value, 10);
                 const monthIdx = parseInt(document.getElementById('staff-my-att-month').value, 10);
                 const data = window.moduleContext.buildStaffMonthAttendanceRows(st, year, monthIdx);
 
                 document.getElementById('my-att-kpi-present').innerText = data.present;
                 document.getElementById('my-att-kpi-absent').innerText = data.absent;
-                document.getElementById('my-att-kpi-holidays').innerText = data.holidays;
+                document.getElementById('my-att-kpi-holidays').innerText = `${data.holidays} Hol / ${data.leave || 0} Lv`;
 
                 const tbody = document.querySelector('#table-staff-my-attendance tbody');
                 tbody.innerHTML = '';
@@ -3863,6 +5057,8 @@
                     let badgeHtml = '';
                     if (r.status === 'Present') {
                         badgeHtml = `<span class="hr-status-pill hr-pill-working">✔ Present</span>`;
+                    } else if (r.status === 'Leave') {
+                        badgeHtml = `<span class="hr-status-pill hr-pill-leave">🏖 ${r.statusDetail}</span>`;
                     } else if (r.status === 'Holiday') {
                         badgeHtml = `<span class="hr-status-pill hr-pill-holiday">🎉 ${r.statusDetail}</span>`;
                     } else {
@@ -3897,17 +5093,21 @@
 
             renderStaffHolidayCalendar: function() {
                 const hols = ensureDefaultHolidays();
+                const weekCfg = getWorkingDaysConfig();
+                const weeklyHolidays = HR_WEEKDAYS_ORDER.filter(d => weekCfg[d] === 'Holiday');
                 const yr = document.getElementById('staff-hol-year-filter').value;
                 const filtered = hols.filter(h => String(h.date).startsWith(String(yr))).sort((a, b) => new Date(a.date) - new Date(b.date));
                 const tbody = document.querySelector('#table-staff-holidays tbody');
                 tbody.innerHTML = '';
 
-                tbody.innerHTML += `<tr style="background:#fff8f3;">
-                    <td><strong>All Sundays (${yr})</strong></td>
-                    <td>Sunday</td>
-                    <td style="color:var(--accent-orange); font-weight:800;">Weekly Off Holiday</td>
-                    <td>Regular weekly non-working day for all staff (Attendance marking inactive)</td>
-                </tr>`;
+                if (weeklyHolidays.length > 0) {
+                    tbody.innerHTML += `<tr style="background:#fff8f3;">
+                        <td><strong>Every ${weeklyHolidays.join(', ')} (${yr})</strong></td>
+                        <td>${weeklyHolidays.join(', ')}</td>
+                        <td style="color:var(--accent-orange); font-weight:800;">Weekly Off Holiday</td>
+                        <td>Configured weekly non-working day(s) for studio staff</td>
+                    </tr>`;
+                }
 
                 filtered.forEach(h => {
                     const p = String(h.date).split('-');
@@ -3922,16 +5122,17 @@
                 });
             },
 
-            // Admin Staff Attendance Monitor & Monthly View Download
+            // 5. Admin Staff Attendance Monitor & Monthly View Download (Inside HR Portal)
             initAdminStaffAttendance: function() {
                 ensureDefaultHolidays();
-                const staffDb = storage.get('revive_staff_db', []);
+                autoCheckoutExpiredSlots();
+                const staffDb = getNormalizedStaffDb();
                 const staffSel = document.getElementById('admin-att-staff-select');
-                staffSel.innerHTML = '<option value="ALL">All Active Staff</option>';
+                staffSel.innerHTML = '<option value="ALL">All Enrolled Staff</option>';
                 staffDb.forEach(st => {
                     const opt = document.createElement('option');
                     opt.value = st.id;
-                    opt.innerText = `${st.name} (Joined: ${formatDateStr(normalizeStaffJoiningIso(st.joiningDate))})`;
+                    opt.innerText = `${st.name} (${st.role || 'Staff'} — Joined: ${formatDateStr(normalizeStaffJoiningIso(st.joiningDate))})`;
                     staffSel.appendChild(opt);
                 });
 
@@ -3961,7 +5162,7 @@
             },
 
             renderAdminStaffAttendance: function() {
-                const staffDb = storage.get('revive_staff_db', []);
+                const staffDb = getNormalizedStaffDb();
                 const selStaffId = document.getElementById('admin-att-staff-select').value;
                 const year = parseInt(document.getElementById('admin-att-year').value, 10);
                 const monthIdx = parseInt(document.getElementById('admin-att-month').value, 10);
@@ -3977,7 +5178,7 @@
                     : staffDb.filter(s => String(s.id) === String(selStaffId));
 
                 if (targetStaffList.length === 0) {
-                    sumTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No active staff configured. Add staff in Staff Access first.</td></tr>';
+                    sumTbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No staff configured. Enrol staff in HR Portal → Staff Enrolment first.</td></tr>';
                     dailyTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No attendance records to display.</td></tr>';
                     window._lastAdminStaffAttReport = null;
                     return;
@@ -3987,15 +5188,19 @@
                 let allDailyRows = [];
 
                 targetStaffList.forEach(st => {
-                    const stNorm = { ...st, joiningDate: normalizeStaffJoiningIso(st.joiningDate) };
+                    const stNorm = ensureStaffObject(st);
                     const res = window.moduleContext.buildStaffMonthAttendanceRows(stNorm, year, monthIdx);
                     const pct = res.workingDays > 0 ? Math.round((res.present / res.workingDays) * 100) : 0;
 
                     summaryList.push({
                         staffName: stNorm.name,
+                        role: stNorm.role || 'Staff',
+                        shifts: (stNorm.shifts || ['Morning', 'Evening']).join(', '),
                         joiningDate: formatDateStr(stNorm.joiningDate),
+                        lastWorkingDay: stNorm.lastWorkingDay ? formatDateStr(stNorm.lastWorkingDay) : 'Active',
                         workingDays: res.workingDays,
                         present: res.present,
+                        leave: res.leave || 0,
                         absent: res.absent,
                         holidays: res.holidays,
                         pct: pct
@@ -4003,10 +5208,11 @@
                     allDailyRows = allDailyRows.concat(res.rows);
 
                     sumTbody.innerHTML += `<tr>
-                        <td><strong>${stNorm.name}</strong></td>
-                        <td>${formatDateStr(stNorm.joiningDate)}</td>
+                        <td><strong>${stNorm.name}</strong><br><span style="font-size:0.74rem; color:var(--text-muted);">${stNorm.role || 'Staff'} • ${(stNorm.shifts || ['Morning','Evening']).join(', ')}</span></td>
+                        <td>${formatDateStr(stNorm.joiningDate)}${stNorm.lastWorkingDay ? `<br><span class="deleted-badge" style="margin:0;">LWD: ${formatDateStr(stNorm.lastWorkingDay)}</span>` : ''}</td>
                         <td><strong>${res.workingDays}</strong></td>
                         <td style="color:var(--success-green); font-weight:800;">${res.present}</td>
+                        <td style="color:#1d4ed8; font-weight:800;">${res.leave || 0}</td>
                         <td style="color:var(--error-red); font-weight:800;">${res.absent}</td>
                         <td style="color:var(--warning-yellow); font-weight:700;">${res.holidays}</td>
                         <td><strong>${pct}%</strong></td>
@@ -4016,11 +5222,12 @@
                 allDailyRows.sort((a, b) => a.dateIso.localeCompare(b.dateIso) || a.staffName.localeCompare(b.staffName));
 
                 if (allDailyRows.length === 0) {
-                    dailyTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No billable attendance dates for this month (check staff Joining Date or selected month).</td></tr>';
+                    dailyTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No billable attendance dates for this month (check staff Joining Date / Last Working Day or selected month).</td></tr>';
                 } else {
                     [...allDailyRows].reverse().forEach(r => {
                         let statusHtml = '';
                         if (r.status === 'Present') statusHtml = `<span class="hr-status-pill hr-pill-working">✔ Present</span>`;
+                        else if (r.status === 'Leave') statusHtml = `<span class="hr-status-pill hr-pill-leave">🏖 ${r.statusDetail}</span>`;
                         else if (r.status === 'Holiday') statusHtml = `<span class="hr-status-pill hr-pill-holiday">🎉 ${r.statusDetail}</span>`;
                         else statusHtml = `<span class="hr-status-pill hr-pill-absent">✖ Absent</span>`;
 
@@ -4059,9 +5266,9 @@
                 lines.push(['REVIVE FITNESS STUDIO - STAFF MONTHLY ATTENDANCE REPORT', `Month: ${rep.monthName} ${rep.year}`].map(esc).join(','));
                 lines.push([]);
                 lines.push(['1. STAFF MONTHLY ATTENDANCE SUMMARY'].map(esc).join(','));
-                lines.push(['Staff Name', 'Joining Date', 'Working Days Elapsed', 'Present Days', 'Absent Days', 'Sundays & Holidays', 'Attendance %'].map(esc).join(','));
+                lines.push(['Staff Name', 'Role', 'Assigned Shifts', 'Joining Date', 'Last Working Day', 'Working Days Elapsed', 'Present Days', 'Leave Days', 'Absent Days', 'Holidays', 'Attendance %'].map(esc).join(','));
                 rep.summaryList.forEach(s => {
-                    lines.push([s.staffName, s.joiningDate, s.workingDays, s.present, s.absent, s.holidays, `${s.pct}%`].map(esc).join(','));
+                    lines.push([s.staffName, s.role, s.shifts, s.joiningDate, s.lastWorkingDay, s.workingDays, s.present, s.leave, s.absent, s.holidays, `${s.pct}%`].map(esc).join(','));
                 });
                 lines.push([]);
 
